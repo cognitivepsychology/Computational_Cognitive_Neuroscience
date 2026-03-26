@@ -60,71 +60,77 @@ blockquote{
     font-size:  90%;    
 }
 
-/* 전체 코드 블록 */
-.hljs {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-weight: 800;              /* 굵기 최상 */
-  font-size: 1.12em;             /* 시각적 크기 보정 */
-  line-height: 1.6;              /* 행간 넉넉하게 */
-  letter-spacing: -0.012em;      /* 자간 살짝 줄여서 구조적 느낌 강화 */
-  color: #0f0f0f;                /* 너무 검지 않은 진한 회색 → 번짐 방지 */
-  font-feature-settings: "liga" 1, "calt" 1; /* ligature 활성화 → <- → ← */
+/* =========================================
+   Quarto 전용 파이썬 코드 블록 스타일링 
+========================================= */
+
+/* 전체 코드 블록 & 줄바꿈 설정 */
+.sourceCode, pre.sourceCode, .sourceCode code {
+  font-family: 'JetBrains Mono', '나눔고딕', monospace !important;
+  font-weight: 800;
+  font-size: 0.95em !important; /* 1.12em에서 0.95em으로 줄여 본문과 조화롭게 수정 */
+  line-height: 1.6;
+  letter-spacing: -0.012em;
+  color: #0f0f0f;
+  font-feature-settings: "liga" 1, "calt" 1;
+  white-space: pre-wrap !important; 
+  word-break: break-all !important;
 }
 
-/* 키워드 (if, for, function 등) */
-.hljs-keyword {
+/* 파이썬 출력 결과물(Output) 자동 줄바꿈 및 폰트 크기/스타일 조정 */
+.cell-output pre, .cell-output code {
+  font-family: 'JetBrains Mono', '나눔고딕', monospace !important; /* 입력 코드와 동일한 폰트 적용 */
+  font-size: 0.95em !important; /* 너무 작았던 기본 크기를 0.95em으로 키움 */
+  white-space: pre-wrap !important; 
+  word-break: break-all !important;
+  color: #333333 !important; /* 출력 결과물이 잘 보이도록 진한 회색으로 고정 */
+}
+
+/* 키워드 (import, if, for 등) */
+.sourceCode .kw, .sourceCode .cf, .sourceCode .im, .sourceCode .op {
   color: #0d47a1;               /* 짙은 파랑 */
-  font-weight: 700;             /* 기본보다 조금 더 강조 */
-  font-family: 'JetBrains Mono', monospace !important; 
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace !important;
 }
 
-/* 함수 이름 */
-.hljs-title,
-.hljs-function {
+/* 함수 이름 (print, np.array 등) */
+.sourceCode .fu, .sourceCode .ex, .sourceCode .bu {
   color: #e64a19;               /* 진한 주황 */
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace !important;
 }
 
-/* 문자열 */
-.hljs-string {
+/* 문자열 ("텍스트" 형태) */
+.sourceCode .st {
   color: #7b1fa2;               /* 선명한 보라 */
   font-weight: 700;
   font-family: 'JetBrains Mono', '나눔고딕', monospace !important;
 }
 
-/* 숫자 */
-.hljs-number {
+/* 숫자 (0.5, 100 등) */
+.sourceCode .dv, .sourceCode .fl {
   color: #6a1b9a;               /* 보라 계열 */
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace !important;
 }
 
-/* 주석 */
-.hljs-comment {
+/* 주석 (# 뒤에 오는 텍스트) */
+.sourceCode .co {
   color: #2e7d32;               /* 진한 녹색 */
   font-style: normal; 
   font-size: 1.03em;  
   font-weight: 800; 
-  font-family: '나눔고딕';
-  
+  font-family: '나눔고딕' !important; /* 한글 주석을 위해 나눔고딕 강제 적용 */
 }
 
-/* 부드러운 톤 권장: 붙여넣기용 (맨 아래에 추가) */
-html body code:not([class*="language-"]):not(.hljs):not(.sourceCode),
-html body .rmd-content code:not([class*="language-"]):not(.hljs):not(.sourceCode),
-html body article code:not([class*="language-"]):not(.hljs):not(.sourceCode) {
-  font-family: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  color: #1f3a93 !important;            /* 진하지만 부드러운 네이비 */
-  background-color: #f5f7ff !important; /* 아주 연한 블루 계열 배경 */
-  font-weight: 600 !important;          /* 너무 두껍지 않게 */
-  padding: 0.06em 0.28em !important;    /* 약간 줄임 */
-  border-radius: 5px !important;
-  border: 1px solid #c7d2f0 !important; /* 얇은 테두리로 구분 */
-  display: inline-block !important;
-  vertical-align: baseline !important;
-  white-space: nowrap !important;
+/* 부드러운 톤 권장: 일반 텍스트 사이의 인라인 코드(백틱 1개) 처리용 */
+html body code:not([class*="language-"]):not(.sourceCode) {
+  font-family: 'JetBrains Mono', '나눔고딕', monospace !important;
+  font-size: 0.9em !important;
+  color: #1f3a93 !important;            
+  background-color: #f5f7ff !important;
+  font-weight: 700 !important;
+  padding: 0.1em 0.3em !important;    
+  border-radius: 4px !important;
+  border: 1px solid #c7d2f0 !important; 
 }
-
