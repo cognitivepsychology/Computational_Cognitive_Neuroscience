@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>인지신경과학 4주차_인공 뉴런의 구현: 활성화 함수, perceptron 구조, XOR 문제</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="week4_2026_files/libs/clipboard/clipboard.min.js"></script>
+<script src="week4_2026_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="week4_2026_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="week4_2026_files/libs/quarto-html/popper.min.js"></script>
+<script src="week4_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="week4_2026_files/libs/quarto-html/anchor.min.js"></script>
+<link href="week4_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="week4_2026_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="week4_2026_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="week4_2026_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="week4_2026_files/libs/bootstrap/bootstrap-98fa28be62b8f7881547832ee57e92b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#부-인공-뉴런의-기초와-선형-대수학" id="toc-부-인공-뉴런의-기초와-선형-대수학" class="nav-link active" data-scroll-target="#부-인공-뉴런의-기초와-선형-대수학">1부: 인공 뉴런의 기초와 선형 대수학</a>
+  <ul>
+  <li><a href="#인지-모델링과-python-환경" id="toc-인지-모델링과-python-환경" class="nav-link" data-scroll-target="#인지-모델링과-python-환경">1.1. 인지 모델링과 Python 환경</a></li>
+  <li><a href="#생물학적-뉴런과-인공-뉴런의-매핑mapping" id="toc-생물학적-뉴런과-인공-뉴런의-매핑mapping" class="nav-link" data-scroll-target="#생물학적-뉴런과-인공-뉴런의-매핑mapping">1.2. 생물학적 뉴런과 인공 뉴런의 매핑(Mapping)</a></li>
+  <li><a href="#신경망-구현을-위한-numpy-패키지와-행렬-내적" id="toc-신경망-구현을-위한-numpy-패키지와-행렬-내적" class="nav-link" data-scroll-target="#신경망-구현을-위한-numpy-패키지와-행렬-내적">1.3. 신경망 구현을 위한 Numpy 패키지와 행렬 내적</a>
+  <ul>
+  <li><a href="#실습-1-1-단일-뉴런의-선형-결합" id="toc-실습-1-1-단일-뉴런의-선형-결합" class="nav-link" data-scroll-target="#실습-1-1-단일-뉴런의-선형-결합">[실습 1-1] 단일 뉴런의 선형 결합</a></li>
+  <li><a href="#실습-1-2-다수-뉴런의-동시-연산행렬-곱" id="toc-실습-1-2-다수-뉴런의-동시-연산행렬-곱" class="nav-link" data-scroll-target="#실습-1-2-다수-뉴런의-동시-연산행렬-곱">[실습 1-2] 다수 뉴런의 동시 연산(행렬 곱)</a></li>
+  </ul></li>
+  <li><a href="#활성화-함수activation-function의-이해" id="toc-활성화-함수activation-function의-이해" class="nav-link" data-scroll-target="#활성화-함수activation-function의-이해">1.4. 활성화 함수(activation function)의 이해</a>
+  <ul>
+  <li><a href="#실습-1-3-활성화-함수-시각화-코딩" id="toc-실습-1-3-활성화-함수-시각화-코딩" class="nav-link" data-scroll-target="#실습-1-3-활성화-함수-시각화-코딩">[실습 1-3] 활성화 함수 시각화 코딩</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#부-논리-게이트-구현과-xor의-딜레마1시간-15분" id="toc-부-논리-게이트-구현과-xor의-딜레마1시간-15분" class="nav-link" data-scroll-target="#부-논리-게이트-구현과-xor의-딜레마1시간-15분">2부: 논리 게이트 구현과 XOR의 딜레마(1시간 15분)</a>
+  <ul>
+  <li><a href="#단층-퍼셉트론single-layer-perceptron" id="toc-단층-퍼셉트론single-layer-perceptron" class="nav-link" data-scroll-target="#단층-퍼셉트론single-layer-perceptron">2.1. 단층 퍼셉트론(single-layer Perceptron)</a></li>
+  <li><a href="#퍼셉트론을-이용한-기본-논리-연산and-or" id="toc-퍼셉트론을-이용한-기본-논리-연산and-or" class="nav-link" data-scroll-target="#퍼셉트론을-이용한-기본-논리-연산and-or">2.2. 퍼셉트론을 이용한 기본 논리 연산(AND / OR)</a>
+  <ul>
+  <li><a href="#실습-2-1-2-2-and-or-게이트-코딩" id="toc-실습-2-1-2-2-and-or-게이트-코딩" class="nav-link" data-scroll-target="#실습-2-1-2-2-and-or-게이트-코딩">[실습 2-1, 2-2] AND / OR 게이트 코딩</a></li>
+  </ul></li>
+  <li><a href="#모든-연산의-기초-nand-게이트" id="toc-모든-연산의-기초-nand-게이트" class="nav-link" data-scroll-target="#모든-연산의-기초-nand-게이트">2.3. 모든 연산의 기초: NAND 게이트</a>
+  <ul>
+  <li><a href="#실습-2-3-nand-게이트-코딩" id="toc-실습-2-3-nand-게이트-코딩" class="nav-link" data-scroll-target="#실습-2-3-nand-게이트-코딩">[실습 2-3] NAND 게이트 코딩</a></li>
+  </ul></li>
+  <li><a href="#선형-분리-불가능성-xor-문제의-비극" id="toc-선형-분리-불가능성-xor-문제의-비극" class="nav-link" data-scroll-target="#선형-분리-불가능성-xor-문제의-비극">2.4. 선형 분리 불가능성: XOR 문제의 비극</a>
+  <ul>
+  <li><a href="#실습-2-4-단층-퍼셉트론의-xor-실패-증명" id="toc-실습-2-4-단층-퍼셉트론의-xor-실패-증명" class="nav-link" data-scroll-target="#실습-2-4-단층-퍼셉트론의-xor-실패-증명">[실습 2-4] 단층 퍼셉트론의 XOR 실패 증명</a></li>
+  </ul></li>
+  <li><a href="#다층-퍼셉트론mlp을-통한-xor-딜레마-돌파" id="toc-다층-퍼셉트론mlp을-통한-xor-딜레마-돌파" class="nav-link" data-scroll-target="#다층-퍼셉트론mlp을-통한-xor-딜레마-돌파">2.5. 다층 퍼셉트론(MLP)을 통한 XOR 딜레마 돌파</a>
+  <ul>
+  <li><a href="#실습-2-5-은닉층을-활용한-xor-해결-코딩" id="toc-실습-2-5-은닉층을-활용한-xor-해결-코딩" class="nav-link" data-scroll-target="#실습-2-5-은닉층을-활용한-xor-해결-코딩">[실습 2-5] 은닉층을 활용한 XOR 해결 코딩</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">인지신경과학 4주차_인공 뉴런의 구현: 활성화 함수, perceptron 구조, XOR 문제</h1>
+<p class="subtitle lead">고려대학교 일반대학원 심리학과</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026년 3월 27일 금요일 4-5교시</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="부-인공-뉴런의-기초와-선형-대수학" class="level2">
+<h2 class="anchored" data-anchor-id="부-인공-뉴런의-기초와-선형-대수학">1부: 인공 뉴런의 기초와 선형 대수학</h2>
+<section id="인지-모델링과-python-환경" class="level3">
+<h3 class="anchored" data-anchor-id="인지-모델링과-python-환경">1.1. 인지 모델링과 Python 환경</h3>
+<ul>
+<li><strong>1. 이론적 설명:</strong> 이번 주부터는 뇌의 인지과정을 수학적 공장으로 바꾼 ’인공 신경망’을 파이썬 코드로 직접 밑바닥부터 짜보는 실습을 병행함.</li>
+<li><strong>2. 심화 해설:</strong> 현대의 거대한 인지 모델(수백억 개의 파라미터를 가진 신경망)을 인간의 손으로 일일이 계산하는 것은 불가능함. 파이썬은 내부적으로 C언어 기반의 초고속 행렬 연산 엔진(Numpy 등)을 품고 있어, 수백만 개의 뇌세포 덩어리를 동시에 연산하는 ’병렬 분산 처리(PDP)’를 컴퓨터 상에서 완벽히 구현해 냄.</li>
+<li><strong>3. 비유:</strong> 인지심리학 이론이 “건물을 이렇게 지어야 한다”는 거대한 ’건축 설계도’라면, 파이썬과 코딩 지식은 흙을 퍼 나르는 ’포크레인’임. 포크레인 조종법을 모르면, 아무리 훌륭한 뇌 설계도를 그려놓아도 영원히 종이 위에만 머물게 됨.</li>
+</ul>
+</section>
+<section id="생물학적-뉴런과-인공-뉴런의-매핑mapping" class="level3">
+<h3 class="anchored" data-anchor-id="생물학적-뉴런과-인공-뉴런의-매핑mapping">1.2. 생물학적 뉴런과 인공 뉴런의 매핑(Mapping)</h3>
+<ul>
+<li><strong>1. 이론적 설명(수학적 1:1 대응):</strong> 인간의 뇌는 860억 개의 뉴런이 연결된 네트워크임. 컴퓨터 모델로 흉내 내기 위해 뉴런의 4대 요소를 수학 공식으로 변환함.
+<ul>
+<li><strong>수상돌기(Dendrite) <span class="math inline">\(\rightarrow\)</span> 입력값(<span class="math inline">\(X\)</span>):</strong> 주변 뉴런들로부터 신호를 받아들이는 나뭇가지 형태의 안테나. 컴퓨터에서는 외부로부터 들어오는 ’자극의 크기(숫자 데이터)’로 치환함.</li>
+<li><strong>시냅스(Synapse) <span class="math inline">\(\rightarrow\)</span> 가중치(<span class="math inline">\(W\)</span>):</strong> 신호가 지나가는 틈새 통로. 통과할 때의 저항이나 전달 강도를 의미함. 컴퓨터에서는 입력 신호에 곱해지는 중요도 점수(가중치)로 치환함.</li>
+<li><strong>세포체(Soma) <span class="math inline">\(\rightarrow\)</span> 선형 결합(<span class="math inline">\(\sum\)</span>):</strong> 여러 안테나로 들어온 미세한 전기 신호들을 중심부에 모두 모아 합치는 기관. 컴퓨터에서는 모든 입력값과 가중치를 곱하고 몽땅 더하는 ’덧셈 연산(합산)’으로 치환함.</li>
+<li><strong>축삭돌기(Axon) <span class="math inline">\(\rightarrow\)</span> 활성화 함수(<span class="math inline">\(f\)</span>):</strong> 모인 신호 총합이 특정 폭발선(임계치)을 넘으면, 다음 뉴런으로 신호를 거세게 발사(Fire)하는 출력 케이블. 컴퓨터에서는 최종 합산 값이 일정 수치를 넘었을 때만 1을 내보내는 ’결정 필터(함수)’로 치환함.</li>
+</ul></li>
+<li><strong>2. 심화 해설(복잡성의 추상화):</strong> 실제 뇌세포 안에서는 나트륨과 칼륨 이온이 이동하는 등 극도로 복잡한 화학 반응이 일어남. 인공 신경망은 이런 화학적 잡음을 모두 쳐내고, 오직 “신호를 증폭/축소해서 더한다”는 수학적 본질만을 남긴 아름다운 ’추상화(abstraction) 모델’임.</li>
+<li><strong>3. 비유(댐과 수로 시스템):</strong> * 비가 내려 산의 여러 갈래 계곡(수상돌기)에서 물이 모여듦. 각 계곡에서 흘러드는 ’물의 양’이 <strong>입력값(X)</strong>임.
+<ul>
+<li>물이 내려오는 중간에 설치된 ’파이프의 굵기(시냅스)’가 <strong>가중치(W)</strong>임. 굵은 파이프에서는 물이 콸콸 쏟아지고, 좁은 파이프에서는 쫄쫄 흐름.</li>
+<li>여러 파이프를 통과한 물들이 하나의 거대한 댐(세포체)에 모여 합쳐지는 과정이 바로 <strong>선형 결합(<span class="math inline">\(\sum\)</span>)</strong>임.</li>
+<li>댐에 모인 물의 수위가 ’안전 한계선(임계치)’을 넘치는 순간, 비상 수문(축삭돌기)이 확 열리면서 다음 하류로 물을 거세게 쏟아냄(fire). 댐의 수문을 열지 말지 결정하는 이 스위치가 바로 <strong>활성화 함수(<span class="math inline">\(f\)</span>)</strong>임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 1] 생물학적 뉴런과 인공 뉴런의 구조적 매핑</strong> <img src="images/week4/Biological_Neuron_Mapping.png" class="img-fluid"></p>
+</section>
+<section id="신경망-구현을-위한-numpy-패키지와-행렬-내적" class="level3">
+<h3 class="anchored" data-anchor-id="신경망-구현을-위한-numpy-패키지와-행렬-내적">1.3. 신경망 구현을 위한 Numpy 패키지와 행렬 내적</h3>
+<ul>
+<li><strong>1. 이론적 설명(Numpy 라이브러리):</strong> 100만 개의 뉴런 연산을 파이썬의 기본 반복문(<code>for</code>)으로 하나하나 계산하면, 컴퓨터는 극심한 병목 현상에 빠짐. <code>numpy</code> 라이브러리는 수백만 개의 데이터를 행렬(matrix)이라는 덩어리로 묶어서, 단 한 줄의 코드로 동시에 계산해 치우는 신경망 구현 최적화 패키지임.</li>
+<li><strong>2. 심화 해설(행렬 내적, dot product):</strong> 수학적 전문 지식이 없어도 두려워할 필요 없음. 행렬 내적 연산이란 복잡한 미적분이 아니라, “두 데이터의 순서에 맞춰 짝꿍끼리 곱한 뒤, 그 결과들을 모두 몽땅 더하는” 단순 산술의 묶음일 뿐임.</li>
+<li><strong>3. 비유(마트 영수증 총액 계산):</strong> * 내 장바구니에 담긴 물건 배열: <code>[사과 2개, 바나나 3개]</code>
+<ul>
+<li>마트의 각 물건 가격표 배열: <code>[1000원, 500원]</code></li>
+<li><strong>내적 연산:</strong> <code>(2개 * 1000원) +(3개 * 500원)</code> = <code>2000 + 1500</code> = <strong>최종 영수증 금액 3500원</strong></li>
+<li>이렇게 두 개의 배열을 통째로 집어넣어, 뉴런 세포체에 꽂힌 뇌의 총 자극량(영수증 총액 3500)을 한 방에 뽑아내는 마법의 주문이 바로 Numpy의 <code>np.dot()</code> 함수임.</li>
+</ul></li>
+</ul>
+<section id="실습-1-1-단일-뉴런의-선형-결합" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-1-단일-뉴런의-선형-결합">[실습 1-1] 단일 뉴런의 선형 결합</h4>
+<ul>
+<li>파이썬의 <code>f-string</code> 용법: 출력문 텍스트 앞에 <code>f</code>를 붙이고 중괄호 <code>{}</code> 안에 변수 이름을 넣으면, 긴 코드를 작성할 필요 없이 문장 중간에 변수의 계산 결과를 직관적으로 쏙 끼워 넣어 출력해주는 매우 편리한 문법임.</li>
+</ul>
+<div id="0d54ba33" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 선형대수 행렬 고속 연산을 위한 numpy 라이브러리를 np라는 짧은 약칭으로 불러옴.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 입력값(X), 가중치(W), 편향(B) 세팅하기</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.8</span>]) <span class="co"># 눈을 통해 들어온 외부 자극(입력값) 2개를 0.5와 0.8의 크기로 담은 numpy 배열을 생성하여 변수 x에 할당함.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> np.array([<span class="fl">0.4</span>, <span class="fl">0.6</span>]) <span class="co"># 각 자극이 통과할 시냅스 파이프의 굵기(가중치)를 0.4와 0.6으로 설정한 배열을 생성하여 변수 w에 할당함.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>                 <span class="co"># 세포체의 흥분 난이도를 결정하는 고유의 편향값(임계치의 반대 개념)을 -0.2로 세팅하여 변수 b에 할당함.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 뉴런 세포체의 총 합산 과정(선형 결합)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># np.dot(x, w) 함수가 바로 영수증 계산기임. 대응하는 원소끼리 곱한 뒤 더함:(0.5 * 0.4) +(0.8 * 0.6) = 0.68</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>weighted_sum <span class="op">=</span> np.dot(x, w) <span class="co"># 내적 연산 함수 np.dot을 이용해 x와 w를 계산하고 그 결과를 weighted_sum 변수에 저장함.</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 방금 계산된 내적 총합(0.68)에 편향(b: -0.2)을 마저 더해줌.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 최종적으로 이 뉴런 세포체(댐)에 모인 순수 전기 신호량은 0.48이 됨.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>net_input <span class="op">=</span> weighted_sum <span class="op">+</span> b <span class="co"># 내적 결과(weighted_sum)에 편향(b)을 더하여 세포체의 최종 신호 수위(net_input)를 계산함.</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># f-string을 활용하여, 최종 신호량 변수인 net_input을 소수점 둘째 자리(.2f)까지만 깔끔하게 자른 뒤 문자열에 끼워 출력함.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"[단일 뉴런] 세포체 댐에 누적된 최종 신호 수위: </span><span class="sc">{</span>net_input<span class="sc">:.2f}</span><span class="ss">"</span>) <span class="co"># f-string 포맷팅을 통해 계산된 net_input 값을 화면에 출력함.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[단일 뉴런] 세포체 댐에 누적된 최종 신호 수위: 0.48</code></pre>
+</div>
+</div>
+</section>
+<section id="실습-1-2-다수-뉴런의-동시-연산행렬-곱" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-2-다수-뉴런의-동시-연산행렬-곱">[실습 1-2] 다수 뉴런의 동시 연산(행렬 곱)</h4>
+<ul>
+<li>“3개의 뉴런으로 구성된 은닉층이 2개의 자극을 동시에 받아들인다”는 것은, 1명의 고객이 마트 3곳을 돌아다니며 영수증을 3장 발급받는 상황과 같음.</li>
+<li>1개의 행렬 곱셈 수행 코드로 도출된 <code>(1x3)</code> 배열 결과물은, 활성화 함수 스위치를 누르기 직전 각각의 뉴런 세포체에 꽉꽉 차오른 ‘최종 물의 수위(신호량)’ 3개를 의미함. 반복문 하나 없이 단 한 번의 연산으로 3개 뉴런의 상태를 동시 도출해 냄.</li>
+</ul>
+<p><strong>[그림 2] 다수 뉴런의 동시 연산(병렬 처리)</strong> <img src="images/week4/Matrix_Dot_Product.png" class="img-fluid"></p>
+<div id="f55308fb" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># X 행렬: 1명의 사용자(1개의 행)가 2개의 자극 정보(2개의 열)를 네트워크에 던짐. 크기 =(1x2)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>X_matrix <span class="op">=</span> np.array([[<span class="fl">0.5</span>, <span class="fl">0.8</span>]]) <span class="co"># [[]] 괄호를 두 번 겹쳐 써서 2차원 형태(1x2)의 행렬로 입력값을 생성해 X_matrix에 저장함.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># W 행렬: 2개의 자극(2개의 행)이 각각 3개의 뉴런(3개의 열)으로 흩어질 때 곱해질 가중치 지도임. 크기 =(2x3)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>W_matrix <span class="op">=</span> np.array([[<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.5</span>],  <span class="co"># 첫 번째 입력 자극(0.5)이 3개의 뉴런으로 전달될 때 각각 곱해질 가중치들임.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                     [<span class="fl">0.2</span>, <span class="fl">0.4</span>, <span class="fl">0.6</span>]]) <span class="co"># 두 번째 입력 자극(0.8)이 3개의 뉴런으로 전달될 때 각각 곱해질 가중치들임.</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># B 행렬: 3개의 뉴런 각각이 갖고 있는 깐깐함의 기준(편향) 3개 모음. 크기 =(1x3)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>B_matrix <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">0.1</span>, <span class="op">-</span><span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.3</span>]) <span class="co"># 3개의 뉴런에 각각 더해질 3개의 편향값을 1차원 배열로 생성하여 B_matrix에 할당함.</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#(1x2) 크기의 입력 행렬과(2x3) 크기의 가중치 행렬을 내적 연산하면, </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 수학의 규칙에 따라 결과적으로(1x3) 크기의 출력 행렬이 완성됨. 여기에 편향 3개를 각각 더해줌.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>net_input_matrix <span class="op">=</span> np.dot(X_matrix, W_matrix) <span class="op">+</span> B_matrix <span class="co"># 행렬 곱셈 연산 후 편향 행렬을 브로드캐스팅으로 더해 다중 뉴런 상태를 구함.</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"[다중 뉴런] 반복문 없이 3개 뉴런의 상태(수위)를 한 번에 계산한 결과:</span><span class="ch">\n</span><span class="sc">{</span>net_input_matrix<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 최종적으로 계산된 3개 뉴런의 신호량 행렬을 줄바꿈(\n)과 함께 출력함.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[다중 뉴런] 반복문 없이 3개 뉴런의 상태(수위)를 한 번에 계산한 결과:
+[[0.11 0.27 0.43]]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="활성화-함수activation-function의-이해" class="level3">
+<h3 class="anchored" data-anchor-id="활성화-함수activation-function의-이해">1.4. 활성화 함수(activation function)의 이해</h3>
+<ul>
+<li><strong>1. 이론적 설명(선형 결합된 신호란?):</strong> 앞서 구한 세포체의 신호(0.48 등)는 단순히 곱하기와 더하기만으로 만들어진 1차 방정식(<span class="math inline">\(y = ax + b\)</span>) 형태의 수학적 수치일 뿐임. 이를 ’선형(linear) 결합된 신호’라고 부름.</li>
+<li><strong>2. 심화 해설(기울기 소실과 비선형성의 부여):</strong>
+<ul>
+<li>세상의 인지 현상은 직선 1개로 딱 떨어지지 않음. 아무리 층을 깊게 수백 겹 쌓아도 덧셈과 곱셈(선형)만 반복하면, 수학의 성질상 결국 거대한 1개의 선형 방정식으로 압축되어 버림. 깊은 층이 제 역할을 하려면 중간중간 1차 방정식의 빳빳한 직선을 확 꺾어버리는 ’수학적 필터’를 끼워 넣어야 함. 이것이 <strong>비선형성(non-linearity)</strong>을 부여하는 과정임.</li>
+<li><strong>[기울기 소실 현상이란?]:</strong> 과거에 쓰이던 시그모이드 함수는 부드러운 S자 곡선을 지니지만, 층이 100개씩 깊어지는 딥러닝에서 역전파(backpropagation) 학습을 수행할 때 치명적인 버그가 발생함. 1보다 한참 작은 0.25 같은 기울기(미분값)를 수백 번 뒤로 곱해나가다 보면, 기울기가 0에 수렴(<span class="math inline">\(0.25^{100} \approx 0\)</span>)하여 앞쪽 뇌세포들이 아예 학습 신호를 받지 못하고 뇌사 상태에 빠지는 현상을 ’기울기 소실(vanishing gradient)’이라고 부름. 이 끔찍한 현상을 해결하기 위해 등장한 것이 바로 렐루(ReLU) 함수임.</li>
+</ul></li>
+<li><strong>3. 비유(3대 활성화 함수의 특징 비교):</strong>
+<ul>
+<li><strong>계단 함수(Step):</strong> 임계치를 넘으면 확 켜지고(1), 못 넘으면 확 꺼지는(0) ’똑딱이 전등 스위치’임. 직선이 도중에 수직으로 완전히 끊어져 있어 학습을 위한 오차 미분 연산이 불가능함.(현재는 버려진 초창기 뉴런).</li>
+<li><strong>시그모이드 함수(Sigmoid):</strong> 0과 1 사이를 부드럽게 오가도록 선을 구부린 ’다이얼 조광기’임. 켜지고 꺼지는 강도가 부드러워 미분이 가능해져 학습 시대를 열었지만, 기울기 소실 딜레마에 빠트린 주범이기도 함.</li>
+<li><strong>렐루 함수(ReLU):</strong> 음수(나쁜 신호)일 때는 꽉 잠겨있고, 양수(좋은 신호)일 때는 튼 수압만큼 비례해서 콸콸 나오는 ’수도꼭지 밸브’임. 양수 구간에서는 직선이라 미분 기울기가 정확히 1임. 1은 수백 번을 계속 곱해도(<span class="math inline">\(1^{100} = 1\)</span>) 소실되지 않으므로, 아무리 깊은 신경망이라도 오차 신호를 앞쪽 뉴런 끝까지 살려내는 딥러닝계의 구원투수임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 3] 활성화 함수의 비선형성</strong> <img src="images/week4/Activation_Functions.png" class="img-fluid"></p>
+<section id="실습-1-3-활성화-함수-시각화-코딩" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-3-활성화-함수-시각화-코딩">[실습 1-3] 활성화 함수 시각화 코딩</h4>
+<ul>
+<li><strong>주요 시각화 함수 사전 학습</strong>
+<ul>
+<li><code>np.linspace(start, stop, count)</code>: 시작점부터 끝점까지 동일한 간격으로 도화지에 찍을 점 100개를 균일하게 생성해 내는 X축 도구.</li>
+<li><code>np.array()</code>: 파이썬의 일반 숫자를 고속 연산이 가능한 넘파이의 특수 배열 덩어리로 변환시킴.</li>
+<li><code>np.exp(-x)</code>: 자연의 포화 상태를 나타내는 자연 상수 <span class="math inline">\(e\)</span>의 지수(<span class="math inline">\(e^{-x}\)</span>)를 계산함.(시그모이드 S곡선 설계도).</li>
+<li><code>np.maximum(0, x)</code>: 들어온 배열 <span class="math inline">\(x\)</span>의 원소들을 0과 1:1로 비교해서 더 큰 쪽만 살려냄.(렐루 함수에서 음수를 0으로 쳐내버릴 때 사용함).</li>
+<li><code>plt.subplots(1, 3)</code>: 1개의 줄에 3칸짜리 방을 나누어, 세 가지 그래프를 한 장의 도화지에 나란히 그리기 위해 틀을 잡는 함수.</li>
+<li><code>plot()</code>: X점과 Y점 좌표들을 펜으로 쓱 이어서 꺾은선 그래프 곡선을 생성함.</li>
+<li><code>set_title()</code>: 도화지 윗부분에 그래프의 이름을 표기함.</li>
+<li><code>grid(True)</code>: 허공에 떠 있는 선 뒤로 촘촘한 모눈종이(격자선)를 깔아주어 눈금을 읽기 편하게 함.</li>
+</ul></li>
+</ul>
+<div id="91e24e1c" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 도화지에 그림을 그리는 시각화 라이브러리를 plt라는 약칭으로 불러옴.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># X축에 뿌려줄 데이터 100개 생성( -5부터 5 사이를 균일하게 100조각으로 자름 )</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x_val <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">100</span>) <span class="co"># -5.0부터 5.0 구간을 100개의 점으로 균일하게 나눈 넘파이 배열을 생성해 x_val 변수에 저장함.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 똑딱이 스위치(계단 함수)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> step_function(x): <span class="co"># x라는 입력을 받아서 계단 함수 결과를 반환하는 사용자 정의 함수를 선언함.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 입력된 x가 0을 넘기면 True(1), 못 넘기면 False(0)가 되는 배열을 만들어 정수형(int)으로 반환함.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(x <span class="op">&gt;</span> <span class="dv">0</span>, dtype<span class="op">=</span><span class="bu">int</span>) <span class="co"># 불리언 연산(x &gt; 0)의 결과를 정수형(0 또는 1) 배열로 변환하여 그대로 반환함.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 다이얼 조광기(시그모이드 함수)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sigmoid(x): <span class="co"># x라는 입력을 받아서 시그모이드 함수 곡선 결과를 반환하는 사용자 정의 함수를 선언함.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 부드러운 S자 곡선을 그리는 시그모이드 공식: 1 /(1 + e^(-x)) 를 파이썬 코드로 구현함.</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>x)) <span class="co"># 자연 상수 e의 -x승을 계산하여 분모에 더한 후 1을 나누어 결과값을 반환함.</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 딥러닝 수도꼭지(렐루 함수)</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> relu(x): <span class="co"># x라는 입력을 받아서 렐루 함수 결과를 반환하는 사용자 정의 함수를 선언함.</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 입력된 수많은 x값 중, 0보다 큰 양수들은 자기 자신 그대로 살리고, 음수들은 모조리 0으로 뭉개버림.</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.maximum(<span class="dv">0</span>, x) <span class="co"># x 원소들과 숫자 0을 비교하여 0보다 작은 음수들을 모두 0으로 덮어씌워 반환함.</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 1줄에 3칸이 나뉘어진 넓은 도화지(가로 15, 세로 4 비율)를 준비함. fig는 캔버스 전체, axes는 3개의 방을 의미함.</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>)) <span class="co"># 1x3 그리드의 서브플롯 영역을 만들고, 전체 크기를 가로 15인치, 세로 4인치로 지정함.</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 첫 번째 방(axes[0])에 파란색으로 계단 함수 펜선을 긋고(plot), 모눈종이(grid)와 제목을 단다.</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(x_val, step_function(x_val), color<span class="op">=</span><span class="st">'blue'</span>, linewidth<span class="op">=</span><span class="dv">2</span>) <span class="co"># x_val을 바탕으로 계단 함수 결과값을 파란색 굵은 선(굵기 2)으로 그림.</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"1. Step Function"</span>) <span class="co"># 첫 번째 그래프 상단에 '1. Step Function'이라는 문자열을 제목으로 달아줌.</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].grid(<span class="va">True</span>) <span class="co"># 첫 번째 그래프의 배경에 눈금을 읽기 쉽게 격자 무늬(모눈종이)를 활성화함.</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 두 번째 방(axes[1])에 빨간색으로 시그모이드 함수 펜선을 긋고 세팅함.</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(x_val, sigmoid(x_val), color<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>) <span class="co"># x_val을 바탕으로 시그모이드 결과를 빨간색 굵은 선(굵기 2)으로 그림.</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"2. Sigmoid Function"</span>) <span class="co"># 두 번째 그래프 상단에 '2. Sigmoid Function'이라는 문자열을 제목으로 달아줌.</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].grid(<span class="va">True</span>) <span class="co"># 두 번째 그래프의 배경에 눈금을 읽기 쉽게 격자 무늬(모눈종이)를 활성화함.</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 세 번째 방(axes[2])에 초록색으로 렐루 함수 펜선을 긋고 세팅함.</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].plot(x_val, relu(x_val), color<span class="op">=</span><span class="st">'green'</span>, linewidth<span class="op">=</span><span class="dv">2</span>) <span class="co"># x_val을 바탕으로 렐루 함수 결과를 초록색 굵은 선(굵기 2)으로 그림.</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_title(<span class="st">"3. ReLU Function"</span>) <span class="co"># 세 번째 그래프 상단에 '3. ReLU Function'이라는 문자열을 제목으로 달아줌.</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].grid(<span class="va">True</span>) <span class="co"># 세 번째 그래프의 배경에 눈금을 읽기 쉽게 격자 무늬(모눈종이)를 활성화함.</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 3개의 그래프가 서로 영역을 침범하지 않고 깔끔하게 보이도록 여백을 컴퓨터가 알아서 자동 조정해 줌.</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>plt.tight_layout() <span class="co"># 서브플롯 간의 간격을 조절하여 글자나 축 번호가 서로 겹치지 않게 여백을 최적화함.</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>plt.show() <span class="co"># 지금까지 설정한 모든 시각화 결과물들을 렌더링하여 사용자 화면에 실제로 띄워 보여줌.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week4_2026_files/figure-html/cell-4-output-1.png" width="1430" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="부-논리-게이트-구현과-xor의-딜레마1시간-15분" class="level2">
+<h2 class="anchored" data-anchor-id="부-논리-게이트-구현과-xor의-딜레마1시간-15분">2부: 논리 게이트 구현과 XOR의 딜레마(1시간 15분)</h2>
+<section id="단층-퍼셉트론single-layer-perceptron" class="level3">
+<h3 class="anchored" data-anchor-id="단층-퍼셉트론single-layer-perceptron">2.1. 단층 퍼셉트론(single-layer Perceptron)</h3>
+<ul>
+<li><strong>1. 이론적 설명:</strong> 단층 퍼셉트론은 인간의 뇌신경 구조를 아주 단순화시켜, 은닉층(hidden layer) 없이 맨 앞의 ‘입력층’과 맨 끝의 ’출력층’ 단 두 개의 층으로만 다이렉트로 연결한 최초의 인공지능 모델임.</li>
+<li><strong>2. 심화 해설:</strong> 비록 중간 가공 단계가 없지만, 기계 장치가 인간의 가장 기본적인 논리적 추론인 AND, OR의 사고방식을 오직 가중치(w)와 편향(b)이라는 두 개의 숫자 곱셈/덧셈만으로 수학적으로 흉내 내고 데이터를 분류할 수 있음을 증명한 위대한 발명임.</li>
+<li><strong>3. 비유:</strong> 바닥에 모래알(데이터)이 흩뿌려져 있을 때, 가위로 단 한 번 ’일직선’으로 싹둑 잘라서 두 개의 그룹(이것은 참이다 그룹 / 이것은 거짓이다 그룹)으로 완벽히 가르는 재단사와 같음.</li>
+</ul>
+<p><strong>[그림 4] 단층 퍼셉트론</strong> <img src="images/week4/Perceptron_Structure.png" class="img-fluid"></p>
+</section>
+<section id="퍼셉트론을-이용한-기본-논리-연산and-or" class="level3">
+<h3 class="anchored" data-anchor-id="퍼셉트론을-이용한-기본-논리-연산and-or">2.2. 퍼셉트론을 이용한 기본 논리 연산(AND / OR)</h3>
+<ul>
+<li><strong>1. 이론적 설명:</strong> 파이썬을 이용해 직접 가중치와 편향을 코드로 꽂아 넣으면, 이 인공 세포 1개가 컴퓨터 논리 연산인 AND 게이트와 OR 게이트 역할을 완벽히 수행하게 만듦.</li>
+<li><strong>2. 심화 해설(편향 조작의 기하학):</strong> 퍼셉트론이 2차원 공간 위에 긋는 직선 칼날의 위치는 ‘편향(Bias)’ 값이 결정함.
+<ul>
+<li><strong>편향을 낮게(-0.7) 설정하면:</strong> 임계치 허들을 넘기 극도로 어려워지므로 직선 칼날이 우측 상단 끄트머리로 밀려나 깐깐한 AND 영역을 자르게 됨.</li>
+<li><strong>편향을 높게(-0.2) 설정하면:</strong> 임계치 허들을 손쉽게 훌쩍 넘게 되므로 직선 칼날이 좌측 하단으로 내려와 관대한 OR 영역을 넓게 포용하며 자르게 됨.</li>
+</ul></li>
+<li><strong>3. 비유(깐깐한 경비원 vs 관대한 점원):</strong> 컴퓨터 세계에서는 데이터 통로(입력 1, 입력 2)로 들어오는 상태값이 무조건 0(거짓) 아니면 1(참)임.
+<ul>
+<li><strong>AND 게이트:</strong> 클럽 입구에서 “입장 티켓(입력 1)”이 확인되고(값 1), “성인 신분증(입력 2)”도 확인되어야만(값 1) 간신히 최종 통과(출력 1)시켜 주는 깐깐한 덩치 경비원 로직임.</li>
+<li><strong>OR 게이트:</strong> 마트 계산대에서 “현금(입력 1)”을 내거나(값 1), “카드(입력 2)”를 내거나(값 1) 둘 중 하나만 참이어도 결제 승인(출력 1)을 띄워주는 관대한 점원 로직임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 5] 기본 논리 연산의 기하학적 분리</strong> <img src="images/week4/AND_OR_Gate.png" class="img-fluid"></p>
+<section id="실습-2-1-2-2-and-or-게이트-코딩" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-1-2-2-and-or-게이트-코딩">[실습 2-1, 2-2] AND / OR 게이트 코딩</h4>
+<div id="935f4797" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AND 게이트(깐깐한 경비원 로직)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> AND_gate(x1, x2): <span class="co"># 입력값 x1과 x2를 파라미터로 받아 AND 연산을 수행하는 함수를 정의함.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array([x1, x2]) <span class="co"># 두 입력값을 넘파이 배열 덩어리로 묶어 변수 x에 할당함.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>]) <span class="co"># 두 가지 조건을 반반의 중요도(0.5)로 확인하겠다는 세팅 배열을 생성하여 변수 w에 할당함.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [핵심] 편향을 -0.7로 매우 깊게 파버려서 임계치를 뚫기 극도로 어렵게 만듦.</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 하나만 1이 들어와선 0.5를 못 뚫고, 무조건 둘 다 1이 들어와 1.0이 되어야 통과함.</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> <span class="op">-</span><span class="fl">0.7</span> <span class="co"># 매우 낮은 편향값 -0.7을 변수 b에 할당하여 임계 허들을 깐깐하게 설정함.</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> np.dot(x, w) <span class="op">+</span> b <span class="co"># 배열 x와 가중치 w를 내적 연산한 뒤 편향 b를 더해 총 신호량을 tmp 변수에 저장함.</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="cf">if</span> tmp <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="co"># 조건문을 사용하여 계산된 tmp가 0보다 크면 1을 반환하고, 그렇지 않으면 0을 반환함.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># OR 게이트(관대한 점원 로직)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> OR_gate(x1, x2): <span class="co"># 입력값 x1과 x2를 파라미터로 받아 OR 연산을 수행하는 함수를 정의함.</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array([x1, x2]) <span class="co"># 두 입력값을 넘파이 배열 덩어리로 묶어 변수 x에 할당함.</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>]) <span class="co"># 중요도는 AND 게이트와 동일하게 각각 0.5씩 설정한 배열을 변수 w에 할당함.</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [핵심] 편향을 -0.2로 얕게 파놓아 허들을 낮춤.</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 둘 중 하나만 1이 들어와 0.5를 획득해도, -0.2를 쉽게 이기고 통과함.</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span> <span class="co"># 비교적 얕은 편향값 -0.2를 변수 b에 할당하여 임계 허들을 관대하게 설정함.</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> np.dot(x, w) <span class="op">+</span> b <span class="co"># 배열 x와 가중치 w를 내적 연산한 뒤 편향 b를 더해 총 신호량을 tmp 변수에 저장함.</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="cf">if</span> tmp <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="co"># 조건문을 사용하여 계산된 tmp가 0보다 크면 1을 반환하고, 그렇지 않으면 0을 반환함.</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- AND Gate 결과 ---"</span>) <span class="co"># AND 게이트 실습 결과의 시작을 알리는 구분 문자열을 출력함.</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [1, 1] -&gt; 출력: </span><span class="sc">{</span>AND_gate(<span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 오직 둘 다 1일 때만 1 통과 결과를 f-string으로 출력함.</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [0, 1] -&gt; 출력: </span><span class="sc">{</span>AND_gate(<span class="dv">0</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 나머지는 가차없이 0 반환 결과를 f-string으로 출력함.</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- OR Gate 결과 ---"</span>) <span class="co"># OR 게이트 실습 결과의 시작을 알리는 구분 문자열과 줄바꿈을 출력함.</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [0, 0] -&gt; 출력: </span><span class="sc">{</span>OR_gate(<span class="dv">0</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 아무것도 안 가져올 때만 0 반환 결과를 f-string으로 출력함.</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [0, 1] -&gt; 출력: </span><span class="sc">{</span>OR_gate(<span class="dv">0</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 하나만 내밀어도 1 통과 결과를 f-string으로 출력함.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--- AND Gate 결과 ---
+입력 [1, 1] -&gt; 출력: 1
+입력 [0, 1] -&gt; 출력: 0
+
+--- OR Gate 결과 ---
+입력 [0, 0] -&gt; 출력: 0
+입력 [0, 1] -&gt; 출력: 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="모든-연산의-기초-nand-게이트" class="level3">
+<h3 class="anchored" data-anchor-id="모든-연산의-기초-nand-게이트">2.3. 모든 연산의 기초: NAND 게이트</h3>
+<ul>
+<li><strong>1. 이론적 설명:</strong> NAND는 ’Not AND’의 줄임말로, 앞서 배운 AND 게이트가 내린 결론(0과 1)을 모조리 정반대(1과 0)로 뒤집어버리는 반골 기질의 논리임.</li>
+<li><strong>2. 심화 해설:</strong> NAND가 중요한 이유는 컴퓨터 공학에서 “유니버설 게이트(universal gate)”로 취급받기 때문임. 수학적으로 이 NAND 스위치 단 하나만 무한히 조립해서 가져다 붙여도 세상의 모든 복잡한 인텔 CPU 프로세서와 메모리 칩을 만들어낼 수 있음.</li>
+<li><strong>3. 비유(청개구리 할인 이벤트):</strong>
+<ul>
+<li>“주말(입력 1)인가?”와 “공휴일(입력 2)인가?”라는 두 가지 질문(통로)에 대해, 둘 다 “예(값 1, 1)”인 날만 제외하고 무조건 할인을 해준다(출력 1).</li>
+<li>두 악재 조건이 최악으로 겹치는 상황(주말이면서 공휴일, 즉 입력 1의 값이 1이고, 입력 2의 값도 1인 상황)에만 할인 작동을 거부(출력 0)하는 청개구리 논리임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 6] 모든 컴퓨터 연산의 기초 블록</strong> <img src="images/week4/NAND_Gate.png" class="img-fluid"></p>
+<section id="실습-2-3-nand-게이트-코딩" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-3-nand-게이트-코딩">[실습 2-3] NAND 게이트 코딩</h4>
+<div id="6be09009" class="cell" data-execution_count="5">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NAND 게이트(청개구리 로직)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> NAND_gate(x1, x2): <span class="co"># 입력값 x1과 x2를 파라미터로 받아 NAND 연산을 수행하는 함수를 정의함.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array([x1, x2]) <span class="co"># 두 입력값을 넘파이 배열 덩어리로 묶어 변수 x에 할당함.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># AND 게이트의 가중치와 편향 부호(+, -)를 거꾸로 싹 뒤집어주면 반골 기질이 완성됨.</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>]) <span class="co"># AND 게이트와 정확히 부호가 반대인 음수 가중치 배열을 변수 w에 할당함.</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> <span class="fl">0.7</span>                    <span class="co"># AND 게이트의 음수 편향(-0.7)을 양수(+0.7)로 완전히 뒤집어 변수 b에 할당함.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> np.dot(x, w) <span class="op">+</span> b <span class="co"># 배열 x와 가중치 w를 내적 연산한 뒤 편향 b를 더해 총 신호량을 tmp 변수에 저장함.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="cf">if</span> tmp <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="co"># 조건문을 사용하여 계산된 tmp가 0보다 크면 1을 반환하고, 그렇지 않으면 0을 반환함.</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- NAND Gate 결과 ---"</span>) <span class="co"># NAND 게이트 실습 결과의 시작을 알리는 구분 문자열을 출력함.</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [1, 1] -&gt; 출력: </span><span class="sc">{</span>NAND_gate(<span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 두 조건이 다 차오르는 얄미운 순간에만 작동을 거부(0)하는 결과를 출력함.</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [1, 0] -&gt; 출력: </span><span class="sc">{</span>NAND_gate(<span class="dv">1</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 조건이 하나라도 비면 무조건 1을 뱉어내는 결과를 출력함.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+--- NAND Gate 결과 ---
+입력 [1, 1] -&gt; 출력: 0
+입력 [1, 0] -&gt; 출력: 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="선형-분리-불가능성-xor-문제의-비극" class="level3">
+<h3 class="anchored" data-anchor-id="선형-분리-불가능성-xor-문제의-비극">2.4. 선형 분리 불가능성: XOR 문제의 비극</h3>
+<ul>
+<li><strong>1. 이론적 설명:</strong> 배타적 논리합(XOR)은 “두 입력값이 서로 다를 때만 1을 반환하고, 두 입력이 같을 때는 0을 뱉어내는” 모순적인 편가르기 논리 구조임. 인간의 뇌로는 처리하기 아주 쉬운 일상적인 결정 논리지만, 초기 인공지능에게는 이 간단한 논리가 치명적인 ’비극’이자 ’딜레마’로 작용함.</li>
+<li><strong>2. 심화 해설(수학적 도구의 한계):</strong>
+<ul>
+<li>기호주의 인공지능의 거두 마빈 민스키(Marvin Minsky)는, 퍼셉트론 세포 1개의 내부 수학 공식인 <span class="math inline">\(w_1x_1 + w_2x_2 + b = 0\)</span> 이, 중학교 때 배우는 2차원 평면의 직선 방정식 <span class="math inline">\(y = ax + b\)</span> 와 완전히 똑같은 껍데기임을 수학적으로 증명함.</li>
+<li>즉, 이 모델은 태생적으로 도화지 위에 <strong>‘단 1개의 빳빳한 직선’</strong>만 그을 수 있게 속박되어 있다는 뜻임. 그런데 XOR 데이터를 좌표계에 그려보면 참(1)과 거짓(0)을 의미하는 점들이 ’X자 대각선’으로 엇갈려 찍히게 됨. 아무리 용을 써도 1개의 직선으로는 대각선으로 엇갈린 두 그룹을 완벽히 양분할 수 없었으며, 기계가 인간의 가장 기초적인 일상 논리조차 수학적으로 분리해내지 못한다는 이 치명적 조롱 하나로 인해 ’1차 AI 겨울’이 도래함.</li>
+</ul></li>
+<li><strong>3. 비유(수프와 샐러드의 딜레마와 한 번의 가위질):</strong> * 인간은 “수프와 샐러드 중 하나만 고르세요”라는 배타적(XOR) 조건을 머릿속에서 유연하게 처리하지만, 이를 식당 테이블(2차원 도화지) 위에 점으로 찍어 기계의 상황으로 바꿔보면 왜 딜레마인지 알 수 있음.
+<ul>
+<li>수프(0), 샐러드(0): 아무것도 안 시킴 <span class="math inline">\(\rightarrow\)</span> 거부(빨간 점).</li>
+<li>수프(1), 샐러드(0): 수프만 시킴 <span class="math inline">\(\rightarrow\)</span> <strong>허용(파란 점)</strong>.</li>
+<li>수프(0), 샐러드(1): 샐러드만 시킴 <span class="math inline">\(\rightarrow\)</span> <strong>허용(파란 점)</strong>.</li>
+<li>수프(1), 샐러드(1): 둘 다 시킴 <span class="math inline">\(\rightarrow\)</span> 거부(빨간 점).</li>
+<li>종이 위에 대각선으로 엇갈리게 찍힌 이 4개의 점을 향해, <strong>’가위질 단 한 번(직선 1개)’만 해서 파란 점 그룹과 빨간 점 그룹을 완벽하게 나누어보라는 불가능한 미션</strong>을 기계에게 요구했던 것임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 7] XOR(배타적 논리합) 문제의 비극</strong> <img src="images/week4/XOR_Gate.png" class="img-fluid"></p>
+<section id="실습-2-4-단층-퍼셉트론의-xor-실패-증명" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-4-단층-퍼셉트론의-xor-실패-증명">[실습 2-4] 단층 퍼셉트론의 XOR 실패 증명</h4>
+<div id="a43d750d" class="cell" data-execution_count="6">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 억지로 가중치를 요리조리 바꿔가며 XOR을 풀어보려는 단층 모델의 비참한 시도</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> XOR_attempt(x1, x2): <span class="co"># 입력값 x1과 x2를 받아 단층 모델로 XOR 연산을 억지로 시도하는 함수를 정의함.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array([x1, x2]) <span class="co"># 두 입력값을 넘파이 배열 덩어리로 묶어 변수 x에 할당함.</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 컴퓨터가 아무리 가중치와 편향을 임의로 바꿔 도화지 위에서 직선을 옮겨보아도...</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>]) <span class="co"># 임의로 가중치 0.5를 두 개 가진 배열을 생성하여 변수 w에 할당함.</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>                 <span class="co"># 직선을 이동시키기 위해 임의의 편향값 -0.5를 지정하여 변수 b에 할당함.</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> np.dot(x, w) <span class="op">+</span> b <span class="co"># 배열 x와 가중치 w를 내적 연산한 뒤 편향 b를 더해 총 신호량을 tmp 변수에 저장함.</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="cf">if</span> tmp <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="co"># 계산된 tmp 결과에 따라 1 또는 0을 반환하는 계단 함수 역할을 수행함.</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- 단층 퍼셉트론의 XOR 시도(필연적 실패) ---"</span>) <span class="co"># XOR 시도 결과의 시작을 알리는 구분 문자열을 출력함.</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [0, 1] -&gt; 기댓값: 1 | 출력: </span><span class="sc">{</span>XOR_attempt(<span class="dv">0</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 0,1 입력 시 1이 나와야 하므로 이는 맞게 동작하는 척 함.</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 아래 결과는 기댓값(0)과 달리 오답(1)이 무조건 튀어나옴. 1개 칼질(직선)의 수학적 한계임.</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [1, 1] -&gt; 기댓값: 0 | 출력: </span><span class="sc">{</span>XOR_attempt(<span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 하지만 1,1 입력 시 0이 나와야 하는데 1이 나와버려 결국 실패함을 증명함.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+--- 단층 퍼셉트론의 XOR 시도(필연적 실패) ---
+입력 [0, 1] -&gt; 기댓값: 1 | 출력: 0
+입력 [1, 1] -&gt; 기댓값: 0 | 출력: 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="다층-퍼셉트론mlp을-통한-xor-딜레마-돌파" class="level3">
+<h3 class="anchored" data-anchor-id="다층-퍼셉트론mlp을-통한-xor-딜레마-돌파">2.5. 다층 퍼셉트론(MLP)을 통한 XOR 딜레마 돌파</h3>
+<ul>
+<li><strong>1. 이론적 설명:</strong> 들어온 입력 데이터를 섣불리 곧바로 결론(출력층) 내리지 않고, 중간에서 정보를 한 번 새롭게 가공하는 ’은닉층(hidden Layer)’이라는 룸을 하나 더 끼워 넣는 발상의 전환이 AI 겨울을 끝냈음. 앞서 만든 단일 게이트(NAND, OR, AND)들을 레고 블록처럼 2층으로 조립하면 XOR 난제를 완벽히 해결함.</li>
+<li><strong>2. 심화 해설(어떻게 단일 게이트 조립이 공간을 고차원으로 구부리는가?):</strong>
+<ul>
+<li>가위질 한 번(직선 1개)으로는 불가능하지만, 1층(은닉층)에서 NAND 칼질과 OR 칼질을 각각 한 번씩 수행하여 특징이 걸러진 새로운 데이터 힌트 2개를 획득함.</li>
+<li>이를 2층(출력층)의 마지막 AND 게이트가 종합하여 판단하면, 마치 도화지에 두 번 가위질을 해서 십자 모양으로 도형을 완벽히 오려내는 것과 같은 엄청난 기하학적 돌파 효과를 거둠.</li>
+</ul></li>
+<li><strong>3. 비유(1차원 공간을 허공으로 붕 띄워 올리기):</strong> * 1차원의 빳빳한 줄(선) 위에 <code>파랑-빨강-파랑</code> 점이 교대로 줄 서 있다고 상상함. 이 1차원 공간에서는 점 한 번 찍어(분할점) 파란색과 빨간색을 분리할 길이 없음.
+<ul>
+<li>그러나 은닉층이 이 점들의 위치(데이터 특징)를 억지로 ‘제곱’ 연산시켜 버리면? 1차원 바닥에 있던 점들이 2차원 허공으로 붕 솟아올라 ’U자형 포물선’이 됨!</li>
+<li>이제 바닥 쪽에 남은 빨간 점과, 허공으로 솟아오른 파란 점들 사이에 가로로 ’평평한 판자(직선)’를 쓱 끼워 넣으면 두 그룹이 완벽히 잘라져 분리됨! 이것이 은닉층이 수행하는 딥러닝 100만 차원 공간 변환의 본질임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 8] 은닉층과 다층 퍼셉트론</strong> <img src="images/week4/MLP_Hidden_Layer.png" class="img-fluid"></p>
+<section id="실습-2-5-은닉층을-활용한-xor-해결-코딩" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-5-은닉층을-활용한-xor-해결-코딩">[실습 2-5] 은닉층을 활용한 XOR 해결 코딩</h4>
+<div id="b2d85adb" class="cell" data-execution_count="7">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 앞서 우리가 정성스레 만든 3개의 1층짜리 게이트(NAND, OR, AND)를 2층 구조로 조립함.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> XOR_gate_with_MLP(x1, x2): <span class="co"># 입력값 x1과 x2를 받아 은닉층이 포함된 다층 구조로 XOR 연산을 수행하는 함수를 정의함.</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. 은닉층 연산 단계: 원본 데이터가 NAND 방과 OR 방 두 갈래로 들어가 새로운 특징(힌트)을 추출함.</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    hidden_node_1 <span class="op">=</span> NAND_gate(x1, x2) <span class="co"># x1과 x2를 NAND 게이트에 통과시켜 도출된 결과를 첫 번째 은닉 노드의 힌트(hidden_node_1)로 저장함.</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    hidden_node_2 <span class="op">=</span> OR_gate(x1, x2)   <span class="co"># x1과 x2를 동시에 OR 게이트에도 통과시켜 두 번째 은닉 노드의 힌트(hidden_node_2)로 저장함.</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. 출력층 연산 단계: 은닉층이 가공해 던져준 힌트 2개를 AND 방이 최종적으로 종합함.</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    final_output <span class="op">=</span> AND_gate(hidden_node_1, hidden_node_2) <span class="co"># 앞서 가공된 두 힌트 변수를 AND 게이트의 입력으로 넣어 최종 분리 결과를 도출함.</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> final_output <span class="co"># AND 게이트를 통과하여 도출된 최종 XOR 연산 결과(0 또는 1)를 반환함.</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- 다층 퍼셉트론을 통한 XOR 완벽 해결 ---"</span>) <span class="co"># MLP를 이용한 XOR 해결 결과의 시작을 알리는 문자열을 출력함.</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [0, 0] -&gt; 출력: </span><span class="sc">{</span>XOR_gate_with_MLP(<span class="dv">0</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 입력이 0,0일 때 기댓값인 0이 정상적으로 출력됨을 확인하여 화면에 뿌려줌.</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [1, 0] -&gt; 출력: </span><span class="sc">{</span>XOR_gate_with_MLP(<span class="dv">1</span>, <span class="dv">0</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 입력이 1,0일 때 기댓값인 1이 정상적으로 출력됨을 확인하여 화면에 뿌려줌.</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [0, 1] -&gt; 출력: </span><span class="sc">{</span>XOR_gate_with_MLP(<span class="dv">0</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 입력이 0,1일 때 기댓값인 1이 정상적으로 출력됨을 확인하여 화면에 뿌려줌.</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 드디어 모순점이었던 둘 다 참일 때 0을 정확하게 걸러냄! 기하학적 한계를 정복함.</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"입력 [1, 1] -&gt; 출력: </span><span class="sc">{</span>XOR_gate_with_MLP(<span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>) <span class="co"># 직선 1개로는 불가능했던 1,1 입력 시의 결과가 정확하게 0으로 도출됨을 증명해 출력함.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+--- 다층 퍼셉트론을 통한 XOR 완벽 해결 ---
+입력 [0, 0] -&gt; 출력: 0
+입력 [1, 0] -&gt; 출력: 1
+입력 [0, 1] -&gt; 출력: 1
+입력 [1, 1] -&gt; 출력: 0</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
