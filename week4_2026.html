@@ -228,7 +228,7 @@ window.Quarto = {
 <ul>
 <li>파이썬의 <code>f-string</code> 용법: 출력문 텍스트 앞에 <code>f</code>를 붙이고 중괄호 <code>{}</code> 안에 변수 이름을 넣으면, 긴 코드를 작성할 필요 없이 문장 중간에 변수의 계산 결과를 직관적으로 쏙 끼워 넣어 출력해주는 매우 편리한 문법임.</li>
 </ul>
-<div id="d6308fb1" class="cell" data-execution_count="1">
+<div id="687ed2d3" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 선형대수 행렬 고속 연산을 위한 numpy 라이브러리를 np라는 짧은 약칭으로 불러옴.</span></span>
@@ -261,7 +261,7 @@ window.Quarto = {
 <li>1개의 행렬 곱셈 수행 코드로 도출된 <code>(1x3)</code> 배열 결과물은, 활성화 함수 스위치를 누르기 직전 각각의 뉴런 세포체에 꽉꽉 차오른 ‘최종 물의 수위(신호량)’ 3개를 의미함. 반복문 하나 없이 단 한 번의 연산으로 3개 뉴런의 상태를 동시 도출해 냄.</li>
 </ul>
 <p><strong>[그림 2] 다수 뉴런의 동시 연산(병렬 처리)</strong> <img src="images/week4/Matrix_Dot_Product.png" class="img-fluid"></p>
-<div id="a1448882" class="cell" data-execution_count="2">
+<div id="4e94007a" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># X 행렬: 1명의 사용자(1개의 행)가 2개의 자극 정보(2개의 열)를 네트워크에 던짐. 크기 =(1x2)</span></span>
@@ -319,7 +319,7 @@ window.Quarto = {
 <li><code>grid(True)</code>: 허공에 떠 있는 선 뒤로 촘촘한 모눈종이(격자선)를 깔아주어 눈금을 읽기 편하게 함.</li>
 </ul></li>
 </ul>
-<div id="936196cb" class="cell" data-execution_count="3">
+<div id="a22a35bd" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 도화지에 그림을 그리는 시각화 라이브러리를 plt라는 약칭으로 불러옴.</span></span>
@@ -404,7 +404,7 @@ window.Quarto = {
 <p><strong>[그림 5] 기본 논리 연산의 기하학적 분리</strong> <img src="images/week4/AND_OR_Gate.png" class="img-fluid"></p>
 <section id="실습-2-1-2-2-and-or-게이트-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-1-2-2-and-or-게이트-코딩">[실습 2-1, 2-2] AND / OR 게이트 코딩</h4>
-<div id="d708dfcf" class="cell" data-execution_count="4">
+<div id="7eef03c4" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AND 게이트(깐깐한 경비원 로직)</span></span>
@@ -465,7 +465,7 @@ window.Quarto = {
 <p><strong>[그림 6] 모든 컴퓨터 연산의 기초 블록</strong> <img src="images/week4/NAND_Gate.png" class="img-fluid"></p>
 <section id="실습-2-3-nand-게이트-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-3-nand-게이트-코딩">[실습 2-3] NAND 게이트 코딩</h4>
-<div id="e1f09fa4" class="cell" data-execution_count="5">
+<div id="049cf5cc" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NAND 게이트(청개구리 로직)</span></span>
@@ -513,7 +513,7 @@ window.Quarto = {
 <p><strong>[그림 7] XOR(배타적 논리합) 문제의 비극</strong> <img src="images/week4/XOR_Gate.png" class="img-fluid"></p>
 <section id="실습-2-4-단층-퍼셉트론의-xor-실패-증명" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-4-단층-퍼셉트론의-xor-실패-증명">[실습 2-4] 단층 퍼셉트론의 XOR 실패 증명</h4>
-<div id="b7391dd7" class="cell" data-execution_count="6">
+<div id="3d291ef9" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 억지로 가중치를 요리조리 바꿔가며 XOR을 풀어보려는 단층 모델의 비참한 시도</span></span>
@@ -551,8 +551,9 @@ window.Quarto = {
 <li>가위질 한 번(직선 1개)으로는 불가능하지만, 1층(은닉층)에서 NAND 칼질과 OR 칼질을 각각 한 번씩 수행하여 특징이 걸러진 새로운 데이터 힌트 2개를 획득함.</li>
 <li>이를 2층(출력층)의 마지막 AND 게이트가 종합하여 판단하면, 마치 도화지에 두 번 가위질을 해서 십자 모양으로 도형을 완벽히 오려내는 것과 같은 엄청난 기하학적 돌파 효과를 거둠.</li>
 </ul></li>
-<li><strong>3. 비유(1차원 공간을 허공으로 붕 띄워 올리기):</strong> * 1차원의 빳빳한 줄(선) 위에 <code>파랑-빨강-파랑</code> 점이 교대로 줄 서 있다고 상상함. 이 1차원 공간에서는 점 한 번 찍어(분할점) 파란색과 빨간색을 분리할 길이 없음.
+<li><strong>3. 비유(1차원 공간을 허공으로 붕 띄워 올리기):</strong>
 <ul>
+<li>1차원의 빳빳한 줄(선) 위에 <code>파랑-빨강-파랑</code> 점이 교대로 줄 서 있다고 상상함. 이 1차원 공간에서는 점 한 번 찍어(분할점) 파란색과 빨간색을 분리할 길이 없음.</li>
 <li>그러나 은닉층이 이 점들의 위치(데이터 특징)를 억지로 ‘제곱’ 연산시켜 버리면? 1차원 바닥에 있던 점들이 2차원 허공으로 붕 솟아올라 ’U자형 포물선’이 됨!</li>
 <li>이제 바닥 쪽에 남은 빨간 점과, 허공으로 솟아오른 파란 점들 사이에 가로로 ’평평한 판자(직선)’를 쓱 끼워 넣으면 두 그룹이 완벽히 잘라져 분리됨! 이것이 은닉층이 수행하는 딥러닝 100만 차원 공간 변환의 본질임.</li>
 </ul></li>
@@ -560,7 +561,7 @@ window.Quarto = {
 <p><strong>[그림 8] 은닉층과 다층 퍼셉트론</strong> <img src="images/week4/MLP_Hidden_Layer.png" class="img-fluid"></p>
 <section id="실습-2-5-은닉층을-활용한-xor-해결-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-5-은닉층을-활용한-xor-해결-코딩">[실습 2-5] 은닉층을 활용한 XOR 해결 코딩</h4>
-<div id="1a90d193" class="cell" data-execution_count="7">
+<div id="6233900d" class="cell" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 앞서 우리가 정성스레 만든 3개의 1층짜리 게이트(NAND, OR, AND)를 2층 구조로 조립함.</span></span>
