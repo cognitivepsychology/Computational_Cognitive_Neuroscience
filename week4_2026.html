@@ -202,8 +202,9 @@ window.Quarto = {
 <li><strong>축삭돌기(Axon) <span class="math inline">\(\rightarrow\)</span> 활성화 함수(<span class="math inline">\(f\)</span>):</strong> 모인 신호 총합이 특정 폭발선(임계치)을 넘으면, 다음 뉴런으로 신호를 거세게 발사(Fire)하는 출력 케이블. 컴퓨터에서는 최종 합산 값이 일정 수치를 넘었을 때만 1을 내보내는 ’결정 필터(함수)’로 치환함.</li>
 </ul></li>
 <li><strong>2. 심화 해설(복잡성의 추상화):</strong> 실제 뇌세포 안에서는 나트륨과 칼륨 이온이 이동하는 등 극도로 복잡한 화학 반응이 일어남. 인공 신경망은 이런 화학적 잡음을 모두 쳐내고, 오직 “신호를 증폭/축소해서 더한다”는 수학적 본질만을 남긴 아름다운 ’추상화(abstraction) 모델’임.</li>
-<li><strong>3. 비유(댐과 수로 시스템):</strong> * 비가 내려 산의 여러 갈래 계곡(수상돌기)에서 물이 모여듦. 각 계곡에서 흘러드는 ’물의 양’이 <strong>입력값(X)</strong>임.
+<li><strong>3. 비유(댐과 수로 시스템):</strong>
 <ul>
+<li>비가 내려 산의 여러 갈래 계곡(수상돌기)에서 물이 모여듦. 각 계곡에서 흘러드는 ’물의 양’이 <strong>입력값(X)</strong>임.</li>
 <li>물이 내려오는 중간에 설치된 ’파이프의 굵기(시냅스)’가 <strong>가중치(W)</strong>임. 굵은 파이프에서는 물이 콸콸 쏟아지고, 좁은 파이프에서는 쫄쫄 흐름.</li>
 <li>여러 파이프를 통과한 물들이 하나의 거대한 댐(세포체)에 모여 합쳐지는 과정이 바로 <strong>선형 결합(<span class="math inline">\(\sum\)</span>)</strong>임.</li>
 <li>댐에 모인 물의 수위가 ’안전 한계선(임계치)’을 넘치는 순간, 비상 수문(축삭돌기)이 확 열리면서 다음 하류로 물을 거세게 쏟아냄(fire). 댐의 수문을 열지 말지 결정하는 이 스위치가 바로 <strong>활성화 함수(<span class="math inline">\(f\)</span>)</strong>임.</li>
@@ -216,8 +217,9 @@ window.Quarto = {
 <ul>
 <li><strong>1. 이론적 설명(Numpy 라이브러리):</strong> 100만 개의 뉴런 연산을 파이썬의 기본 반복문(<code>for</code>)으로 하나하나 계산하면, 컴퓨터는 극심한 병목 현상에 빠짐. <code>numpy</code> 라이브러리는 수백만 개의 데이터를 행렬(matrix)이라는 덩어리로 묶어서, 단 한 줄의 코드로 동시에 계산해 치우는 신경망 구현 최적화 패키지임.</li>
 <li><strong>2. 심화 해설(행렬 내적, dot product):</strong> 수학적 전문 지식이 없어도 두려워할 필요 없음. 행렬 내적 연산이란 복잡한 미적분이 아니라, “두 데이터의 순서에 맞춰 짝꿍끼리 곱한 뒤, 그 결과들을 모두 몽땅 더하는” 단순 산술의 묶음일 뿐임.</li>
-<li><strong>3. 비유(마트 영수증 총액 계산):</strong> * 내 장바구니에 담긴 물건 배열: <code>[사과 2개, 바나나 3개]</code>
+<li><strong>3. 비유(마트 영수증 총액 계산):</strong>
 <ul>
+<li>내 장바구니에 담긴 물건 배열: <code>[사과 2개, 바나나 3개]</code></li>
 <li>마트의 각 물건 가격표 배열: <code>[1000원, 500원]</code></li>
 <li><strong>내적 연산:</strong> <code>(2개 * 1000원) +(3개 * 500원)</code> = <code>2000 + 1500</code> = <strong>최종 영수증 금액 3500원</strong></li>
 <li>이렇게 두 개의 배열을 통째로 집어넣어, 뉴런 세포체에 꽂힌 뇌의 총 자극량(영수증 총액 3500)을 한 방에 뽑아내는 마법의 주문이 바로 Numpy의 <code>np.dot()</code> 함수임.</li>
@@ -228,7 +230,7 @@ window.Quarto = {
 <ul>
 <li>파이썬의 <code>f-string</code> 용법: 출력문 텍스트 앞에 <code>f</code>를 붙이고 중괄호 <code>{}</code> 안에 변수 이름을 넣으면, 긴 코드를 작성할 필요 없이 문장 중간에 변수의 계산 결과를 직관적으로 쏙 끼워 넣어 출력해주는 매우 편리한 문법임.</li>
 </ul>
-<div id="687ed2d3" class="cell" data-execution_count="1">
+<div id="2121ebfc" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 선형대수 행렬 고속 연산을 위한 numpy 라이브러리를 np라는 짧은 약칭으로 불러옴.</span></span>
@@ -261,7 +263,7 @@ window.Quarto = {
 <li>1개의 행렬 곱셈 수행 코드로 도출된 <code>(1x3)</code> 배열 결과물은, 활성화 함수 스위치를 누르기 직전 각각의 뉴런 세포체에 꽉꽉 차오른 ‘최종 물의 수위(신호량)’ 3개를 의미함. 반복문 하나 없이 단 한 번의 연산으로 3개 뉴런의 상태를 동시 도출해 냄.</li>
 </ul>
 <p><strong>[그림 2] 다수 뉴런의 동시 연산(병렬 처리)</strong> <img src="images/week4/Matrix_Dot_Product.png" class="img-fluid"></p>
-<div id="4e94007a" class="cell" data-execution_count="2">
+<div id="fe70d959" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># X 행렬: 1명의 사용자(1개의 행)가 2개의 자극 정보(2개의 열)를 네트워크에 던짐. 크기 =(1x2)</span></span>
@@ -319,7 +321,7 @@ window.Quarto = {
 <li><code>grid(True)</code>: 허공에 떠 있는 선 뒤로 촘촘한 모눈종이(격자선)를 깔아주어 눈금을 읽기 편하게 함.</li>
 </ul></li>
 </ul>
-<div id="a22a35bd" class="cell" data-execution_count="3">
+<div id="cc9eecdd" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 도화지에 그림을 그리는 시각화 라이브러리를 plt라는 약칭으로 불러옴.</span></span>
@@ -404,7 +406,7 @@ window.Quarto = {
 <p><strong>[그림 5] 기본 논리 연산의 기하학적 분리</strong> <img src="images/week4/AND_OR_Gate.png" class="img-fluid"></p>
 <section id="실습-2-1-2-2-and-or-게이트-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-1-2-2-and-or-게이트-코딩">[실습 2-1, 2-2] AND / OR 게이트 코딩</h4>
-<div id="7eef03c4" class="cell" data-execution_count="4">
+<div id="3d8adde7" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AND 게이트(깐깐한 경비원 로직)</span></span>
@@ -465,7 +467,7 @@ window.Quarto = {
 <p><strong>[그림 6] 모든 컴퓨터 연산의 기초 블록</strong> <img src="images/week4/NAND_Gate.png" class="img-fluid"></p>
 <section id="실습-2-3-nand-게이트-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-3-nand-게이트-코딩">[실습 2-3] NAND 게이트 코딩</h4>
-<div id="049cf5cc" class="cell" data-execution_count="5">
+<div id="a90cd342" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NAND 게이트(청개구리 로직)</span></span>
@@ -513,7 +515,7 @@ window.Quarto = {
 <p><strong>[그림 7] XOR(배타적 논리합) 문제의 비극</strong> <img src="images/week4/XOR_Gate.png" class="img-fluid"></p>
 <section id="실습-2-4-단층-퍼셉트론의-xor-실패-증명" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-4-단층-퍼셉트론의-xor-실패-증명">[실습 2-4] 단층 퍼셉트론의 XOR 실패 증명</h4>
-<div id="3d291ef9" class="cell" data-execution_count="6">
+<div id="07b34455" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 억지로 가중치를 요리조리 바꿔가며 XOR을 풀어보려는 단층 모델의 비참한 시도</span></span>
@@ -561,7 +563,7 @@ window.Quarto = {
 <p><strong>[그림 8] 은닉층과 다층 퍼셉트론</strong> <img src="images/week4/MLP_Hidden_Layer.png" class="img-fluid"></p>
 <section id="실습-2-5-은닉층을-활용한-xor-해결-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-5-은닉층을-활용한-xor-해결-코딩">[실습 2-5] 은닉층을 활용한 XOR 해결 코딩</h4>
-<div id="6233900d" class="cell" data-execution_count="7">
+<div id="d2e041c7" class="cell" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 앞서 우리가 정성스레 만든 3개의 1층짜리 게이트(NAND, OR, AND)를 2층 구조로 조립함.</span></span>
