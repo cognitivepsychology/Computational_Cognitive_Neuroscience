@@ -158,6 +158,11 @@ window.Quarto = {
   </ul></li>
   <li><a href="#한계점의-의의-파국적-간섭과-6주차-빌드업" id="toc-한계점의-의의-파국적-간섭과-6주차-빌드업" class="nav-link" data-scroll-target="#한계점의-의의-파국적-간섭과-6주차-빌드업">2.7. 한계점의 의의: 파국적 간섭과 6주차 빌드업</a>
   <ul>
+  <li><a href="#이론적-설명" id="toc-이론적-설명" class="nav-link" data-scroll-target="#이론적-설명">(1) 이론적 설명</a></li>
+  </ul></li>
+  <li><a href="#심화-해설동시-활성화의-맹점과-떡져버림" id="toc-심화-해설동시-활성화의-맹점과-떡져버림" class="nav-link" data-scroll-target="#심화-해설동시-활성화의-맹점과-떡져버림">(2) 심화 해설(동시 활성화의 맹점과 떡져버림)</a>
+  <ul>
+  <li><a href="#의의" id="toc-의의" class="nav-link" data-scroll-target="#의의">(3) 의의</a></li>
   <li><a href="#실습-2-7-비직교-패턴-중첩이-부른-파국적-간섭의-목격의도된-실패" id="toc-실습-2-7-비직교-패턴-중첩이-부른-파국적-간섭의-목격의도된-실패" class="nav-link" data-scroll-target="#실습-2-7-비직교-패턴-중첩이-부른-파국적-간섭의-목격의도된-실패">[실습 2-7] 비직교 패턴 중첩이 부른 파국적 간섭의 목격(의도된 실패)</a></li>
   </ul></li>
   </ul></li>
@@ -233,7 +238,7 @@ window.Quarto = {
 <p><strong>[그림 2] 수축과 팽창: 신경망을 구동하는 두 개의 수레바퀴</strong> <img src="images/week5/Slide_002.png" class="img-fluid"></p>
 <section id="실습-1-1-파이썬을-통한-내적과-외적의-연산-및-형태-비교" class="level4">
 <h4 class="anchored" data-anchor-id="실습-1-1-파이썬을-통한-내적과-외적의-연산-및-형태-비교">[실습 1-1] 파이썬을 통한 내적과 외적의 연산 및 형태 비교</h4>
-<div id="c4e940a8" class="cell" data-execution_count="1">
+<div id="8963c41d" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 선형대수 고속 연산을 위한 numpy 라이브러리를 np 약칭으로 임포트함</span></span>
@@ -287,7 +292,7 @@ window.Quarto = {
 <p><strong>[그림 3] 생물학적 각인: 헵 규칙에 의한 파이프라인 팽창</strong> <img src="images/week5/Slide_003.png" class="img-fluid"></p>
 <section id="실습-1-2-단일-시냅스의-헵-규칙-학습-코딩" class="level4">
 <h4 class="anchored" data-anchor-id="실습-1-2-단일-시냅스의-헵-규칙-학습-코딩">[실습 1-2] 단일 시냅스의 헵 규칙 학습 코딩</h4>
-<div id="a93cc824" class="cell" data-execution_count="2">
+<div id="245435c0" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 시냅스 초기 상태 및 하이퍼파라미터 세팅</span></span>
@@ -345,7 +350,7 @@ window.Quarto = {
 <p><strong>[그림 4] 차원의 마법: 1억 번의 개별 연산 vs 단숨의 일괄 인쇄</strong> <img src="images/week5/Slide_004.png" class="img-fluid"></p>
 <section id="실습-1-3-외적을-활용한-가중치-행렬-맵-일괄-업데이트" class="level4">
 <h4 class="anchored" data-anchor-id="실습-1-3-외적을-활용한-가중치-행렬-맵-일괄-업데이트">[실습 1-3] 외적을 활용한 가중치 행렬 맵 일괄 업데이트</h4>
-<div id="c43887db" class="cell" data-execution_count="3">
+<div id="e331ff21" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 3개의 입력 뉴런과 3개의 출력 뉴런 세팅(총 9개의 파이프가 얽혀 있음)</span></span>
@@ -395,7 +400,7 @@ window.Quarto = {
 <p><strong>[그림 5] 폭주와 제어: 망각항이 빚어내는 항상성(Oja’s rule)</strong> <img src="images/week5/Slide_005.png" class="img-fluid"></p>
 <section id="실습-1-4-오자-규칙을-통한-시스템-안정화-시뮬레이션" class="level4">
 <h4 class="anchored" data-anchor-id="실습-1-4-오자-규칙을-통한-시스템-안정화-시뮬레이션">[실습 1-4] 오자 규칙을 통한 시스템 안정화 시뮬레이션</h4>
-<div id="a791a55f" class="cell" data-execution_count="4">
+<div id="dc22f10a" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 반복 학습에 따른 가중치 변화(팽창/수렴)를 꺾은선 그래프로 그리기 위해 임포트함</span></span>
@@ -454,7 +459,7 @@ window.Quarto = {
 <section id="인과관계-규명-연합기억원인과-패턴-완성결과" class="level3">
 <h3 class="anchored" data-anchor-id="인과관계-규명-연합기억원인과-패턴-완성결과">2.2. 인과관계 규명: 연합기억(원인)과 패턴 완성(결과)</h3>
 <ul>
-<li><strong>이론적 설명:</strong> 교재에 자주 혼용되는 ’연합기억(Associative Memory)’과 ’패턴 완성(Pattern Completion)’은 동의어가 아님. 연합기억은 정보를 물리적으로 결속시키는 <strong>‘원인 메커니즘’</strong>이며, 패턴 완성은 그 구축된 인프라로 인해 발생하는 <strong>‘소프트웨어적 인출 결과 현상’</strong>임.</li>
+<li><strong>이론적 설명:</strong> 교재에 자주 혼용되는 ’연합기억(aAssociative memory)’과 ’패턴 완성(pattern completion)’은 동의어가 아님. 연합기억은 정보를 물리적으로 결속시키는 <strong>원인 메커니즘</strong>이며, 패턴 완성은 그 구축된 인프라로 인해 발생하는 <strong>소프트웨어적 인출 결과 현상</strong>임.</li>
 <li><strong>심화 해설:</strong>
 <ul>
 <li><strong>원인(연합기억)</strong>
@@ -496,7 +501,7 @@ window.Quarto = {
 <p><strong>[그림 8] 운명 공동체: 자가 연합 기억과 대각선의 침묵</strong> <img src="images/week5/Slide_008.png" class="img-fluid"></p>
 <section id="실습-2-1-원인-메커니즘-자가-연합기억의-각인저장" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-1-원인-메커니즘-자가-연합기억의-각인저장">[실습 2-1] 원인 메커니즘: 자가 연합기억의 각인(저장)</h4>
-<div id="44fbcfed" class="cell" data-execution_count="5">
+<div id="db3b1d28" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 뇌에 각인시킬 완벽한 원본 패턴 A 생성 (사과의 특징 패턴)</span></span>
@@ -539,7 +544,7 @@ window.Quarto = {
 <p><strong>[그림 9] 숫자의 바다: 단 한 장의 도화지에 이뤄지는 중첩</strong> <img src="images/week5/Slide_009.png" class="img-fluid"></p>
 <section id="실습-2-2-두-번째-패턴을-동일한-단일-행렬에-중첩덧셈-저장하기" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-2-두-번째-패턴을-동일한-단일-행렬에-중첩덧셈-저장하기">[실습 2-2] 두 번째 패턴을 동일한 단일 행렬에 중첩(덧셈) 저장하기</h4>
-<div id="13b0f45f" class="cell" data-execution_count="6">
+<div id="b72da4be" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 완전히 다른 새로운 패턴 B(바나나) 생성</span></span>
@@ -570,7 +575,7 @@ window.Quarto = {
 <ul>
 <li>기호주의의 서랍과 달리 연결주의의 기억은 ’수치의 패턴’으로 넓게 분포함. 이 뒤엉킨 숫자의 바다를 히트맵(heatmap) 색상으로 시각화하여 확인해봄.</li>
 </ul>
-<div id="34fcd2f9" class="cell" data-execution_count="7">
+<div id="e1d234cd" class="cell" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 행렬을 이미지 색상으로 그려주는 시각화 패키지 임포트</span></span>
@@ -607,7 +612,7 @@ window.Quarto = {
 <p><strong>[그림 10] 마법의 뜰채: 부호 함수를 통한 기적의 노이즈 복구</strong> <img src="images/week5/Slide_010.png" class="img-fluid"></p>
 <section id="실습-2-4-결과적-현상-손상된-힌트로부터-부호-함수를-거쳐-단번one-shot에-원본-복원" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-4-결과적-현상-손상된-힌트로부터-부호-함수를-거쳐-단번one-shot에-원본-복원">[실습 2-4] 결과적 현상: 손상된 힌트로부터 부호 함수를 거쳐 단번(one-shot)에 원본 복원</h4>
-<div id="966b0512" class="cell" data-execution_count="8">
+<div id="d07a0a27" class="cell" data-execution_count="8">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 패턴 A의 일부가 훼손되고 노이즈가 낀 힌트 데이터 입력</span></span>
@@ -640,15 +645,23 @@ window.Quarto = {
 <section id="실습-2-5-끌개로의-수렴-심각한-손상-복구를-위한-다단계-재귀multi-step-recursive-연산" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-5-끌개로의-수렴-심각한-손상-복구를-위한-다단계-재귀multi-step-recursive-연산">[실습 2-5] 끌개로의 수렴: 심각한 손상 복구를 위한 다단계 재귀(multi-step recursive) 연산</h4>
 <ul>
-<li>아주 심각하게 훼손된 기억은 단 한 번의 연산(인출)만으로는 완벽히 복원되지 않음. 이때 필요한 것이 <strong>다단계 재귀 연산</strong>임.
-<ul>
+<li>아주 심각하게 훼손된 기억은 단 한 번의 연산(인출)만으로는 완벽히 복원되지 않음. 이때 필요한 것이 <strong>다단계 재귀 연산</strong>임.</li>
 <li><strong>재귀 연산(recursive operation):</strong> 방금 연산해서 튀어나온 ’결과값’을 밖으로 버리지 않고, 다시 다음 연산의 ’입력값(힌트)’으로 고스란히 집어넣는 꼬리에 꼬리를 무는 수학적 기법을 뜻함.</li>
-<li><strong>다단계(multi-step):</strong> 이 재귀 과정을 한 번에 끝내지 않고 1단계, 2단계, 3단계로 여러 번 반복한다는 뜻임.</li>
-<li>뇌는 1차로 끄집어낸 ’여전히 좀 흐릿한 기억’을 다시 새로운 힌트로 삼아 기억망에 밀어 넣고 2차 복구를 시도함. 이를 반복할수록 기억은 점점 선명해지며, 수학적으로는 공간상의 <strong>끌개(attractor) 웅덩이</strong> 바닥, 즉 완벽한 원본 기억의 형태로 데굴데굴 굴러 떨어지며 최종 안착하게 됨.</li>
+<li><strong>다단계(multi-step)</strong>
+<ul>
+<li>의미: 이 재귀 과정을 한 번에 끝내지 않고 1단계, 2단계, 3단계로 여러 번 반복한다는 뜻임.</li>
+<li>절차: 뇌는 1차로 끄집어낸 ’여전히 좀 흐릿한 기억’을 다시 새로운 힌트로 삼아 기억망(깊은 계곡이 파여 있는 거대한 3차원 에너지 지형도)에 밀어넣고 2차 복구를 시도함. 이를 반복할수록 기억은 점점 선명해지며, 수학적으로는 공간상의 <strong>끌개(attractor) 웅덩이</strong> 바닥, 즉 노이즈가 하나도 없는 완벽한 원본 기억의 형태(가장 깊게 파인 계곡의 맨 밑바닥)로 데굴데굴 굴러 떨어지며 최종 안착하게 됨.</li>
+<li>비유: 우리가 어떤 패턴(예: 사과)을 헵 규칙으로 반복해서 강하게 학습시킬수록, 이 지형도에서 사과가 위치한 좌표의 땅바닥이 밑으로 푹! 하고 깊게 파이게 됨.</li>
+</ul></li>
+<li><strong>다단계 재귀 연산 단계</strong>
+<ul>
+<li>1단계 연산(1차 인출): 현재 경사면 중턱에 있는 구슬(힌트)을 가중치 행렬과 곱함. 이 수학 연산의 진짜 의미는 <strong>현재 위치에서 어느 쪽이 내리막길이냐?</strong>를 계산하는 것. 계산이 끝나면 구슬은 내리막길을 따라 밑으로 한 발짝 데굴 굴러감. 이때 도출된 1차 결괏값(여전히 좀 흐릿한 기억)은 구슬이 한 발짝 내려와서 멈춘 <strong>새로운 중턱의 좌표</strong>가 됨.</li>
+<li>2단계 재귀 연산: 구슬은 아직 바닥에 안 닿은 상태. 방금 도착한 ’새로운 좌표(결괏값)’를 다시 입력값으로 집어넣음. 그러면 신경망은 또다시 “여기서 어느 쪽이 내리막이지?”를 계산하고 구슬을 한 발짝 더 밑으로 굴려보냄.</li>
+<li>수렴(최종 안착): 이 재귀 연산을 계속 반복하면 구슬은 계속 경사면을 타고 내려가다가, 마침내 <strong>끌개 웅덩이의 맨 밑바닥(완벽한 원본 사과 기억)</strong>에 도달하게 됨. 바닥은 평평하므로 더 이상 굴러갈 내리막이 없음. 이때 재귀 연산을 또 돌려봐야 입력값과 결괏값이 똑같이 나옴. 이것을 수학적으로 <strong>끌개로 수렴(converge)했다</strong>고 표현하며, 뇌과학적으로는 <strong>흐릿했던 기억이 완벽히 선명하게 복원되었다</strong>고 하는 것임.</li>
 </ul></li>
 </ul>
 <p><strong>[그림 11] 끌개로의 수렴: 다단계 재귀 연산을 통한 심층 복원</strong> <img src="images/week5/Slide_011.png" class="img-fluid"></p>
-<div id="175708fa" class="cell" data-execution_count="9">
+<div id="475ea955" class="cell" data-execution_count="9">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 패턴 A에서 무려 3개의 요소가 0으로 망가진 최악의 힌트</span></span>
@@ -703,7 +716,7 @@ window.Quarto = {
 <ul>
 <li>실제로 앞서 성공적으로 중첩 저장되었던 패턴 A와 B가 직교하는지 파이썬 코드로 검증해보기.</li>
 </ul>
-<div id="13fc3bd1" class="cell" data-execution_count="10">
+<div id="31b56afb" class="cell" data-execution_count="10">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== [실습 2-6] 패턴 간의 직교성 수학적 검증 ==="</span>) <span class="co"># 직교성 검증 실습 헤더 출력</span></span>
@@ -729,35 +742,109 @@ window.Quarto = {
 </section>
 <section id="한계점의-의의-파국적-간섭과-6주차-빌드업" class="level3">
 <h3 class="anchored" data-anchor-id="한계점의-의의-파국적-간섭과-6주차-빌드업">2.7. 한계점의 의의: 파국적 간섭과 6주차 빌드업</h3>
+<section id="이론적-설명" class="level4">
+<h4 class="anchored" data-anchor-id="이론적-설명">(1) 이론적 설명</h4>
 <ul>
-<li><strong>이론적 설명:</strong> 직교하지 않는(유사하게 겹치는 특징이 많은) 여러 패턴들을 무작정 단일 가중치 행렬에 덧셈으로 중첩시키면, 가중치 숫자들의 균형이 깨지고 오염되어 기존의 잘 저장되어 있던 옛날 기억들마저 모조리 파괴되고 뭉개지는 현상을 <strong>파국적 간섭(catastrophic interference)</strong>이라고 부름.</li>
-<li><strong>심화 해설(동시 활성화의 맹점과 떡져버림):</strong>
+<li>설명: 직교하지 않는(유사하게 겹치는 특징이 많은) 여러 패턴들을 무작정 단일 가중치 행렬에 덧셈으로 중첩시키면, 가중치 숫자들의 균형이 깨지고 오염되어 기존의 잘 저장되어 있던 옛날 기억들마저 모조리 파괴되고 뭉개지는 현상을 <strong>파국적 간섭(catastrophic interference)</strong>이라고 부름.</li>
+<li>주요 용어
 <ul>
-<li>헵 규칙은 오직 “두 뉴런이 동시에 켜지면 묻지도 따지지도 않고 무조건 가중치 숫자를 올려라!”라는 융통성 없는 맹목적 로직임.</li>
-<li>도화지 한 장에 ’사과’를 그리고, 그 위에 사과와 아주 비슷하게 생긴 ’토마토’를 겹쳐 그린다고 가정해 봄. 둘 다 빨갛고 둥글기 때문에 거의 동일한 위치의 뉴런들이 겹쳐서 동시에 켜짐.</li>
-<li>단순 덧셈만 하는 헵 규칙은 사과와 토마토의 공유 선(가중치)을 똑같은 자리에 계속 두껍게 덧칠함. 결국 나중에 ‘사과’ 단서만 넣고 꺼내려 해도, 사과와 토마토의 가중치 잉크가 한 덩어리로 뭉개져버려서(떡져버려서) 정체불명의 괴물 기억을 뱉어내는 참사가 벌어짐.</li>
+<li>패턴
+<ul>
+<li>의미: 뇌 속의 수많은 뉴런(뇌세포)들 중에서 <strong>어떤 뉴런은 켜지고(1), 어떤 뉴런은 꺼져있는지(-1)를 나열한 고유한 ‘조명 조합’</strong>.</li>
+<li>예시: 사과를 볼 때 1번 뉴런(빨강), 2번 뉴런(둥글다)은 켜지고 3번 뉴런(길쭉하다)은 꺼짐. 그럼 사과의 ’패턴’은 <code>[1, 1, -1]</code>이라는 이진수 배열이 됨. 즉 패턴이란 <strong>사물에 대한 내 뇌세포들의 반응 모양(데이터 그 자체)</strong>을 뜻함.</li>
 </ul></li>
-<li><strong>의의</strong>
+<li>가중치 행렬
 <ul>
-<li>헵 규칙의 한계: 이 치명적인 시스템 실패를 눈으로 목격하는 것이 5주차 수업의 최종 목표임. “그냥 켜지는 대로 가중치 잉크를 덧셈 누적하자”는 헵의 낭만적인 원시 알고리즘으로는 유사한 사물을 구별하는 인간 수준의 지능을 절대 만들 수 없다는 한계가 수학적으로 증명됨.</li>
-<li>6주차 빌드업
+<li>의미: 위에서 만든 패턴을 뇌에 영구적으로 기록해두는 <strong>단 한 장의 거대한 엑셀 표(도화지).</strong></li>
+<li>예시: 1번 뉴런과 2번 뉴런이 얼마나 친한지(시냅스 연결 굵기)를 가로세로 교차표에 숫자로 적어둔 장부와 같음. 패턴이 <strong>정보</strong>라면, 가중치 행렬은 그 정보가 끈끈하게 엮여서 저장되는 물리적인 <strong>메모리 공간</strong>임.</li>
+</ul></li>
+<li>중첩
 <ul>
-<li>이 파국을 해결하기 위해 학자들은 발상을 180도 전환함. “단순히 켜진다고 덧셈 누적하는 짓을 당장 멈춰라. 대신, 신경망이 내놓은 <strong>예측값과 실제 정답 사이의 오차를 냉정하게 계산하여, 정답에 맞게끔 가중치 잉크를 정교하게 깎아내고 미분 튜닝하자.</strong>”</li>
-<li>6주차 수업에서 등장할 현대 딥러닝의 심장, <strong>델타 규칙(Delta rule)과 오차 역전파 학습</strong>의 탄생을 부르는 역사적 당위성임.</li>
+<li>의미: 사과 패턴을 가중치 행렬에 저장한 뒤, 토마토 패턴을 저장할 때 새 엑셀 파일을 만들지 않고 <strong>기존 사과가 적혀있는 그 똑같은 엑셀 표 위에 숫자를 포개어 더해버리는 행위.</strong></li>
+<li>예시: 투명한 셀로판지(가중치 행렬) 한 장에 사과를 매직으로 그리고, 도화지를 바꾸지 않고 그 위에 토마토를 또 그리는 것. 공간을 아주 좁게 쓰면서 여러 기억을 한 곳에 ‘겹쳐서’ 저장하는 방식.</li>
+</ul></li>
+<li>가중치 숫자들 간 균형의 깨짐
+<ul>
+<li>의미: 전혀 다르게 생긴 사과와 바나나를 중첩하면, 엑셀 표 안에서 어떤 칸은 더해지고(+) 어떤 칸은 빼지면서(-) 숫자들이 절묘하게 텐션(장력)을 유지함. 텐트를 칠 때 사방에서 밧줄을 팽팽하게 당겨서 모양을 유지하는 것과 같음.</li>
+<li>예시
+<ul>
+<li>사과 위에 아주 비슷하게 생긴 토마토와 체리를 중첩한다면? 사과와 토마토 그리고 체리는 공유하는 특징이 너무 많아서, 엑셀 표의 <strong>특정 칸(예: ’빨갛다’와 ’둥글다’가 만나는 칸)에만 숫자가 +1, +2, +3… 계속 더해져 비정상적으로 비대해짐.</strong></li>
+<li>한쪽 밧줄만 너무 세게 당겨버리면 텐트가 와르르 무너지듯, 숫자들의 팽팽했던 균형이 박살 나고 잉크가 한 덩어리로 떡져서 원래 사과 모양이 완전히 뭉개져버림.</li>
+<li>신경망에 “빨갛고 달콤한 게 뭐였지?”(사과 단서) 하고 힌트를 주면, ’사과’를 떠올려야 함. 그런데 가중치 도화지 안에서 <code>[빨갛다 - 둥글다]</code> 연결이 ’3’이라는 압도적인 힘으로 다른 모든 신호를 다 잡아먹어 버림(블랙홀처럼 끌어당김). <span class="math inline">\(\Rightarrow\)</span> 결국 신경망은 사과의 고유한 특징인 ’달콤함(1)’을 떠올리는 대신, 가장 굵은 파이프라인에 휩쓸려 토마토의 ’짭짤함(1)’이나 체리의 ’작다(1)’를 마구잡이로 같이 켜버리게 됨.</li>
+</ul></li>
 </ul></li>
 </ul></li>
 </ul>
-<p><strong>[그림 13] 헵 규칙의 비극: 비직교 패턴이 부른 파국적 간섭</strong> <img src="images/week5/Slide_013.png" class="img-fluid"></p>
+<p><strong>[그림 13] 파국적 간섭: ‘+3’ 블랙홀이 낳은 프랑켄슈타인 기억</strong> <img src="images/week5/Slide_013_1.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="심화-해설동시-활성화의-맹점과-떡져버림" class="level3">
+<h3 class="anchored" data-anchor-id="심화-해설동시-활성화의-맹점과-떡져버림">(2) 심화 해설(동시 활성화의 맹점과 떡져버림)</h3>
+<ul>
+<li>헵 규칙은 오직 “두 뉴런이 동시에 켜지면 묻지도 따지지도 않고 무조건 가중치 숫자를 올려라!”라는 융통성 없는 맹목적 로직임.</li>
+<li>도화지 한 장에 ’사과’를 그리고, 그 위에 사과와 아주 비슷하게 생긴 ’토마토’를 겹쳐 그린다고 가정해봄. 둘 다 빨갛고 둥글기 때문에 거의 동일한 위치의 뉴런들이 겹쳐서 동시에 켜짐.</li>
+<li>단순 덧셈만 하는 헵 규칙은 사과와 토마토의 공유 선(가중치)을 똑같은 자리에 계속 두껍게 덧칠함.
+<ul>
+<li>덧칠의 결과: 결국 나중에 ‘사과’ 단서(cue)만 넣고 꺼내려 해도(사과의 특징[예: 완벽한 사과 모양의 입력값]을 힌트로 줘서 오직 ’사과’라는 깨끗한 정답 하나만 출력해내려고 시도해도), 사과와 토마토의 가중치 잉크가 한 덩어리로 뭉개져버려서(떡져버려서) 정체불명의 괴물 기억을 뱉어내는 참사가 벌어짐. <span class="math inline">\(\Rightarrow\)</span> 분명히 <strong>사과 단서</strong>를 줬는데도, 도화지 안의 가중치가 너무 심하게 오염되어 있어서 신경망이 헛갈리게 됨. 결과적으로 사과의 ’달콤함’과 토마토의 ’물컹함’이 마구잡이로 뒤섞인, 사과도 토마토도 아닌 <strong>정체불명의 괴물 패턴(오답)</strong>을 화면에 뱉어내게 됨. 이것이 바로 파국적 간섭의 비극임.</li>
+<li>참사의 원인: 둘 다 ’빨갛고 둥글다’는 특징을 공유하므로 가중치 잉크가 한곳에 너무 두껍게 뭉쳐버렸기 때문.</li>
+<li>덧셈의 대상: 가중치 행렬(엑셀 표) 칸 안에 적혀 있는 <strong>시냅스 연결 강도(호감도 숫자).</strong></li>
+<li>덧셈에 대한 구체적 설명
+<ul>
+<li>사과를 볼 때 ’빨강 뉴런’과 ’둥글다 뉴런’이 동시에 켜짐. 그럼 헵 규칙은 엑셀 표에서 이 두 뉴런이 만나는 칸에 <strong>+1</strong>을 더함.</li>
+<li>다음 날 토마토를 볼 때 또 ’빨강 뉴런’과 ’둥글다 뉴런’이 동시에 켜짐. 그럼 헵 규칙은 아까 사과 때문에 +1이 적혀있던 그 똑같은 칸에 또 <strong>+1</strong>을 더해서 숫자를 <strong>2</strong>로 만들어버림. <span class="math inline">\(\Rightarrow\)</span> 더한다는 것은 <strong>비슷한 자극이 들어올 때마다 뉴런 사이의 파이프 굵기(가중치 숫자)를 기존 값 위에 계속 누적해서 산술적으로 키워버린다</strong>는 뜻.</li>
+</ul></li>
+<li>단서(cue)
+<ul>
+<li>의미: 인공신경망에서 단서란 뇌(가중치 행렬 도화지)에 저장해둔 전체 기억(원본 패턴)을 다시 끄집어내기 위해 시스템에 던져주는 <strong>초기 입력값</strong> 또는 <strong>부분적인 힌트 조각</strong>을 뜻함.</li>
+<li>예시
+<ul>
+<li>우리가 뇌 속에 사과를 <code>[빨갛다, 둥글다, 달콤하다, 단단하다]</code>라는 4가지 특징의 조합으로 저장했다고 가정.</li>
+<li>나중에 이 사과에 대한 완벽한 기억을 다시 떠올리고 싶을 때, 우리는 신경망에 다음과 같은 <strong>단서</strong>를 던져줄 수 있음.
+<ul>
+<li>불완전한 단서: “빨갛고 둥근 게 뭐였지?”(<code>[빨갛다, 둥글다, 모름, 모름]</code>)</li>
+<li>완벽한 단서: “빨갛고, 둥글고, 달콤하고, 단단한 것!”(<code>[빨갛다, 둥글다, 달콤하다, 단단하다]</code>)</li>
+</ul></li>
+<li>연합기억 모델이 정상적으로 잘 작동한다면, 어떤 단서를 주든 아스팔트처럼 튼튼하게 깔린 가중치 도로망을 타고 <strong>“아! 그거 온전한 사과(원본) 말하는 거구나!”</strong> 하고 사과의 전체 패턴을 100% 깔끔하게 출력(복원)해내야 함.</li>
+</ul></li>
+<li>요약: 단서란 범인을 찾기 위해 경찰이 컴퓨터에 입력하는 <strong>몽타주 조각(입력 데이터)</strong>과 같음. 범인 A의 몽타주(사과 단서)를 넣었으면 딱 범인 A의 얼굴만 튀어나와야 하는데, 시스템이 고장 나서 범인 A와 B의 눈코입이 기괴하게 섞인 얼굴(괴물 기억)을 뱉어낸 상황으로 비유할 수 있음.</li>
+</ul></li>
+</ul></li>
+</ul>
+<section id="의의" class="level4">
+<h4 class="anchored" data-anchor-id="의의">(3) 의의</h4>
+<ul>
+<li>헵 규칙의 한계
+<ul>
+<li>이 치명적인 시스템 실패를 눈으로 목격하는 것이 5주차 수업의 최종 목표임. “그냥 켜지는 대로 가중치 잉크를 덧셈 누적하자”는 헵의 낭만적인 원시 알고리즘으로는 유사한 사물을 구별하는 인간 수준의 지능을 절대 만들 수 없다는 한계가 수학적으로 증명됨.</li>
+<li>“켜지는 대로 누적한다”
+<ul>
+<li>켜짐의 주어: 전기를 뿜어내는 <strong>뉴런(뇌세포).</strong></li>
+<li>구체적 설명
+<ul>
+<li>우리 뇌의 뉴런들은 특정 자극(색깔, 모양 등)을 받으면 전기를 뿜어내며 활성화되는데, 이걸 ’켜진다(fire)’고 표현.</li>
+<li>“그냥 켜지는 대로 누적한다”는 말은 헵 규칙이 굉장히 단순 무식하다는 걸 비판하는 표현. 헵 규칙은 지금 들어온 데이터가 ’토마토’인지 ’사과’인지, 맥락이 무엇인지 지능적으로 따지지 않음.</li>
+<li>“어? 뉴런 A랑 뉴런 B가 방금 우연히 동시에 켜졌어? 이유는 모르겠지만 일단 둘 사이의 가중치 숫자 올려(+1)!” <span class="math inline">\(\Rightarrow\)</span> 이렇게 뉴런이 켜지기만 하면 묻지도 따지지도 않고 무조건 덧셈을 해버리는 원시적인(단순한) 로직이기 때문에, 정교하게 사물을 구별하는 현대의 AI나 인간 수준의 지능을 헵 규칙 하나만으로는 절대 구현할 수 없음.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>6주차 빌드업
+<ul>
+<li>이 파국을 해결하기 위해 학자들은 발상을 180도 전환함. “단순히 켜진다고 덧셈 누적하는 짓을 당장 멈춰라. 대신, 신경망이 내놓은 <strong>예측값과 실제 정답 사이의 오차를 냉정하게 계산하여, 정답에 맞게끔 가중치 잉크를 정교하게 깎아내고 미분 튜닝하자.</strong>”</li>
+<li>6주차 수업에서 등장할 현대 딥러닝의 심장, <strong>델타 규칙(delta rule)과 오차 역전파 학습</strong>의 탄생을 부르는 역사적 당위성이 됨.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 14] 헵 규칙의 비극: 비직교 패턴이 부른 파국적 간섭</strong> <img src="images/week5/Slide_013.png" class="img-fluid"></p>
+</section>
 <section id="실습-2-7-비직교-패턴-중첩이-부른-파국적-간섭의-목격의도된-실패" class="level4">
 <h4 class="anchored" data-anchor-id="실습-2-7-비직교-패턴-중첩이-부른-파국적-간섭의-목격의도된-실패">[실습 2-7] 비직교 패턴 중첩이 부른 파국적 간섭의 목격(의도된 실패)</h4>
 <ul>
 <li>왜 파국적 간섭이 일어나는지, 부호 함수를 거치기 전의 <strong>원시 시그널 수치</strong>를 직접 뜯어보며 오염된 가중치의 횡포를 확인하기.</li>
 </ul>
-<div id="c314287d" class="cell" data-execution_count="11">
+<div id="14272432" class="cell" data-execution_count="11">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 기존 패턴 A([1, 1, -1, -1])와 극도로 유사하게 생긴 패턴 C(토마토) 생성</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pattern_C <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>]) <span class="co"># 패턴 A(사과)와 비교했을 때 4개 특징 중 무려 3개가 겹쳐버리는 몹시 헷갈리는 비직교 데이터를 생성함</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pattern_C <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>]) <span class="co"># 패턴 A(사과)와 비교했을 때 4개 특징 중 무려 3개가 겹쳐버리는 몹시 헛갈리는 비직교 데이터를 생성함</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== [실습 2-7] 의도된 실패: 파국적 간섭 테스트 ==="</span>) <span class="co"># 실패 시뮬레이션 헤더 출력</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 내적(Dot product)으로 두 패턴의 직교성을 검사함 (0이 나와야 안전한 독립 상태임)</span></span>
@@ -793,7 +880,7 @@ window.Quarto = {
 -&gt; 최종 결론: 손상되지 않은 완벽한 사과 힌트를 줬음에도 불구하고, 가중치 도화지가 토마토와 떡져버린(파국적 간섭) 탓에 세 번째 원소가 +1로 심각하게 오염된 엉뚱한 프랑켄슈타인 기억을 뱉어냄(패턴 완성의 처참한 붕괴). 이 치명적인 '맹목적 덧셈' 에러를 박살내고 가중치를 정교하게 깎아내기 위해 6주차의 '오차 기반 학습법(역전파)'이 등장함!</code></pre>
 </div>
 </div>
-<p><strong>[그림 14] 새로운 패러다임의 탄생: 헵 규칙에서 오차 역전파로</strong> <img src="images/week5/Slide_014.png" class="img-fluid"></p>
+<p><strong>[그림 15] 새로운 패러다임의 탄생: 헵 규칙에서 오차 역전파로</strong> <img src="images/week5/Slide_014.png" class="img-fluid"></p>
 </section>
 </section>
 </section>
