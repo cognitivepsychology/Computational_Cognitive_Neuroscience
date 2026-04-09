@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>계산주의와 인지신경과학 6주차_학습의 원리 #2: 델타 규칙(delta rule)과 오차 역전파 기초</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="week6_2026_files/libs/clipboard/clipboard.min.js"></script>
+<script src="week6_2026_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="week6_2026_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="week6_2026_files/libs/quarto-html/popper.min.js"></script>
+<script src="week6_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="week6_2026_files/libs/quarto-html/anchor.min.js"></script>
+<link href="week6_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="week6_2026_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="week6_2026_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="week6_2026_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="week6_2026_files/libs/bootstrap/bootstrap-e0048d6574ccc2aa33e6fadbbc53b6fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#주차-수업-목표" id="toc-주차-수업-목표" class="nav-link active" data-scroll-target="#주차-수업-목표">6주차 수업 목표</a></li>
+  <li><a href="#부-맹목적-덧셈에서-오차-기반-수정으로델타-규칙" id="toc-부-맹목적-덧셈에서-오차-기반-수정으로델타-규칙" class="nav-link" data-scroll-target="#부-맹목적-덧셈에서-오차-기반-수정으로델타-규칙">1부: 맹목적 덧셈에서 오차 기반 수정으로(델타 규칙)</a>
+  <ul>
+  <li><a href="#패러다임의-전환-헵-규칙의-비극과-델타-규칙의-탄생" id="toc-패러다임의-전환-헵-규칙의-비극과-델타-규칙의-탄생" class="nav-link" data-scroll-target="#패러다임의-전환-헵-규칙의-비극과-델타-규칙의-탄생">1.1. 패러다임의 전환: 헵 규칙의 비극과 델타 규칙의 탄생</a>
+  <ul>
+  <li><a href="#실습-1-1-델타-규칙의-기본-오차-기반-단일-가중치-튜닝" id="toc-실습-1-1-델타-규칙의-기본-오차-기반-단일-가중치-튜닝" class="nav-link" data-scroll-target="#실습-1-1-델타-규칙의-기본-오차-기반-단일-가중치-튜닝">[실습 1-1] 델타 규칙의 기본: 오차 기반 단일 가중치 튜닝</a></li>
+  </ul></li>
+  <li><a href="#경사하강법gradient-descent과-손실공간loss-landscape" id="toc-경사하강법gradient-descent과-손실공간loss-landscape" class="nav-link" data-scroll-target="#경사하강법gradient-descent과-손실공간loss-landscape">1.2. 경사하강법(gradient descent)과 손실공간(loss landscape)</a>
+  <ul>
+  <li><a href="#실습-1-2-학습률에-따른-경사하강법의-발산과-수렴-비교" id="toc-실습-1-2-학습률에-따른-경사하강법의-발산과-수렴-비교" class="nav-link" data-scroll-target="#실습-1-2-학습률에-따른-경사하강법의-발산과-수렴-비교">[실습 1-2] 학습률에 따른 경사하강법의 발산과 수렴 비교</a></li>
+  </ul></li>
+  <li><a href="#주차의-복수-델타-규칙으로-파국적-간섭-완벽히-억제하기" id="toc-주차의-복수-델타-규칙으로-파국적-간섭-완벽히-억제하기" class="nav-link" data-scroll-target="#주차의-복수-델타-규칙으로-파국적-간섭-완벽히-억제하기">1.3. 5주차의 복수: 델타 규칙으로 파국적 간섭 완벽히 억제하기</a>
+  <ul>
+  <li><a href="#실습-1-3-델타-규칙을-통한-비직교-패턴의-간섭-억제-및-특징-추상화" id="toc-실습-1-3-델타-규칙을-통한-비직교-패턴의-간섭-억제-및-특징-추상화" class="nav-link" data-scroll-target="#실습-1-3-델타-규칙을-통한-비직교-패턴의-간섭-억제-및-특징-추상화">[실습 1-3] 델타 규칙을 통한 비직교 패턴의 간섭 억제 및 특징 추상화</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#부-은닉층의-발견과-책임의-분배오차-역전파" id="toc-부-은닉층의-발견과-책임의-분배오차-역전파" class="nav-link" data-scroll-target="#부-은닉층의-발견과-책임의-분배오차-역전파">2부: 은닉층의 발견과 책임의 분배(오차 역전파)</a>
+  <ul>
+  <li><a href="#단층-퍼셉트론의-치명적-한계와-선형-분리-불가능성" id="toc-단층-퍼셉트론의-치명적-한계와-선형-분리-불가능성" class="nav-link" data-scroll-target="#단층-퍼셉트론의-치명적-한계와-선형-분리-불가능성">2.1. 단층 퍼셉트론의 치명적 한계와 선형 분리 불가능성</a>
+  <ul>
+  <li><a href="#실습-2-1-파이썬으로-확인하는-단층-퍼셉트론의-선형-분리-한계xor-실패-목격" id="toc-실습-2-1-파이썬으로-확인하는-단층-퍼셉트론의-선형-분리-한계xor-실패-목격" class="nav-link" data-scroll-target="#실습-2-1-파이썬으로-확인하는-단층-퍼셉트론의-선형-분리-한계xor-실패-목격">[실습 2-1] 파이썬으로 확인하는 단층 퍼셉트론의 선형 분리 한계(XOR 실패 목격)</a></li>
+  </ul></li>
+  <li><a href="#오차-역전파backpropagation-책임은-누구에게-있는가" id="toc-오차-역전파backpropagation-책임은-누구에게-있는가" class="nav-link" data-scroll-target="#오차-역전파backpropagation-책임은-누구에게-있는가">2.2. 오차 역전파(backpropagation): 책임은 누구에게 있는가?</a>
+  <ul>
+  <li><a href="#실습-2-2-다층-신경망의-순전파와-역전파-1회차-해부하기" id="toc-실습-2-2-다층-신경망의-순전파와-역전파-1회차-해부하기" class="nav-link" data-scroll-target="#실습-2-2-다층-신경망의-순전파와-역전파-1회차-해부하기">[실습 2-2] 다층 신경망의 순전파와 역전파 1회차 해부하기</a></li>
+  </ul></li>
+  <li><a href="#은닉층의-비선형적-공간-왜곡과-xor의-정복" id="toc-은닉층의-비선형적-공간-왜곡과-xor의-정복" class="nav-link" data-scroll-target="#은닉층의-비선형적-공간-왜곡과-xor의-정복">2.3. 은닉층의 비선형적 공간 왜곡과 XOR의 정복</a>
+  <ul>
+  <li><a href="#실습-2-3-다층-신경망mlp의-10000번-역전파-루프와-xor-문제-정복" id="toc-실습-2-3-다층-신경망mlp의-10000번-역전파-루프와-xor-문제-정복" class="nav-link" data-scroll-target="#실습-2-3-다층-신경망mlp의-10000번-역전파-루프와-xor-문제-정복">[실습 2-3] 다층 신경망(MLP)의 10,000번 역전파 루프와 XOR 문제 정복</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#주차-요약-및-다음-주-예고" id="toc-주차-요약-및-다음-주-예고" class="nav-link" data-scroll-target="#주차-요약-및-다음-주-예고">6주차 요약 및 다음 주 예고</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">계산주의와 인지신경과학 6주차_학습의 원리 #2: 델타 규칙(delta rule)과 오차 역전파 기초</h1>
+<p class="subtitle lead">고려대학교 일반대학원 심리학과</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026년 4월 10일 금요일 4-5교시</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="주차-수업-목표" class="level2">
+<h2 class="anchored" data-anchor-id="주차-수업-목표">6주차 수업 목표</h2>
+<ul>
+<li><strong>패러다임의 전환 (맹목적 수용에서 비판적 수정으로):</strong> 단순 동시 활성화에만 의존하여 무한 덧셈을 수행하던 헵 규칙(Hebbian learning)의 한계를 비판적으로 검토하고, 오차를 기반으로 가중치를 정교하게 깎아내는 델타 규칙(delta rule)의 철학적, 수학적 원리를 심층적으로 이해함.</li>
+<li><strong>학습 심리학과의 수학적 조우:</strong> 델타 규칙이 동물 학습 심리학의 금자탑인 ’레스콜라-와그너(Rescorla-Wagner) 모델’과 어떻게 수학적으로 완벽히 동일한지 규명하고, ’예측오차(prediction error)’가 인지 시스템의 핵심 학습 동력임을 체화함.</li>
+<li><strong>경사하강법(gradient descent)의 직관적 체화:</strong> 미분과 기울기의 개념을 ’안대 낀 등산객이 산을 내려가는 과정’에 비유하여, 고차원 손실 공간(loss landscape)에서의 파라미터 최적화 원리와 학습률(learning rate)의 중요성을 파악함.</li>
+<li><strong>파국적 간섭(catastrophic interference)의 수학적 통제:</strong> 오차 수정 메커니즘이 비직교(non-orthogonal) 패턴 간의 특징 겹침 문제를 어떻게 스스로 억제하고 튜닝해내는지 파이썬 코드로 증명함.</li>
+<li><strong>기여도 할당 문제(credit assignment problem)와 오차 역전파:</strong> 다층 퍼셉트론(multi-layer perceptron, MLP)의 은닉층이 갖는 인지적 내부 표상(internal representation)의 의미를 이해하고, 미분의 연쇄법칙(chain rule)을 통해 최종 오차의 ’책임’을 하위 뉴런들에게 거꾸로 분배하는 역전파(backpropagation) 알고리즘을 코드로 구현함.</li>
+</ul>
+<p><strong>[그림 1] 학습의 원리 #2: 델타 규칙(delta rule)과 오차 역전파 기초</strong> <img src="images/week6/Slide_001.png" class="img-fluid"></p>
+</section>
+<section id="부-맹목적-덧셈에서-오차-기반-수정으로델타-규칙" class="level2">
+<h2 class="anchored" data-anchor-id="부-맹목적-덧셈에서-오차-기반-수정으로델타-규칙">1부: 맹목적 덧셈에서 오차 기반 수정으로(델타 규칙)</h2>
+<section id="패러다임의-전환-헵-규칙의-비극과-델타-규칙의-탄생" class="level3">
+<h3 class="anchored" data-anchor-id="패러다임의-전환-헵-규칙의-비극과-델타-규칙의-탄생">1.1. 패러다임의 전환: 헵 규칙의 비극과 델타 규칙의 탄생</h3>
+<p><strong>[그림 2] 학습 모델의 3단계 진화</strong> <img src="images/week6/Slide_002.png" class="img-fluid"></p>
+<ul>
+<li><strong>이론적 배경(5주차 복기)</strong>
+<ul>
+<li><strong>헵 규칙의 맹점:</strong> 5주차에서 확인했듯, 헵 규칙은 두 뉴런이 활성화되기만 하면 무조건 가중치를 증가시킴(<span class="math inline">\(\Delta w = \eta \cdot x \cdot y\)</span>). 이는 데이터의 맥락이나 시스템이 목표로 하는 정답 여부를 전혀 고려하지 않는 ’맹목적인 덧셈 기계’에 불과함.</li>
+<li><strong>시스템 붕괴:</strong> 사과와 토마토처럼 특징(빨갛다, 둥글다)이 겹치는 비직교 패턴이 연달아 입력되면, 겹치는 시냅스의 가중치만 <span class="math inline">\(+3\)</span>, <span class="math inline">\(+4\)</span>로 무한 누적됨(가중치 폭주). 결국 단서를 주었을 때 사과와 토마토가 기괴하게 섞인 프랑켄슈타인 기억이 인출되는 ’파국적 간섭’이 발생함.</li>
+</ul></li>
+<li><strong>델타 규칙(delta rule)의 철학</strong>
+<ul>
+<li>버나드 위드로우(Bernard Widrow)와 마시안 호프(Marcian Hoff)가 제안한 위드로우-호프 규칙(Widrow-Hoff rule)으로도 불림. 현대 기계학습의 뼈대를 이룬 공식 중 하나임.</li>
+<li><strong>핵심 철학:</strong> “학습은 오직 ’기대’와 ’실제’가 다를 때, 즉 <strong>놀랐을 때(surprise)</strong>만 일어난다.”</li>
+<li>정답(target, <span class="math inline">\(T\)</span>)과 현재 인공신경망의 예측값(output, <span class="math inline">\(Y\)</span>)을 비교하여, <strong>틀린 만큼만(error, <span class="math inline">\(\delta\)</span>)</strong> 가중치를 고치는 피드백 기반의 지도 학습(supervised learning) 메커니즘임.</li>
+<li><strong>수식:</strong> <span class="math inline">\(\Delta w = \eta \cdot (T - Y) \cdot X\)</span>
+<ul>
+<li><span class="math inline">\(\eta\)</span>: 학습률. 한 번의 오차를 발견했을 때 가중치를 얼마나 크게 수정할 것인가를 결정하는 보폭.</li>
+<li><span class="math inline">\((T - Y)\)</span>: 오차(<span class="math inline">\(\delta\)</span>). 목표값에서 실제 출력값을 뺀 값. 이것이 가중치 변화의 ’방향’과 ’크기’를 동시에 결정함.</li>
+<li><span class="math inline">\(X\)</span>: 입력값. 오차를 발생시키는 데 기여한 바로 그 뉴런의 신호.</li>
+</ul></li>
+</ul></li>
+<li><strong>심화 해설</strong>
+<ul>
+<li><strong>오차 제로(<span class="math inline">\(0\)</span>)의 법칙:</strong> 만약 신경망이 이미 정답을 완벽하게 맞혔다면(<span class="math inline">\(T = Y\)</span>), 오차<span class="math inline">\((T - Y)\)</span>는 <span class="math inline">\(0\)</span>이 됨. 수식에 따라 가중치 변화량(<span class="math inline">\(\Delta w\)</span>)도 <span class="math inline">\(0\)</span>이 됨. <span class="math inline">\(\Rightarrow\)</span> “이미 완벽히 알고 있는 지식에 대해서는 뇌가 더 이상 시냅스 에너지를 낭비하며 가중치를 조작하지 않는다”는 인지적 경제성을 완벽히 구현함.</li>
+<li><strong>레스콜라-와그너 모델(Rescorla-Wagner model)과의 조우</strong>
+<ul>
+<li>델타 규칙과의 유사성: 1972년 발표된 고전적 조건형성의 수학적 모델인 레스콜라-와그너 공식(<span class="math inline">\(\Delta V = \alpha \beta (\lambda - \Sigma V)\)</span>)과 알파벳 기호만 다를 뿐 수학적 원리가 100% 동일함.</li>
+<li>모델의 본질: ’놀람’의 수학화
+<ul>
+<li>1972년 제안된 고전적 조건형성(파블로프 학습)의 기념비적 수학 모델.</li>
+<li>동물은 두 사건(종소리와 밥)이 단순히 “동시에 발생”했다고 맹목적으로 연결하지 않음.</li>
+<li>학습은 오직 동물이 <strong>예상치 못한 결과에 놀랐을 때(prediction error)</strong>만 일어난다고 규명함.</li>
+</ul></li>
+<li>공식의 이해: <span class="math inline">\(\Delta V = \alpha \beta (\lambda - \Sigma V)\)</span>
+<ul>
+<li><span class="math inline">\(\Delta V\)</span>(학습량): 이번 경험을 통해 새롭게 수정할 단서(종소리)와 결과(밥)의 연합 강도.</li>
+<li><span class="math inline">\(\lambda\)</span>(실제 현실): 실제로 주어진 밥의 유무 및 크기(예: 밥이 주어지면 1).</li>
+<li><span class="math inline">\(\Sigma V\)</span>(기대치 총합): 현재 환경에 있는 모든 단서(종소리, 불빛 등)를 보고 동물이 ‘예상한’ 밥의 크기.</li>
+<li><span class="math inline">\((\lambda - \Sigma V)\)</span>(예측오차): 실제 현실에서 내 예상을 뺀 값. 즉 <strong>놀람의 크기</strong>.</li>
+</ul></li>
+<li>학습의 역동성(시간 흐름에 따른 변화)
+<ul>
+<li>초기 학습: 종소리 직후 밥이 처음 떨어지면 전혀 예상치 못했으므로 크게 놀람(오차 극대화 <span class="math inline">\(\Rightarrow\)</span> 가파른 학습).</li>
+<li>후기 안정화: 경험이 쌓여 종소리만 들어도 밥을 100% 확신하게 되면, 밥이 나와도 더 이상 놀라지 않음(오차 0 <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(\Delta V\)</span>도 0이 되어 학습 종료).</li>
+</ul></li>
+<li>최대 업적: 차단 효과(blocking effect)의 수학적 증명
+<ul>
+<li>현상: 쥐에게 [종소리 <span class="math inline">\(\rightarrow\)</span> 밥]을 100% 학습시킨 뒤, [종소리+빛 <span class="math inline">\(\rightarrow\)</span> 밥]을 제시하면 쥐는 새로운 단서인 ’빛’을 학습하지 않음.</li>
+<li>원리: 이미 종소리만으로 밥의 등장(<span class="math inline">\(\lambda=1\)</span>)을 완벽히 예측(<span class="math inline">\(\Sigma V=1\)</span>)하고 있기 때문에 예측오차가 <span class="math inline">\(0\)</span>임.</li>
+<li>결론: “뇌는 이미 완벽하게 예측 가능한 결과에 대해서는, 새로운 정보(빛)가 동시에 주어져도 시냅스 에너지를 낭비하며 추가학습을 하지 않는다”는 뇌의 인지적 경제성을 완벽히 증명함.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 3] 학습 심리학과 AI의 완벽한 수학적 조우</strong> <img src="images/week6/Slide_004.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유</strong>
+<ul>
+<li><strong>헵 규칙(헬스장 근육맨):</strong> 양궁 선수가 과녁을 보지도 않고, 화살을 쏠 때마다 무조건 활시위를 당기는 근력을 키우는 맹목적 훈련. 결국 팔 근육만 너무 비대해져서 정밀한 폼이 다 망가짐.</li>
+<li><strong>델타 규칙(전문 코칭):</strong> 코치(정답 <span class="math inline">\(T\)</span>)가 화살이 과녁 중앙에서 10cm 우측으로 빗나갔다(오차)고 피드백을 주면, 딱 그 10cm를 좌측으로 보정할 만큼만 근육의 각도를 미세하게 수정하는 훈련. 정중앙을 맞추면 훈련(가중치 수정)을 즉각 종료하고 에너지를 보존함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 4] 맹목적 근육 키우기 vs.&nbsp;정밀한 영점 조절</strong> <img src="images/week6/Slide_003.png" class="img-fluid"></p>
+<section id="실습-1-1-델타-규칙의-기본-오차-기반-단일-가중치-튜닝" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-1-델타-규칙의-기본-오차-기반-단일-가중치-튜닝">[실습 1-1] 델타 규칙의 기본: 오차 기반 단일 가중치 튜닝</h4>
+<ul>
+<li>오차가 어떻게 가중치 업데이트의 브레이크 역할을 하며 시스템을 스스로 수렴(convergence)하게 만드는지 파이썬 코드로 뜯어보기.</li>
+</ul>
+<p><strong>[그림 5] [실습 1-1] 코드 해부: 오차 기반 단일 가중치 튜닝</strong> <img src="images/week6/Slide_005.png" class="img-fluid"></p>
+<div id="32179de8" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 초기 세팅 (아무것도 모르는 백지 상태의 시냅스)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 초기 시냅스 가중치: 아직 학습되지 않은 임의의 작은 연결 강도(0.1)를 부여함.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 학습률(learning_rate): 한 번의 오차를 발견했을 때 가중치를 얼마나 수정할지(오차의 20%만 반영) 결정함.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 입력 자극: 뇌에 빛 자극신호가 강하게 들어옴(1.0)을 모사함.</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 목표 정답(target): 빛 자극이 들어왔을 때 신경망이 도달해야 할 이상적인 반응 강도(1.0)를 설정함.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-1] 델타 규칙: 틀린 만큼만 정밀하게 고친다 ==="</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"목표 정답(target): </span><span class="sc">{</span>target<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 반복 학습(epochs)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 가중치의 변화과정을 기록하기 위해 빈 리스트를 생성함.</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>history_w <span class="op">=</span> []</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 1번부터 10번까지 총 10회(epoch)의 반복경험(학습)을 진행함.</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 전방 계산(forward pass): 현재의 시냅스 가중치(w)에 입력 신호(x)를 곱하여 신경망의 현재 예측치(output)를 계산함.</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> w <span class="op">*</span> x                      </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 오차 계산(error calculation): 목표로 하는 정답(target)에서 현재 신경망의 예측치(output)를 빼서 순수한 오차(error, 델타)를 구함.</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> target <span class="op">-</span> output             </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 역방향 수정(backward update): 헵 규칙과 달리 '오차(error)'를 곱해주어 오차가 클수록 크게, 작을수록 작게 가중치 변화량(delta_w)을 통제함.</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    delta_w <span class="op">=</span> learning_rate <span class="op">*</span> error <span class="op">*</span> x </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 기존 가중치(w)에 새롭게 계산된 변화량(delta_w)을 더해 시냅스 연결 강도를 최종 업데이트함.</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> w <span class="op">+</span> delta_w                     </span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 변화된 가중치를 나중에 그래프나 로그로 보기 위해 기록 리스트에 추가함.</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    history_w.append(w)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 매 에포크마다 예측치, 오차, 그리고 수정된 가중치 상태를 화면에 출력하여 모니터링함.</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"[epoch </span><span class="sc">{</span>epoch<span class="sc">:2d}</span><span class="ss">] 예측치: </span><span class="sc">{</span>output<span class="sc">:.4f}</span><span class="ss"> | 오차(error): </span><span class="sc">{</span>error<span class="sc">:.4f}</span><span class="ss"> | 수정량: +</span><span class="sc">{</span>delta_w<span class="sc">:.4f}</span><span class="ss"> -&gt; 새 가중치: </span><span class="sc">{</span>w<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 통찰: 에포크가 지날수록 예측치가 정답(1.0)에 가까워짐에 따라, 오차(error)는 점점 0으로 줄어듦."</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 오차가 줄어드니 가중치 수정량(delta_w)도 자연스럽게 0에 수렴하며, 시스템이 폭주하지 않고 스스로 학습을 멈추는 완벽한 항상성(homeostasis)을 보여줌."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 1-1] 델타 규칙: 틀린 만큼만 정밀하게 고친다 ===
+목표 정답(target): 1.0
+
+[epoch  1] 예측치: 0.1000 | 오차(error): 0.9000 | 수정량: +0.1800 -&gt; 새 가중치: 0.2800
+[epoch  2] 예측치: 0.2800 | 오차(error): 0.7200 | 수정량: +0.1440 -&gt; 새 가중치: 0.4240
+[epoch  3] 예측치: 0.4240 | 오차(error): 0.5760 | 수정량: +0.1152 -&gt; 새 가중치: 0.5392
+[epoch  4] 예측치: 0.5392 | 오차(error): 0.4608 | 수정량: +0.0922 -&gt; 새 가중치: 0.6314
+[epoch  5] 예측치: 0.6314 | 오차(error): 0.3686 | 수정량: +0.0737 -&gt; 새 가중치: 0.7051
+[epoch  6] 예측치: 0.7051 | 오차(error): 0.2949 | 수정량: +0.0590 -&gt; 새 가중치: 0.7641
+[epoch  7] 예측치: 0.7641 | 오차(error): 0.2359 | 수정량: +0.0472 -&gt; 새 가중치: 0.8113
+[epoch  8] 예측치: 0.8113 | 오차(error): 0.1887 | 수정량: +0.0377 -&gt; 새 가중치: 0.8490
+[epoch  9] 예측치: 0.8490 | 오차(error): 0.1510 | 수정량: +0.0302 -&gt; 새 가중치: 0.8792
+[epoch 10] 예측치: 0.8792 | 오차(error): 0.1208 | 수정량: +0.0242 -&gt; 새 가중치: 0.9034
+
+-&gt; 통찰: 에포크가 지날수록 예측치가 정답(1.0)에 가까워짐에 따라, 오차(error)는 점점 0으로 줄어듦.
+-&gt; 오차가 줄어드니 가중치 수정량(delta_w)도 자연스럽게 0에 수렴하며, 시스템이 폭주하지 않고 스스로 학습을 멈추는 완벽한 항상성(homeostasis)을 보여줌.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="경사하강법gradient-descent과-손실공간loss-landscape" class="level3">
+<h3 class="anchored" data-anchor-id="경사하강법gradient-descent과-손실공간loss-landscape">1.2. 경사하강법(gradient descent)과 손실공간(loss landscape)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>델타 규칙은 인지 모델링의 언어이지만, 이를 공학과 수학의 언어로 번역하면 최적화 알고리즘의 핵심 뼈대인 <strong>경사하강법(gradient descent)</strong>과 완벽히 일치함.</li>
+<li>인공신경망 학습의 궁극적인 목표는 수만 개의 시냅스 가중치(<span class="math inline">\(W\)</span>)들이 뱉어내는 수많은 예측오차들을 전부 모아 제곱하여 더한 <strong>총 손실(total loss, 비용 함수)</strong>의 값을 수학적으로 가장 작게(최소화) 만드는 완벽한 가중치 조합을 찾는 것임.</li>
+</ul></li>
+<li><strong>심화 해설 (기하학적 이해)</strong>
+<ul>
+<li><strong>손실 공간(loss landscape):</strong> 가로축을 가중치(<span class="math inline">\(W\)</span>), 세로축을 오차(loss)로 두면, 허공에 거대한 밥그릇 모양의 2차 함수 곡선 지형도가 그려짐.</li>
+<li><strong>미분(derivative)의 역할:</strong> 미분은 현재 가중치 위치에서 지형의 ’기울기(가파른 정도와 방향)’를 알려주는 나침반임. 기울기가 양수(+)면 오른쪽이 오르막이란 뜻이고, 음수(-)면 오른쪽이 내리막이란 뜻.</li>
+<li><strong>경사하강(descent):</strong> 오차를 줄이려면 오르막(기울기)의 <strong>정반대 방향(마이너스 부호 적용)</strong>으로 걸음을 내디뎌야 함. 이를 수식화한 것이 <span class="math inline">\(W_{new} = W_{old} - \eta \cdot \nabla L\)</span> 이며, 여기서 손실 함수의 미분값(<span class="math inline">\(\nabla L\)</span>)을 풀면 정확히 델타 규칙의 <span class="math inline">\((Y-T) \cdot X\)</span> 형태가 도출됨.</li>
+<li><strong>학습률(<span class="math inline">\(\eta\)</span>)의 딜레마:</strong>
+<ul>
+<li>보폭(<span class="math inline">\(\eta\)</span>)이 너무 작으면 바닥에 도달하기까지 천년 만년이 걸리거나, 중간에 있는 얕은 웅덩이(local minimum)에 빠져 갇혀버림(과소 적합).</li>
+<li>보폭(<span class="math inline">\(\eta\)</span>)이 너무 크면 계곡 반대편 언덕으로 튕겨 나가며 오차가 걷잡을 수 없이 더 커지는 <strong>발산(overshooting)</strong> 현상이 일어남. 모델 피팅(model fitting) 시 가장 주의해야 할 하이퍼파라미터임.</li>
+</ul></li>
+</ul></li>
+<li><strong>비유</strong>
+<ul>
+<li><strong>안대 낀 등산객:</strong> 짙은 안개가 낀 거대한 분지 지형(한라산 백록담) 한가운데에 안대를 낀 등산객(신경망)이 헬기에서 떨어짐. 이 사람의 목표는 가장 고도가 낮은 골짜기 밑바닥(loss = <span class="math inline">\(0\)</span>)을 찾는 것임.</li>
+<li>지도가 없으니 오직 발바닥에 느껴지는 현재 땅의 경사(미분값)만 느낌. 앞꿈치가 들려있으면(오르막), 뒤로 한 걸음 물러섬. 뒤꿈치가 들려있으면 앞으로 한 걸음 감.</li>
+<li>이 ‘가장 가파른 내리막을 향해 한 걸음씩 걷는’ 무식하지만 확실한 반복행위가 바로 딥러닝과 인지 모델을 학습시키는 경사하강법의 본질임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 6] 손실 공간과 안대 낀 등산객</strong> <img src="images/week6/Slide_006.png" class="img-fluid"></p>
+<section id="실습-1-2-학습률에-따른-경사하강법의-발산과-수렴-비교" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-2-학습률에-따른-경사하강법의-발산과-수렴-비교">[실습 1-2] 학습률에 따른 경사하강법의 발산과 수렴 비교</h4>
+<ul>
+<li>학습률(보폭) 설정에 따라 모델이 정답을 향해 우아하게 내려가는지(수렴), 아니면 계곡 밖으로 튕겨 나가는지(발산) 코드를 통해 극명한 차이를 확인.</li>
+</ul>
+<p><strong>[그림 7] [실습 1-2] 학습률(<span class="math inline">\(\eta\)</span>)의 딜레마: 수렴과 발산</strong> <img src="images/week6/Slide_007.png" class="img-fluid"></p>
+<div id="65d6534f" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 동일한 문제 환경 세팅</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 비교를 위해 입력 신호(x)와 도달해야 할 정답(target)을 1.0으로 동일하게 고정함.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 신경망 두 개의 가중치 및 학습률 차별 세팅</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 첫 번째 신경망: 정상적인 신경망(w_good)</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>w_good <span class="op">=</span> <span class="fl">0.1</span>          <span class="co"># 정상 신경망의 초기 가중치</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>lr_good <span class="op">=</span> <span class="fl">0.2</span>         <span class="co"># 적당한 보폭으로 설정한 정상 학습률(안정적 수렴을 유도함)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 두 번째 신경망: 문제가 있는 신경망(w_bad)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>w_bad <span class="op">=</span> <span class="fl">0.1</span>           <span class="co"># 문제 신경망의 초기 가중치(출발선은 동일함)</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>lr_bad <span class="op">=</span> <span class="fl">1.5</span>          <span class="co"># 의도적으로 너무 큰 보폭으로 설정한 과다 학습률(계곡 반대편으로 튕겨 나가는 발산을 유도함)</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-2] 학습률의 마법과 저주 ==="</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"목표: 가중치(w)가 1.0에 도달해야 함.</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 경사하강법 5회 반복 시뮬레이션</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 에포크를 5회만 짧게 돌려 발산 현상이 초반에 어떻게 일어나는지 관찰함.</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">6</span>):</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [정상 신경망의 예측, 오차 계산, 가중치 수정 과정]</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    out_good <span class="op">=</span> w_good <span class="op">*</span> x                           <span class="co"># 현재 가중치로 예측치를 도출함</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    err_good <span class="op">=</span> target <span class="op">-</span> out_good                    <span class="co"># 오차를 계산함(정답 - 예측치)</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    w_good <span class="op">=</span> w_good <span class="op">+</span> (lr_good <span class="op">*</span> err_good <span class="op">*</span> x)      <span class="co"># 적절한 학습률(0.2)을 곱하여 델타 규칙으로 가중치를 업데이트함</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [과다 학습률 신경망의 예측, 오차 계산, 가중치 수정 과정]</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    out_bad <span class="op">=</span> w_bad <span class="op">*</span> x                             <span class="co"># 문제 신경망의 예측치를 도출함</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    err_bad <span class="op">=</span> target <span class="op">-</span> out_bad                      <span class="co"># 문제 신경망의 오차를 계산함</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    w_bad <span class="op">=</span> w_bad <span class="op">+</span> (lr_bad <span class="op">*</span> err_bad <span class="op">*</span> x)          <span class="co"># 지나치게 큰 학습률(1.5)을 곱하여 델타 규칙으로 가중치를 무리하게 업데이트함</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 매 에포크마다 두 신경망의 오차와 수정된 가중치 상태를 출력하여 직관적으로 비교함</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"[epoch </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss">]"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  - 적정 학습률 (lr=0.2): 오차 </span><span class="sc">{</span>err_good<span class="sc">:5.2f}</span><span class="ss"> -&gt; 새 가중치 </span><span class="sc">{</span>w_good<span class="sc">:6.2f}</span><span class="ss"> (안정적 접근)"</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  - 과다 학습률 (lr=1.5): 오차 </span><span class="sc">{</span>err_bad<span class="sc">:5.2f}</span><span class="ss"> -&gt; 새 가중치 </span><span class="sc">{</span>w_bad<span class="sc">:6.2f}</span><span class="ss"> (지그재그 폭주!)"</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 통찰: 학습률(보폭)이 너무 크면, 계곡 바닥을 지나쳐 반대편 언덕 더 높은 곳으로 튕겨 나가는 '오버슈팅'이 발생하여 영원히 정답을 찾지 못함."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 1-2] 학습률의 마법과 저주 ===
+목표: 가중치(w)가 1.0에 도달해야 함.
+
+[epoch 1]
+  - 적정 학습률 (lr=0.2): 오차  0.90 -&gt; 새 가중치   0.28 (안정적 접근)
+  - 과다 학습률 (lr=1.5): 오차  0.90 -&gt; 새 가중치   1.45 (지그재그 폭주!)
+[epoch 2]
+  - 적정 학습률 (lr=0.2): 오차  0.72 -&gt; 새 가중치   0.42 (안정적 접근)
+  - 과다 학습률 (lr=1.5): 오차 -0.45 -&gt; 새 가중치   0.77 (지그재그 폭주!)
+[epoch 3]
+  - 적정 학습률 (lr=0.2): 오차  0.58 -&gt; 새 가중치   0.54 (안정적 접근)
+  - 과다 학습률 (lr=1.5): 오차  0.23 -&gt; 새 가중치   1.11 (지그재그 폭주!)
+[epoch 4]
+  - 적정 학습률 (lr=0.2): 오차  0.46 -&gt; 새 가중치   0.63 (안정적 접근)
+  - 과다 학습률 (lr=1.5): 오차 -0.11 -&gt; 새 가중치   0.94 (지그재그 폭주!)
+[epoch 5]
+  - 적정 학습률 (lr=0.2): 오차  0.37 -&gt; 새 가중치   0.71 (안정적 접근)
+  - 과다 학습률 (lr=1.5): 오차  0.06 -&gt; 새 가중치   1.03 (지그재그 폭주!)
+
+-&gt; 통찰: 학습률(보폭)이 너무 크면, 계곡 바닥을 지나쳐 반대편 언덕 더 높은 곳으로 튕겨 나가는 '오버슈팅'이 발생하여 영원히 정답을 찾지 못함.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="주차의-복수-델타-규칙으로-파국적-간섭-완벽히-억제하기" class="level3">
+<h3 class="anchored" data-anchor-id="주차의-복수-델타-규칙으로-파국적-간섭-완벽히-억제하기">1.3. 5주차의 복수: 델타 규칙으로 파국적 간섭 완벽히 억제하기</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>5주차 실습에서 사과(<code>[1, 1, -1, -1]</code>)와 토마토(<code>[1, 1, 1, -1]</code>)를 직교성(orthogonality) 없이 단순히 한 도화지에 덧셈(헵 규칙)했을 때, 두 과일이 공유하는 특징(빨갛다, 둥글다)의 가중치가 비정상적으로 누적(<span class="math inline">\(+3\)</span>, <span class="math inline">\(+4\)</span>)되어 시스템이 붕괴했음.</li>
+<li>하지만 델타 규칙은 <strong>오차를 줄이는 방향으로만</strong> 움직이므로, 이 ’비직교 패턴’들도 한 네트워크망 안에 잉크 번짐(폭주) 없이 안전하게 구별하여 저장할 수 있음.</li>
+</ul></li>
+<li><strong>해결 원리(특징 선택 및 억제 메커니즘)</strong>
+<ul>
+<li>네트워크에 사과를 보여주고 “이건 사과야(<span class="math inline">\(+1\)</span>)”라고 지도하고, 다음 날 토마토를 보여주고 “이건 토마토야(<span class="math inline">\(-1\)</span>)”라고 번갈아가며 오차를 튜닝함.</li>
+<li>학습이 반복되면 네트워크는 놀라운 사실을 스스로 깨달음: <strong>빨갛다(1번 노드)와 둥글다(2번 노드)는 두 과일에 다 들어 있어서 정답을 맞히는 데 전혀 도움이 안 된다!</strong></li>
+<li>델타 규칙은 오차를 최소화하기 위해 쓸모없는 공유 특징(1번, 2번 노드)의 시냅스 연결선 가중치를 스스로 아예 <strong><span class="math inline">\(0\)</span>에 가깝게 깎아버림(cancel out).</strong></li>
+<li>대신 사과와 토마토를 완벽히 가르는 결정적 차이인 3번 노드(물렁함)의 가중치만 극대화시켜서 문제를 해결함.</li>
+</ul></li>
+</ul>
+<section id="실습-1-3-델타-규칙을-통한-비직교-패턴의-간섭-억제-및-특징-추상화" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-3-델타-규칙을-통한-비직교-패턴의-간섭-억제-및-특징-추상화">[실습 1-3] 델타 규칙을 통한 비직교 패턴의 간섭 억제 및 특징 추상화</h4>
+<ul>
+<li>파국적 간섭을 일으켰던 두 패턴을 델타 규칙으로 학습시켜, 가중치가 떡지지 않고 깎여나가며 수렴하는지 확인.</li>
+</ul>
+<p><strong>[그림 8] [실습 1-3] 특징 선택: 비직교 패턴의 파국적 간섭 억제</strong> <img src="images/week6/Slide_008.png" class="img-fluid"></p>
+<div id="757eb30c" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 5주차의 악몽: 특징이 심하게 겹치는 비직교 패턴 준비</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 4개의 감각 노드 구조: [빨강, 둥긂, 물렁함, 길쭉함]</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 사과는 빨갛고(+1), 둥글고(+1), 물렁하지 않으며(-1), 길쭉하지 않음(-1)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>apple <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 토마토는 빨갛고(+1), 둥글고(+1), 물렁하며(+1), 길쭉하지 않음(-1)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>tomato <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span>,  <span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 정답(target) 세팅: 사과가 들어오면 +1을 출력하고, 토마토가 들어오면 -1을 출력하도록 지도학습 정답을 지시함.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>target_apple <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>target_tomato <span class="op">=</span> <span class="op">-</span><span class="fl">1.0</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 가중치 초기화</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 4개의 감각특징을 받아들이기 위해 시냅스 연결 파이프 4개를 생성하고 가중치를 모두 0으로 비워둠.</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 벡터/행렬의 관례에 따라 W는 대문자로 유지함.</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>W <span class="op">=</span> np.zeros(<span class="dv">4</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 가중치를 조금씩 수정할 학습률을 0.1로 안정적으로 설정함.</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-3] 델타 규칙으로 파국적 간섭 억제 및 텐션 튜닝 ==="</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 번갈아 가며 델타 규칙 학습(epoch 50회)</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 사과와 토마토를 한 번씩 번갈아 보여주는 과정을 50번 반복함.</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">51</span>):</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [사과 학습 단계]</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 사과 데이터를 넣어 현재 뇌(W)가 사과를 얼마나 긍정적으로 판단하는지 예측함.</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    out_apple <span class="op">=</span> np.dot(W, apple)                 </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 사과에 대한 이상적 정답(+1)에서 현재 예측치를 빼서 사과 오차를 계산함.</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    err_apple <span class="op">=</span> target_apple <span class="op">-</span> out_apple         </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 사과의 입력값, 오차, 학습률을 곱해 가중치를 양의 방향(+)으로 수정함.</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> W <span class="op">+</span> learning_rate <span class="op">*</span> err_apple <span class="op">*</span> apple    </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [토마토 학습 단계]</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 방금 수정된 뇌(W)에 토마토 데이터를 넣어 예측치를 산출함.</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    out_tomato <span class="op">=</span> np.dot(W, tomato)               </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 토마토에 대한 이상적 정답(-1)에서 현재 예측치를 빼서 토마토 오차를 계산함.</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    err_tomato <span class="op">=</span> target_tomato <span class="op">-</span> out_tomato      </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 토마토의 입력값, 오차, 학습률을 곱해 가중치를 이번엔 음의 방향(-)으로 수정함.</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> W <span class="op">+</span> learning_rate <span class="op">*</span> err_tomato <span class="op">*</span> tomato  </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 학습 과정을 10번마다 화면에 출력하여 총 오차가 점진적으로 0을 향해 수렴하는지 모니터링함.</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        total_error <span class="op">=</span> <span class="bu">abs</span>(err_apple) <span class="op">+</span> <span class="bu">abs</span>(err_tomato)</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"[epoch </span><span class="sc">{</span>epoch<span class="sc">:2d}</span><span class="ss">] 사과오차: </span><span class="sc">{</span>err_apple<span class="sc">:5.2f}</span><span class="ss"> | 토마토오차: </span><span class="sc">{</span>err_tomato<span class="sc">:5.2f}</span><span class="ss"> | 총오차: </span><span class="sc">{</span>total_error<span class="sc">:5.2f}</span><span class="ss">"</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 폭주가 억제된 최종 가중치 맵 확인</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="co"># 반복학습이 끝난 후 최종적으로 결정된 시냅스 가중치 4개를 확인함.</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">[학습 완료] 최종 안정화된 가중치(W):"</span>, W.<span class="bu">round</span>(<span class="dv">2</span>))</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 노드 1,2(빨강, 둥긂)와 노드 4(길쭉함)는 0으로 죽어버렸고, 노드 3(물렁함)만 -1로 강력하게 세팅됨!"</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="co"># 학습된 신경망이 사과와 토마토를 입력받았을 때 목표한 정답을 완벽히 뱉어내는지 검증함.</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">[검증 테스트]"</span>)</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"사과 입력 시 모델 출력: </span><span class="sc">{</span>np<span class="sc">.</span>dot(W, apple)<span class="sc">:.2f}</span><span class="ss"> (우리가 지시한 정답: </span><span class="sc">{</span>target_apple<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"토마토 입력 시 모델 출력: </span><span class="sc">{</span>np<span class="sc">.</span>dot(W, tomato)<span class="sc">:.2f}</span><span class="ss"> (우리가 지시한 정답: </span><span class="sc">{</span>target_tomato<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 심화 해설: 5주차 헵 규칙에서는 1번, 2번 노드(빨강, 둥긂)가 계속 덧셈 누적되어 잉크가 떡지고 붕괴했음."</span>)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 반면 델타 규칙은 두 과일을 구별하는 데 쓸모없는 공통 특징 가중치를 스스로 0으로 소거(cancel out)해버림."</span>)</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 오직 차이점인 3번 노드(물렁함) 하나만 잡고서 두 사물을 완벽하게 분류해내는 '데이터 추상화(abstraction)'의 지능을 획득함!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 1-3] 델타 규칙으로 파국적 간섭 억제 및 텐션 튜닝 ===
+[epoch 10] 사과오차:  0.12 | 토마토오차: -0.11 | 총오차:  0.23
+[epoch 20] 사과오차:  0.01 | 토마토오차: -0.01 | 총오차:  0.02
+[epoch 30] 사과오차:  0.00 | 토마토오차: -0.00 | 총오차:  0.00
+[epoch 40] 사과오차:  0.00 | 토마토오차: -0.00 | 총오차:  0.00
+[epoch 50] 사과오차:  0.00 | 토마토오차: -0.00 | 총오차:  0.00
+
+[학습 완료] 최종 안정화된 가중치(W): [-0. -0. -1.  0.]
+-&gt; 노드 1,2(빨강, 둥긂)와 노드 4(길쭉함)는 0으로 죽어버렸고, 노드 3(물렁함)만 -1로 강력하게 세팅됨!
+
+[검증 테스트]
+사과 입력 시 모델 출력: 1.00 (우리가 지시한 정답: 1.0)
+토마토 입력 시 모델 출력: -1.00 (우리가 지시한 정답: -1.0)
+
+-&gt; 심화 해설: 5주차 헵 규칙에서는 1번, 2번 노드(빨강, 둥긂)가 계속 덧셈 누적되어 잉크가 떡지고 붕괴했음.
+-&gt; 반면 델타 규칙은 두 과일을 구별하는 데 쓸모없는 공통 특징 가중치를 스스로 0으로 소거(cancel out)해버림.
+-&gt; 오직 차이점인 3번 노드(물렁함) 하나만 잡고서 두 사물을 완벽하게 분류해내는 '데이터 추상화(abstraction)'의 지능을 획득함!</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="부-은닉층의-발견과-책임의-분배오차-역전파" class="level2">
+<h2 class="anchored" data-anchor-id="부-은닉층의-발견과-책임의-분배오차-역전파">2부: 은닉층의 발견과 책임의 분배(오차 역전파)</h2>
+<section id="단층-퍼셉트론의-치명적-한계와-선형-분리-불가능성" class="level3">
+<h3 class="anchored" data-anchor-id="단층-퍼셉트론의-치명적-한계와-선형-분리-불가능성">2.1. 단층 퍼셉트론의 치명적 한계와 선형 분리 불가능성</h3>
+<ul>
+<li><strong>이론적 설명(단층구조의 기하학적 한계)</strong>
+<ul>
+<li>델타 규칙으로 많은 최적화 문제가 해결되었으나, 1969년 마빈 민스키(Marvin Minsky)와 시모어 패퍼트(Seymour Papert)는 저서 <em>Perceptrons</em>를 통해 <strong>단층 퍼셉트론(입력층과 출력층만 있는 단순 구조)의 치명적인 수학적 한계</strong>를 완벽하게 증명함.</li>
+<li><strong>AND와 OR 연산의 성공</strong>
+<ul>
+<li>AND(둘 다 참일 때만 1)나 OR(하나라도 참이면 1) 문제는 2차원 평면(그래프)에 4개의 데이터를 찍었을 때, <strong>단 하나의 일직선(선형경계, linear boundary)</strong>을 그어 정답(1)과 오답(0) 그룹을 깔끔하게 가를 수 있음(선형분리 가능).</li>
+<li>단층 퍼셉트론의 가중치 계산 수식(<span class="math inline">\(w_1x_1 + w_2x_2 + b = 0\)</span>)은 기하학적으로 볼 때 2차원 평면 위에 이 일직선 하나를 긋는 행위와 정확히 일치함.</li>
+</ul></li>
+<li><strong>XOR 문제(배타적 논리합)의 절망</strong>
+<ul>
+<li>하지만 XOR 문제는 “두 입력이 서로 다를 때만 참(1)을, 같으면(둘 다 0이거나 둘 다 1) 거짓(0)을 반환하라”는 조건임.</li>
+<li>이를 2차원 평면에 점으로 찍으면 (0, 1)과 (1, 0)은 대각선으로 마주 보고, (0, 0)과 (1, 1) 역시 반대 대각선으로 마주 보는 교차 형태가 됨.</li>
+<li>아무리 가중치를 정교하게 튜닝(경사하강)해도, <strong>평면 위에 빳빳한 직선 단 하나를 그어서 대각선으로 마주 보는 점들을 같은 그룹으로 묶어낼 방법은 우주상에 존재하지 않음</strong> <span class="math inline">\(\Rightarrow\)</span> 선형분리 불가능 문제.</li>
+</ul></li>
+</ul></li>
+<li><strong>심화 해설(인지적 유연성의 부재와 맥락의 상실)</strong>
+<ul>
+<li>4주차에서 깊이 논의했듯, 이 XOR 문제는 단순한 수학 논리 퍼즐이 아니라 <strong>고차원적 인간 인지의 필수요건인 맥락 의존성(context-dependency)</strong>을 상징하는 거대한 장벽임.</li>
+<li>예시
+<ul>
+<li>인지 시스템에 “나는 커피(A)도 좋고, 오렌지 주스(B)도 좋지만, 두 개를 섞어 마시는 것(A AND B)은 최악이다”라는 취향을 학습시킨다고 가정해보겠음.</li>
+<li>단층 퍼셉트론은 단순히 입력된 신호의 호감도(가중치)를 ‘독립적으로 더하는(덧셈)’ 역할만 하므로, 커피(+1)와 주스(+1)가 동시에 들어오면 긍정 수치가 폭발하여 무조건 ’아주 좋다(+2)’는 치명적인 오답 결론을 내림.</li>
+</ul></li>
+<li>이처럼 단층 구조의 선형적 판단력으로는 “각각의 요소는 긍정적이지만, 두 요소가 ‘동시에’ 존재할 때는 부정적으로 의미가 뒤집힌다”는 비선형적이고 배타적인 상호작용(맥락)을 절대 분리해낼 수 없음. 결국 이 단순한 1차원적 덧셈 기계는 조금만 맥락이 꼬여 있는 환경을 만나면 영원히 에러율 50%의 늪에 빠져 허우적대며, 인공지능 역사에 길고 추운 첫 번째 AI 겨울을 불러오게 됨.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 9] 선형 분리 불가능성: 1차원적 덧셈 기계의 절망</strong> <img src="images/week6/Slide_009.png" class="img-fluid"></p>
+<section id="실습-2-1-파이썬으로-확인하는-단층-퍼셉트론의-선형-분리-한계xor-실패-목격" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-1-파이썬으로-확인하는-단층-퍼셉트론의-선형-분리-한계xor-실패-목격">[실습 2-1] 파이썬으로 확인하는 단층 퍼셉트론의 선형 분리 한계(XOR 실패 목격)</h4>
+<ul>
+<li>수만 번을 델타 규칙으로 학습시켜도, 은닉층이 없는 단층 모델은 XOR 문제에서 오차를 줄이지 못하고 절망적인 0.5 근처를 맴돌게 됨을 직접 목격.</li>
+</ul>
+<p><strong>[그림 10] [실습 2-1] 파이썬으로 목격하는 평면의 한계</strong> <img src="images/week6/Slide_010.png" class="img-fluid"></p>
+<div id="a7a7a29d" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. XOR 데이터셋 준비</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># XOR 논리 회로: 두 입력이 [0,0]이거나 [1,1]로 같으면 정답은 0, 서로 다르면([0,1] 또는 [1,0]) 정답은 1을 출력해야 함.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>X_xor <span class="op">=</span> np.array([[<span class="dv">0</span>,<span class="dv">0</span>], [<span class="dv">0</span>,<span class="dv">1</span>], [<span class="dv">1</span>,<span class="dv">0</span>], [<span class="dv">1</span>,<span class="dv">1</span>]])</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>Y_xor <span class="op">=</span> np.array([[<span class="dv">0</span>],   [<span class="dv">1</span>],   [<span class="dv">1</span>],   [<span class="dv">0</span>]])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 단층 퍼셉트론 가중치 세팅</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 은닉층 없이 입력 2개에서 곧바로 출력 1개로 직행하는 2 x 1 가중치 행렬을 임의로(0.1, 0.2) 생성함.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>W_single <span class="op">=</span> np.array([[<span class="fl">0.1</span>], [<span class="fl">0.2</span>]])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 2-1] 단층 퍼셉트론의 절망: XOR 문제 시도 ==="</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 5000번의 고된 델타 규칙 훈련</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 직선(선형 모델)으로 대각선 데이터를 자르기 위해 무려 5,000번이나 오차를 수정함.</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5000</span>):</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 입력 데이터 4세트 전체를 한꺼번에 가중치와 내적 곱셈(선형 변환) 처리함.</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    linear_out <span class="op">=</span> np.dot(X_xor, W_single)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 선형 합산된 값을 시그모이드 함수에 통과시켜 모든 값을 0과 1 사이로 부드럽게 압축함(확률값 도출).</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>linear_out)) </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 각각의 정답에서 현재의 압축된 예측치를 빼서 전체 에러를 계산함.</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> Y_xor <span class="op">-</span> output</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 시그모이드를 쓴 비선형 단층 퍼셉트론의 델타 규칙 가중치 수정 공식을 적용함.</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># error에 시그모이드 미분값인 output*(1-output)을 곱한 뒤 입력 행렬의 전치(X.T)를 곱해 기울기를 구함.</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    delta_w <span class="op">=</span> learning_rate <span class="op">*</span> np.dot(X_xor.T, error <span class="op">*</span> output <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> output))</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 계산된 변화량만큼 단층 가중치를 업데이트함.</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    W_single <span class="op">+=</span> delta_w</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 최종 예측 결과 확인</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">[학습 완료] 단층 퍼셉트론의 XOR 예측 결과:"</span>)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 5,000번 훈련이 끝난 최종 가중치(W_single)를 사용하여 4가지 입력 패턴의 결과를 최종 산출함.</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>final_prediction <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>np.dot(X_xor, W_single)))</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="co"># 4개의 입력 셋트를 루프로 돌면서 정답과 딥러닝 모델의 예측값을 나란히 출력하여 비교함.</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"입력: </span><span class="sc">{</span>X_xor[i]<span class="sc">}</span><span class="ss"> -&gt; 예측: </span><span class="sc">{</span>final_prediction[i][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss"> (정답: </span><span class="sc">{</span>Y_xor[i][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 심화 해설: 5000번이나 학습시켰지만, 예측값이 모두 0.5 언저리로 붕괴해버림."</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 직선 하나로는 대각선 데이터를 가를 수 없기 때문에, 신경망이 '모르겠다(0.5)'라고 포기해버린 수학적 절망 상태를 보여줌."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 2-1] 단층 퍼셉트론의 절망: XOR 문제 시도 ===
+
+[학습 완료] 단층 퍼셉트론의 XOR 예측 결과:
+입력: [0 0] -&gt; 예측: 0.5000 (정답: 0)
+입력: [0 1] -&gt; 예측: 0.5000 (정답: 1)
+입력: [1 0] -&gt; 예측: 0.5000 (정답: 1)
+입력: [1 1] -&gt; 예측: 0.5000 (정답: 0)
+
+-&gt; 심화 해설: 5000번이나 학습시켰지만, 예측값이 모두 0.5 언저리로 붕괴해버림.
+-&gt; 직선 하나로는 대각선 데이터를 가를 수 없기 때문에, 신경망이 '모르겠다(0.5)'라고 포기해버린 수학적 절망 상태를 보여줌.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="오차-역전파backpropagation-책임은-누구에게-있는가" class="level3">
+<h3 class="anchored" data-anchor-id="오차-역전파backpropagation-책임은-누구에게-있는가">2.2. 오차 역전파(backpropagation): 책임은 누구에게 있는가?</h3>
+<ul>
+<li><strong>이론적 설명(기여도 할당의 딜레마)</strong>
+<ul>
+<li>단층 퍼셉트론의 한계를 부수기 위한 해결책은 명확했음. 입력층과 출력층 사이에 <strong>은닉층</strong>이라는 새로운 중간 다리를 놓아 다층 퍼셉트론(multi-layer perceptron, MLP) 구조를 만드는 것임.</li>
+<li>그러나 다층 구조가 되면서 인지과학과 AI 모두에 거대한 딜레마가 발생함. 바로 <strong>기여도 할당 문제(credit assignment problem)</strong>임.</li>
+<li>최종 출력층(운동신경)에서 오차가 발생했을 때, 이 오차의 책임은 바로 앞단인 <strong>[은닉층 <span class="math inline">\(\rightarrow\)</span> 출력층을 잇는 가중치(<span class="math inline">\(W_2\)</span>)]</strong>에 있는가? 아니면 아예 처음부터 데이터가 잘못 넘어온 <strong>[입력층 <span class="math inline">\(\rightarrow\)</span> 은닉층을 잇는 가중치(<span class="math inline">\(W_1\)</span>)]</strong>에서부터 꼬인 것인가?</li>
+<li>외부에서 정답(target)을 직접 알려주는 곳은 오직 최종 출력층뿐임. 그렇다면 정답을 알 수 없는 중간 기착지, 즉 <strong>[입력층 <span class="math inline">\(\rightarrow\)</span> 은닉층을 잇는 가중치(<span class="math inline">\(W_1\)</span>)]</strong>는 도대체 자신의 오차를 어떻게 구해서 델타 규칙을 적용한단 말인가?</li>
+</ul></li>
+</ul>
+<p><strong>[그림 11] 다층 구조의 등장과 기여도 할당의 딜레마</strong> <img src="images/week6/Slide_011.png" class="img-fluid"></p>
+<ul>
+<li><strong>해결책: 미분의 연쇄법칙</strong>
+<ul>
+<li>1980년대 제프리 힌튼(Geoffrey Hinton), 데이비드 루멜하트(David Rumelhart) 등이 제안한 <strong>오차 역전파</strong> 알고리즘이 10여 년의 AI 겨울을 끝내고 이 문제를 해결함.</li>
+<li>고등학교 수학에 나오는 미분의 ’연쇄법칙(합성함수의 미분)’을 이용해, 최종 출력층에서 계산된 오차(<span class="math inline">\(\delta\)</span>)를 뒤에서부터 앞으로(backward) 가중치 파이프라인을 거꾸로 타고 흘려보내며 각 시냅스 다리(<span class="math inline">\(W_2\)</span>, <span class="math inline">\(W_1\)</span>)의 책임 비율을 분배함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 12] 사장님의 분노와 미분의 연쇄법칙</strong> <img src="images/week6/Slide_012_1.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유(회사 조직의 적자와 내리갈굼)</strong>
+<ul>
+<li>구조
+<ul>
+<li>입력층 = 말단 사원.</li>
+<li>은닉층 = 중간 관리자.</li>
+<li>출력층 = 사장.</li>
+<li>손실(error) = 회사의 막대한 적자.</li>
+</ul></li>
+<li>가중치 다리
+<ul>
+<li><span class="math inline">\(W_1\)</span> = 말단 사원의 보고를 중간 관리자가 신뢰하는 정도.</li>
+<li><span class="math inline">\(W_2\)</span> = 중간 관리자의 기획안을 사장이 신뢰하는 정도.</li>
+</ul></li>
+<li><strong>순전파(forward pass):</strong> 말단 사원이 원본 데이터를 올리면(<span class="math inline">\(W_1\)</span> 통과), 중간 관리자가 취합하고, 사장이 최종 결정함(<span class="math inline">\(W_2\)</span> 통과). <span class="math inline">\(\rightarrow\)</span> 결재가 났는데 회사가 10억 적자를 봄.</li>
+<li><strong>역전파(backward pass):</strong>
+<ul>
+<li>적자(오차)가 발생하면, 사장은 중간 관리자가 적자에 기여한 지분(기울기)을 따져 묻고, 그 책임만큼 중간 관리자에 대한 신뢰도(가중치 <span class="math inline">\(W_2\)</span>)를 깎아버림.</li>
+<li>질책을 받은 중간 관리자는 자기가 받은 벌점을 바탕으로, 애초에 데이터를 올린 말단 사원들의 책임 지분을 역추적하여 그들에 대한 신뢰도(가중치 <span class="math inline">\(W_1\)</span>)를 깎아내림.</li>
+<li>요약: 이처럼 “정확한 책임 비율(오차)을 <strong>위에서 아래로</strong> 연쇄적으로 따져 묻고, 그 벌점만큼 서로 간의 신뢰도(가중치)를 수정하는” 구조가 역전파 알고리즘의 핵심임.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 13] 오차 역전파: 책임의 연쇄 추궁</strong> <img src="images/week6/Slide_012.png" class="img-fluid"></p>
+<section id="실습-2-2-다층-신경망의-순전파와-역전파-1회차-해부하기" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-2-다층-신경망의-순전파와-역전파-1회차-해부하기">[실습 2-2] 다층 신경망의 순전파와 역전파 1회차 해부하기</h4>
+<ul>
+<li>복잡한 미분 수식 대신, 파이썬 행렬 연산을 통해 오차가 뒷단에서 앞단으로 어떻게 거꾸로 흘러 들어가는지 코드의 흐름(chain rule)을 뜯어봄.</li>
+<li>“전치행렬”과 <code>W2.T</code>란?
+<ul>
+<li><strong>전치행렬(transpose matrix):</strong> 행렬의 <strong>행(가로)</strong>과 <strong>열(세로)</strong>을 서로 맞바꾼 행렬을 뜻함. 수학기호로는 행렬 우측 상단에 알파벳 <span class="math inline">\(T\)</span>를 붙여서 <span class="math inline">\(W^T\)</span>라고 표기. 세로로 길쭉했던 행렬은 가로로 눕혀지고, 가로로 넓었던 행렬은 세로로 세워지는 연산.</li>
+<li><strong><code>W2.T</code>의 의미:</strong> 파이썬의 <code>numpy</code> 라이브러리에서는 행렬 변수 뒤에 <code>.T</code>만 붙이면 전치행렬을 만들어줌. 즉 <code>W2.T</code>는 <strong>“W2 행렬의 가로세로 방향을 뒤집어라”</strong>라는 파이썬 명령어.</li>
+</ul></li>
+<li>왜 역전파에서 ’전치’가 필수적인가?
+<ul>
+<li>[실습 2-2]의 뼈대를 보면 <strong>중간 관리자(은닉층)는 2명</strong>이고, <strong>사장님(출력층)은 1명</strong>임.</li>
+<li>순전파(업무보고 방향): <span class="math inline">\(W_2\)</span> 사용
+<ul>
+<li>보고서는 <strong>2명(은닉층)</strong> <span class="math inline">\(\rightarrow\)</span> <strong>1명(출력층)</strong> 방향으로 올라감.</li>
+<li>이때 두 층을 연결하는 가중치 파이프 <span class="math inline">\(W_2\)</span>는 중간 관리자 각각의 신뢰도를 담아야 하므로 <code>[[0.6], [0.7]]</code>이라는 <strong>2행 1열(세로로 긴 모양)</strong>의 행렬이 됨.</li>
+</ul></li>
+<li>역전파(내리갈굼 방향): <span class="math inline">\(W_2^T\)</span> 사용
+<ul>
+<li>회사가 적자(오차)를 보면, 이제 사장님이 중간 관리자들에게 책임을 물어야 함.</li>
+<li>질책의 방향은 아까와 반대로 <strong>1명(출력층)</strong> <span class="math inline">\(\rightarrow\)</span> <strong>2명(은닉층)</strong> 방향으로 ’역류’해야 함.</li>
+<li>방향이 거꾸로 바뀌었기 때문에, 보고서가 올라갈 때 썼던 세로 파이프(<span class="math inline">\(W_2\)</span>, 2x1)를 그대로 쓸 수가 없음. 수학적으로 행렬의 아귀(차원)가 맞지 않기 때문.</li>
+<li>그래서 사장님의 질책(<span class="math inline">\(\Delta\)</span>) 1개가 2명의 중간 관리자에게 쫙 퍼져 내려가도록, <strong>기존 파이프를 가로로 눕혀서 1행 2열(<code>[0.6, 0.7]</code>)</strong>(수학적으로는 전치를 해도 여전히 행렬이지만, 파이썬 상에서는 벡터로 취급됨)의 파이프로 억지로 방향을 뒤집어주는 작업이 필요. 이것이 바로 전치행렬(<code>W2.T</code>)을 곱하는 이유.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 14] [실습 2-2] 행렬의 전치(Transpose)와 역류하는 파이프</strong> <img src="images/week6/Slide_013.png" class="img-fluid"></p>
+<div id="df481ebe" class="cell" data-execution_count="5">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 0. 사전 함수 정의</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 어떤 값이든 0과 1 사이로 압축해주는 비선형 활성화 함수인 시그모이드 함수를 정의함.</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sigmoid(x):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 신경망의 곡선 기울기(미분)를 구하는 함수. 시그모이드는 (결과값) * (1 - 결과값)으로 매우 간단히 미분됨.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sigmoid_derivative(out):</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> out)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 네트워크 뼈대 구성</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 입력 노드 2개(말단 사원 2명)가 제출한 데이터 보고서를 세팅함.</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.array([[<span class="fl">1.0</span>, <span class="fl">0.5</span>]])</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 최종 출력 노드 1개(사장님)가 기대한 완벽한 100% 이익(정답)을 세팅함.</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> np.array([[<span class="fl">1.0</span>]])</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 가중치 초기화</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 말단 사원(2명)에서 중간 관리자(2명)로 가는 W1 파이프(2x2 행렬)의 호감도를 양수로 고정 세팅함.</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>W1 <span class="op">=</span> np.array([[<span class="fl">0.2</span>, <span class="fl">0.3</span>],</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>               [<span class="fl">0.4</span>, <span class="fl">0.5</span>]])</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 중간 관리자(2명)에서 사장님(1명)으로 가는 W2 파이프(2x1 행렬)의 호감도를 세팅함.</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>W2 <span class="op">=</span> np.array([[<span class="fl">0.6</span>],</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>               [<span class="fl">0.7</span>]])</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 한 번 혼낼 때마다 가중치를 얼마나 깎을지 결정할 학습률을 0.5로 크게 설정함.</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 2-2] 오차 역전파 흐름 1회차 뜯어보기 ==="</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------------</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co"># [Step 1] 순전파(forward pass): 입력 -&gt; 은닉 -&gt; 출력(업무보고 라인)</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------------</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 입력 데이터가 W1 가중치 망을 통과하여 은닉층에 도착한 순수 전기 합산량을 구함.</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>hidden_input <span class="op">=</span> np.dot(X, W1)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 은닉층 노드가 그 합산량을 시그모이드 함수로 압축시켜 내부 표상(중간 결재안)을 생성함.</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>hidden_out <span class="op">=</span> sigmoid(hidden_input)</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co"># 은닉층의 결과물이 W2 가중치 망을 통과하여 최종 출력층(사장님)에 도달한 합산량을 구함.</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>final_input <span class="op">=</span> np.dot(hidden_out, W2)</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="co"># 사장님이 그 합산량을 시그모이드 함수로 압축시켜 최종 예측(회사 실적)을 뱉어냄.</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>final_out <span class="op">=</span> sigmoid(final_input)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co"># 사장님이 기대한 정답(target)에서 방금 도출한 최종 실적(final_out)을 빼서 발생한 적자(총 오차)를 구함.</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>error <span class="op">=</span> target <span class="op">-</span> final_out</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="co"># 업무 보고가 끝나고 1차적으로 발생한 오차가 얼마인지 화면에 출력함.</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"1. 사장님 최종 예측: </span><span class="sc">{</span>final_out[<span class="dv">0</span>][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss"> | 타겟: </span><span class="sc">{</span>target[<span class="dv">0</span>][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss"> | 발생한 오차: </span><span class="sc">{</span>error[<span class="dv">0</span>][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------------</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co"># [Step 2] 역전파 1단계: 출력층 -&gt; 은닉층 가중치(W2) 책임 묻기</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------------</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co"># 사장님 층의 국소 오차(델타) = 총 발생한 오차 * 사장님 층의 곡선 기울기(시그모이드 미분값).</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>d_output <span class="op">=</span> error <span class="op">*</span> sigmoid_derivative(final_out)</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co"># 델타 규칙: (은닉층 출력물의 전치 행렬) * (사장층 델타) * (학습률)을 통해 W2를 얼마나 고칠지 양을 계산함.</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>delta_w2 <span class="op">=</span> learning_rate <span class="op">*</span> np.dot(hidden_out.T, d_output)</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="co"># W2 가중치 파이프가 얼마나 두꺼워지거나 깎여나가야 하는지 화면에 출력함.</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"2. 중간관리자와 사장 사이의 가중치(W2) 업데이트량:</span><span class="ch">\n</span><span class="sc">{</span>delta_w2<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------------</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="co"># [Step 3] 역전파 2단계: 은닉층 -&gt; 입력층 가중치(W1) 책임 묻기 (내리갈굼의 핵심)</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------------</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="co"># [가장 중요한 연쇄법칙 단계] 은닉층은 자신만의 정답이 없으므로, 방금 구한 사장층의 델타(d_output)를</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="co"># 기존의 W2 파이프(전치행렬 형태)를 타고 '거꾸로(역류)' 내려보내 중간 관리자들의 순수 책임량을 추산함.</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>error_hidden <span class="op">=</span> np.dot(d_output, W2.T)</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="co"># 역류해 들어온 은닉층의 에러 합산량에 자신의 곡선 기울기(시그모이드 미분값)를 곱해 은닉층의 진짜 국소 오차(델타)를 완성함.</span></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>d_hidden <span class="op">=</span> error_hidden <span class="op">*</span> sigmoid_derivative(hidden_out)</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="co"># 델타 규칙: (원래 입력물의 전치 행렬) * (은닉층 델타) * (학습률)을 통해 W1 가중치를 어떻게 고칠지 양을 계산함.</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>delta_w1 <span class="op">=</span> learning_rate <span class="op">*</span> np.dot(X.T, d_hidden)</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="co"># W1 가중치가 어떻게 업데이트되어야 하는지 최종적으로 화면에 출력함.</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"3. 말단사원과 중간관리자 사이의 가중치(W1) 업데이트량 (오차 역류의 결과):</span><span class="ch">\n</span><span class="sc">{</span>delta_w1<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 통찰: 은닉층 가중치(W1)는 밖에서 주어지는 오차 정답을 몰라도, 오차 역전파를 통해 W2를 거쳐 역류해 들어온 수학적 책임(d_hidden)을 받아 스스로를 수정할 수 있음!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 2-2] 오차 역전파 흐름 1회차 뜯어보기 ===
+1. 사장님 최종 예측: 0.6906 | 타겟: 1.0000 | 발생한 오차: 0.3094
+2. 중간관리자와 사장 사이의 가중치(W2) 업데이트량:
+[[0.0198]
+ [0.021 ]]
+3. 말단사원과 중간관리자 사이의 가중치(W1) 업데이트량 (오차 역류의 결과):
+[[0.0048 0.0054]
+ [0.0024 0.0027]]
+
+-&gt; 통찰: 은닉층 가중치(W1)는 밖에서 주어지는 오차 정답을 몰라도, 오차 역전파를 통해 W2를 거쳐 역류해 들어온 수학적 책임(d_hidden)을 받아 스스로를 수정할 수 있음!</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="은닉층의-비선형적-공간-왜곡과-xor의-정복" class="level3">
+<h3 class="anchored" data-anchor-id="은닉층의-비선형적-공간-왜곡과-xor의-정복">2.3. 은닉층의 비선형적 공간 왜곡과 XOR의 정복</h3>
+<ul>
+<li><strong>이론적 설명(은닉층의 역할과 공간 왜곡)</strong>
+<ul>
+<li>단층 퍼셉트론이 데이터를 가르기 위해 빳빳한 직선 하나만 그을 수 있다면, 은닉층과 비선형 활성화 함수(sigmoid 등)가 결합된 다층구조는 데이터가 놓인 차원의 뼈대 자체를 구부러뜨리고 왜곡하는 강력한 능력을 가짐.</li>
+<li>오차 역전파는 단순히 결과의 정답을 맞히는 것을 넘어, 이 공간을 ‘어떻게 구부려야’ 꼬여 있는 데이터를 가장 잘 가를 수 있는지 은닉층 뉴런들에게 그 기준을 수학적으로 학습시킴.</li>
+</ul></li>
+<li><strong>심화 해설(내부 표상과 고차원 분리)</strong>
+<ul>
+<li>인지과학적으로 은닉층을 통과한다는 것은 망막에 맺힌 날것의 2차원 감각 데이터(XOR)를 뇌가 이해하기 쉬운 고차원적 개념으로 재배치하여 <strong>내부 표상(internal representation)</strong>을 형성하는 과정임.</li>
+<li>2차원 평면에 대각선으로 얽혀있던 평범한 XOR 데이터는, 은닉층 노드들(hidden nodes)이 각자의 가중치 기준에 맞게 이리저리 당기고 휘게 만들면서 3차원 이상의 구부러진 언덕으로 재배치됨.</li>
+<li>데이터가 3차원 입체로 구부러지면, 그 구부러진 골짜기 사이로 평평한 색종이(선형평면[hyperplane])를 쑥 집어넣어 데이터를 두 그룹으로 완벽하게 잘라낼 수 있음. 이것이 은닉층이 지닌 비선형성 마법의 본질임.</li>
+</ul></li>
+<li><strong>비유(종이 접기와 한 번의 가위질)</strong>
+<ul>
+<li><strong>종이 접기 비유:</strong> 검은 점 2개와 흰 점 2개가 대각선 모양으로 엇갈려 그려져 있는 평평한 도화지(XOR 데이터)가 있음. 이 도화지를 바닥에 그대로 둔 채, 자를 대고 직선으로 단 한 번 가위질(단층 퍼셉트론)을 해서 검은 점과 흰 점을 나눌 방법은 절대 없음.</li>
+<li>하지만 도화지를 허공으로 들어 올려 입체적으로 둥글게 접거나 꼬아버리면(은닉층의 비선형 왜곡), 엇갈려 있던 검은 점들과 흰 점들의 ’높이(차원)’가 달라지게 됨.</li>
+<li>이렇게 2차원 종이를 3차원 입체로 비틀어버리면, 허공에서 단 한 번의 평평한 가위질(최종 출력층의 선형 경계)만으로도 두 집단을 완벽하게 잘라낼 수 있음.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 15] 은닉층의 본질: 비선형적 공간 왜곡</strong> <img src="images/week6/Slide_014.png" class="img-fluid"></p>
+<section id="실습-2-3-다층-신경망mlp의-10000번-역전파-루프와-xor-문제-정복" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-3-다층-신경망mlp의-10000번-역전파-루프와-xor-문제-정복">[실습 2-3] 다층 신경망(MLP)의 10,000번 역전파 루프와 XOR 문제 정복</h4>
+<ul>
+<li>[실습 2-1]에서 단층 퍼셉트론이 절대 풀지 못했던 XOR 데이터셋을, 방금 만든 2층짜리 다층 신경망(MLP)과 역전파 루프에 넣어 10,000번 훈련시켜 완벽히 풀어낼 수 있음.</li>
+</ul>
+<p><strong>[그림 16] [실습 2-3] 다층 신경망(MLP)의 공간 왜곡과 XOR 정복</strong> <img src="images/week6/Slide_015.png" class="img-fluid"></p>
+<div id="9e59164e" class="cell" data-execution_count="6">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 풀리지 않던 XOR 데이터셋 재준비</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 입력 4종류와 이에 매칭되는 정답 4종류를 배열로 정의함.</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>X_xor <span class="op">=</span> np.array([[<span class="dv">0</span>,<span class="dv">0</span>], [<span class="dv">0</span>,<span class="dv">1</span>], [<span class="dv">1</span>,<span class="dv">0</span>], [<span class="dv">1</span>,<span class="dv">1</span>]])</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>Y_xor <span class="op">=</span> np.array([[<span class="dv">0</span>],   [<span class="dv">1</span>],   [<span class="dv">1</span>],   [<span class="dv">0</span>]])</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 다층 신경망 (2입력 -&gt; 4은닉 -&gt; 1출력) 뼈대 세팅</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 동일한 결과를 재현하기 위해 파이썬 난수 생성기의 시드(씨앗) 값을 42로 고정함.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 입력층(2개)에서 은닉층(4개)으로 가는 W1 행렬을 생성하고, -1에서 1 사이의 난수로 무작위 초기화함.</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 은닉 노드를 4개로 넉넉히 두어 2차원 평면을 고차원 입체로 충분히 비틀어 휘게 만듦.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>W1 <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, (<span class="dv">2</span>, <span class="dv">4</span>))</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 은닉층(4개)에서 출력층(1개)으로 가는 W2 가중치 파이프 4개를 난수로 초기화함.</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>W2 <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, (<span class="dv">4</span>, <span class="dv">1</span>))</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 오차 역전파 시 가중치를 한 번에 크게 수정하여 빠르게 학습시키기 위해 학습률을 1.0으로 대폭 키움.</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 2-3] 오차 역전파를 이용한 XOR 문제의 완벽한 정복 ==="</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 10,000번의 순전파와 역전파 무한 루프 반복 훈련</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [순전파 단계]</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 전체 입력 데이터(X_xor)를 은닉층(W1)으로 보내 시그모이드 비선형 함수로 압축 및 왜곡(내부 표상)시킴.</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    hidden_out <span class="op">=</span> sigmoid(np.dot(X_xor, W1))</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 왜곡된 은닉층 데이터를 출력층(W2)으로 보내 최종 딥러닝 예측값(final_out)을 도출함.</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    final_out <span class="op">=</span> sigmoid(np.dot(hidden_out, W2))</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [오차 계산 단계]</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 최종 예측값이 정답(Y_xor)에서 얼마나 벗어났는지 모든 데이터 셋에 대해 오차 행렬을 계산함.</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> Y_xor <span class="op">-</span> final_out</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [역전파 단계: 연쇄 법칙]</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 출력층 사장님의 델타(국소 오차)를 미분 기울기를 곱해 계산함.</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    d_output <span class="op">=</span> error <span class="op">*</span> sigmoid_derivative(final_out)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 사장님의 델타(d_output)를 W2 파이프를 타고 역류시킨 뒤, 은닉층 자체의 미분 기울기를 곱해 은닉층의 델타를 도출함.</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>    d_hidden <span class="op">=</span> np.dot(d_output, W2.T) <span class="op">*</span> sigmoid_derivative(hidden_out)</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [가중치 업데이트 단계]</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 계산된 사장층 델타에 학습률과 은닉층 출력 정보를 곱해 출력층 앞 가중치(W2)를 수정 누적함.</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    W2 <span class="op">+=</span> learning_rate <span class="op">*</span> np.dot(hidden_out.T, d_output)</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 계산된 은닉층 델타에 학습률과 입력 정보를 곱해 말단-은닉 사이의 가중치(W1)를 수정 누적함.</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    W1 <span class="op">+=</span> learning_rate <span class="op">*</span> np.dot(X_xor.T, d_hidden)</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2000번 루프가 돌 때마다 현재의 전체 신경망이 손실 공간에서 얼마나 바닥(0)으로 내려왔는지 </span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># '오차 제곱의 평균(MSE loss)'을 화면에 출력하여 모니터링함.</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">2000</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> np.mean(np.square(error))</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"[epoch </span><span class="sc">{</span>epoch<span class="sc">:4d}</span><span class="ss">] loss: </span><span class="sc">{</span>loss<span class="sc">:.4f}</span><span class="ss"> (손실 공간을 타고 밑바닥으로 수렴 중...)"</span>)</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 학습 완료 후 최종 딥러닝 예측 결과 검증</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">[학습 완료] XOR 예측 결과 테스트:"</span>)</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a><span class="co"># 만 번의 훈련을 마치고 완벽히 조율된 W1과 W2를 사용해 마지막으로 전체 입력값에 대한 예측을 한 번 더 수행함.</span></span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>final_prediction <span class="op">=</span> sigmoid(np.dot(sigmoid(np.dot(X_xor, W1)), W2))</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="co"># 각 입력 패턴에 대해 모델이 출력한 예측값이 0 또는 1의 정답과 얼마나 가까워졌는지 출력함.</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"입력: </span><span class="sc">{</span>X_xor[i]<span class="sc">}</span><span class="ss"> -&gt; 딥러닝 예측: </span><span class="sc">{</span>final_prediction[i][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss"> (정답: </span><span class="sc">{</span>Y_xor[i][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 최종 결론: 단층 모델로는 0.5에서 계속 멈추던 XOR 문제를, 은닉층을 통한 '비선형 공간 왜곡'과 역전파의 '미분 책임 배분'을 통해 완벽하게(0과 1에 극도로 수렴하게) 풀어냄!"</span>)</span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 이것이 오늘날 모든 딥러닝 모델과 뇌 과학 연결주의 아키텍처를 작동시키는 근본 동력임."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 2-3] 오차 역전파를 이용한 XOR 문제의 완벽한 정복 ===
+[epoch    0] loss: 0.2629 (손실 공간을 타고 밑바닥으로 수렴 중...)
+[epoch 2000] loss: 0.0016 (손실 공간을 타고 밑바닥으로 수렴 중...)
+[epoch 4000] loss: 0.0007 (손실 공간을 타고 밑바닥으로 수렴 중...)
+[epoch 6000] loss: 0.0004 (손실 공간을 타고 밑바닥으로 수렴 중...)
+[epoch 8000] loss: 0.0003 (손실 공간을 타고 밑바닥으로 수렴 중...)
+
+[학습 완료] XOR 예측 결과 테스트:
+입력: [0 0] -&gt; 딥러닝 예측: 0.0187 (정답: 0)
+입력: [0 1] -&gt; 딥러닝 예측: 0.9894 (정답: 1)
+입력: [1 0] -&gt; 딥러닝 예측: 0.9829 (정답: 1)
+입력: [1 1] -&gt; 딥러닝 예측: 0.0142 (정답: 0)
+
+-&gt; 최종 결론: 단층 모델로는 0.5에서 계속 멈추던 XOR 문제를, 은닉층을 통한 '비선형 공간 왜곡'과 역전파의 '미분 책임 배분'을 통해 완벽하게(0과 1에 극도로 수렴하게) 풀어냄!
+-&gt; 이것이 오늘날 모든 딥러닝 모델과 뇌 과학 연결주의 아키텍처를 작동시키는 근본 동력임.</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="주차-요약-및-다음-주-예고" class="level2">
+<h2 class="anchored" data-anchor-id="주차-요약-및-다음-주-예고">6주차 요약 및 다음 주 예고</h2>
+<p><strong>[그림 17] 패러다임 비교: 선형적 덧셈에서 차원의 조작으로</strong> <img src="images/week6/Slide_016.png" class="img-fluid"></p>
+<ul>
+<li><strong>요약</strong>
+<ul>
+<li>인지 시스템은 단순한 동시성 덧셈(헵 규칙)만으로는 복잡한 간섭현상을 통제할 수 없음.</li>
+<li>레스콜라-와그너 모델이 시사하듯, 뇌는 <strong>예측오차</strong>를 계산하여 가중치를 미분적으로 깎아내는 <strong>델타 규칙(경사하강법)</strong>을 사용함.</li>
+<li>역전파 알고리즘
+<ul>
+<li>다층구조에서 최종오차의 책임을 ’데이터를 기초 가공하는 은닉층(중간 관리자)’으로 거꾸로 전달함.</li>
+<li>연결주의 모델이 직선적 사고의 한계를 넘어, 공간을 왜곡하고 복잡한 문제를 해결할 수 있게 만든 결정적인 수학적 엔진임.</li>
+</ul></li>
+</ul></li>
+<li><strong>다음 주(7주차) 예고</strong>
+<ul>
+<li>시냅스 가중치가 충분히 훈련된 이후, 뇌는 외부에서 쏟아지는 불확실한 감각정보(증거)들을 초당 단위로 어떻게 긁어모아 최종적인 <strong>의사결정</strong>을 내리는가?</li>
+<li>이 과정에서 왜 어려운 문제는 반응시간(RT)이 오래 걸리는지, ‘빠른 결정(속도)’과 ’신중한 결정(정확성)’ 사이의 타협(trade-off) 메커니즘을 확률적인 그래프로 시뮬레이션하는 <strong>표류확산 모델(drift diffusion model, DDM)</strong>을 다룰 예정임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 18] 넥스트 스텝: 증거 축적과 의사결정의 시간</strong> <img src="images/week6/Slide_017.png" class="img-fluid"></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
