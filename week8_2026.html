@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>계산주의와 인지신경과학 8주차_모델 평가와 파라미터 추정: 그리드 서치와 최적화</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="week8_2026_files/libs/clipboard/clipboard.min.js"></script>
+<script src="week8_2026_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="week8_2026_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="week8_2026_files/libs/quarto-html/popper.min.js"></script>
+<script src="week8_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="week8_2026_files/libs/quarto-html/anchor.min.js"></script>
+<link href="week8_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="week8_2026_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="week8_2026_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="week8_2026_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="week8_2026_files/libs/bootstrap/bootstrap-e0048d6574ccc2aa33e6fadbbc53b6fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#주차-수업-목표" id="toc-주차-수업-목표" class="nav-link active" data-scroll-target="#주차-수업-목표">8주차 수업 목표</a></li>
+  <li><a href="#부-모델-피팅의-철학과-적합도-평가goodness-of-fit" id="toc-부-모델-피팅의-철학과-적합도-평가goodness-of-fit" class="nav-link" data-scroll-target="#부-모델-피팅의-철학과-적합도-평가goodness-of-fit">1부: 모델 피팅의 철학과 적합도 평가(goodness-of-fit)</a>
+  <ul>
+  <li><a href="#역방향-추론reverse-engineering-the-mind" id="toc-역방향-추론reverse-engineering-the-mind" class="nav-link" data-scroll-target="#역방향-추론reverse-engineering-the-mind">1.1. 역방향 추론(reverse engineering the mind)</a>
+  <ul>
+  <li><a href="#실습-1-1-타겟이-될-피험자의-가상-행동-데이터-생성" id="toc-실습-1-1-타겟이-될-피험자의-가상-행동-데이터-생성" class="nav-link" data-scroll-target="#실습-1-1-타겟이-될-피험자의-가상-행동-데이터-생성">[실습 1-1] 타겟이 될 피험자의 가상 행동 데이터 생성</a></li>
+  </ul></li>
+  <li><a href="#오차-제곱합sum-of-squared-errors-sse" id="toc-오차-제곱합sum-of-squared-errors-sse" class="nav-link" data-scroll-target="#오차-제곱합sum-of-squared-errors-sse">1.2. 오차 제곱합(sum of squared errors, SSE)</a>
+  <ul>
+  <li><a href="#실습-1-2-파이썬으로-구현하는-sse-적합도-평가기" id="toc-실습-1-2-파이썬으로-구현하는-sse-적합도-평가기" class="nav-link" data-scroll-target="#실습-1-2-파이썬으로-구현하는-sse-적합도-평가기">[실습 1-2] 파이썬으로 구현하는 SSE 적합도 평가기</a></li>
+  </ul></li>
+  <li><a href="#과적합overfitting과-오컴의-면도날occams-razor" id="toc-과적합overfitting과-오컴의-면도날occams-razor" class="nav-link" data-scroll-target="#과적합overfitting과-오컴의-면도날occams-razor">1.3. 과적합(overfitting)과 오컴의 면도날(Occam’s Razor)</a>
+  <ul>
+  <li><a href="#실습-1-3-파라미터-개수에-따른-과적합-현상-관찰" id="toc-실습-1-3-파라미터-개수에-따른-과적합-현상-관찰" class="nav-link" data-scroll-target="#실습-1-3-파라미터-개수에-따른-과적합-현상-관찰">[실습 1-3] 파라미터 개수에 따른 과적합 현상 관찰</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#부-최적화-기법과-최대우도추정optimization-mle" id="toc-부-최적화-기법과-최대우도추정optimization-mle" class="nav-link" data-scroll-target="#부-최적화-기법과-최대우도추정optimization-mle">2부: 최적화 기법과 최대우도추정(optimization &amp; MLE)</a>
+  <ul>
+  <li><a href="#무식하지만-확실한-탐색-그리드-서치grid-search" id="toc-무식하지만-확실한-탐색-그리드-서치grid-search" class="nav-link" data-scroll-target="#무식하지만-확실한-탐색-그리드-서치grid-search">2.1. 무식하지만 확실한 탐색: 그리드 서치(grid search)</a>
+  <ul>
+  <li><a href="#실습-2-1-2차원-파라미터-공간의-그리드-서치-구현" id="toc-실습-2-1-2차원-파라미터-공간의-그리드-서치-구현" class="nav-link" data-scroll-target="#실습-2-1-2차원-파라미터-공간의-그리드-서치-구현">[실습 2-1] 2차원 파라미터 공간의 그리드 서치 구현</a></li>
+  </ul></li>
+  <li><a href="#최대우도추정maximum-likelihood-estimation-mle" id="toc-최대우도추정maximum-likelihood-estimation-mle" class="nav-link" data-scroll-target="#최대우도추정maximum-likelihood-estimation-mle">2.2. 최대우도추정(maximum likelihood estimation, MLE)</a>
+  <ul>
+  <li><a href="#실습-2-2-로그-우도log-likelihood를-이용한-파라미터-역추적" id="toc-실습-2-2-로그-우도log-likelihood를-이용한-파라미터-역추적" class="nav-link" data-scroll-target="#실습-2-2-로그-우도log-likelihood를-이용한-파라미터-역추적">[실습 2-2] 로그 우도(Log-Likelihood)를 이용한 파라미터 역추적</a></li>
+  </ul></li>
+  <li><a href="#자동화된-최적화-알고리즘algorithmic-optimization" id="toc-자동화된-최적화-알고리즘algorithmic-optimization" class="nav-link" data-scroll-target="#자동화된-최적화-알고리즘algorithmic-optimization">2.3. 자동화된 최적화 알고리즘(algorithmic optimization)</a>
+  <ul>
+  <li><a href="#실습-2-3-scipy-라이브러리를-활용한-자동-파라미터-최적화model-fitting-구현" id="toc-실습-2-3-scipy-라이브러리를-활용한-자동-파라미터-최적화model-fitting-구현" class="nav-link" data-scroll-target="#실습-2-3-scipy-라이브러리를-활용한-자동-파라미터-최적화model-fitting-구현">[실습 2-3] Scipy 라이브러리를 활용한 자동 파라미터 최적화(model fitting) 구현</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#주차-요약-및-다음-주-예고" id="toc-주차-요약-및-다음-주-예고" class="nav-link" data-scroll-target="#주차-요약-및-다음-주-예고">8주차 요약 및 다음 주 예고</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">계산주의와 인지신경과학 8주차_모델 평가와 파라미터 추정: 그리드 서치와 최적화</h1>
+<p class="subtitle lead">고려대학교 일반대학원 심리학과</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026년 4월 24일 금요일 4-5교시</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="주차-수업-목표" class="level2">
+<h2 class="anchored" data-anchor-id="주차-수업-목표">8주차 수업 목표</h2>
+<p><strong>[그림 1] 데이터를 통한 마음의 역추적(model fitting)</strong> <img src="images/week8/Slide_001.png" class="img-fluid"></p>
+<ul>
+<li><strong>패러다임의 역발상(forward에서 backward로):</strong> 파라미터를 조작해 가상의 행동 데이터를 생성했던 정방향 시뮬레이션(forward modeling)을 뒤집어, 실험실의 실제 행동 데이터로부터 뇌 속에 숨겨진 인지 파라미터를 거꾸로 역추적하는 <strong>역방향 추론(reverse engineering)</strong> 메커니즘을 체화함.</li>
+<li><strong>적합도 평가의 수학적 기준(SSE):</strong> 연구자가 만든 인지 모델의 예측값이 피험자의 실제 데이터와 얼마나 완벽하게 일치하는지를 정량적으로 평가하는 <strong>오차 제곱합(sum of squared errors, SSE)</strong>의 수학적 원리와 기하학적 패널티 시스템을 이해함.</li>
+<li><strong>과적합(overfitting)의 인지적 통제:</strong> 모델의 파라미터가 무한정 늘어날 때 발생하는 과적합의 위험성을 파악하고, 오캄의 면도날(Occam’s razor) 철학을 바탕으로 모델의 설명력과 복잡도 사이의 균형을 통제함.</li>
+<li><strong>확률적 최적화(MLE):</strong> 단순한 오차 최소화를 넘어, ’현재의 데이터가 관측될 확률을 극대화한다’는 통계학의 근간인 <strong>최대우도추정(maximum likelihood estimation, MLE)</strong> 기법을 인지 모델링에 도입함.</li>
+<li><strong>파라미터 탐색 알고리즘 직접 구현:</strong> 무식하지만 확실한 전수조사 기법인 <strong>그리드 서치(grid search)</strong>와, 알고리즘 기반의 <strong>자동 최적화(optimization)</strong> 함수를 파이썬으로 직접 코딩하여 피험자의 숨겨진 마음을 해독함.</li>
+</ul>
+</section>
+<section id="부-모델-피팅의-철학과-적합도-평가goodness-of-fit" class="level2">
+<h2 class="anchored" data-anchor-id="부-모델-피팅의-철학과-적합도-평가goodness-of-fit">1부: 모델 피팅의 철학과 적합도 평가(goodness-of-fit)</h2>
+<section id="역방향-추론reverse-engineering-the-mind" class="level3">
+<h3 class="anchored" data-anchor-id="역방향-추론reverse-engineering-the-mind">1.1. 역방향 추론(reverse engineering the mind)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>인지 모델링 연구의 궁극적인 목적은 컴퓨터 안에서의 장난감 시뮬레이션이 아님.</li>
+<li>실제 인간 피험자를 대상으로 실험을 진행한 뒤 기록된 차가운 숫자들(반응시간[RT], 정답률)을 분석하여, <strong>이 피험자의 전두엽 임계값(<span class="math inline">\(a\)</span>)은 몇이었고, 시각 피질의 정보처리 속도(<span class="math inline">\(v\)</span>)는 몇이었는가?</strong>를 정밀하게 추정해내는 것임.</li>
+<li>이처럼 관측된 결과(data)를 바탕으로 원인이 되는 내부 변수(parameters)의 최적값을 찾아 퍼즐을 맞추는 일련의 수학적 과정을 <strong>모델 피팅(model fitting)</strong> 또는 <strong>파라미터 추정(parameter estimation)</strong>이라고 부름.</li>
+</ul></li>
+<li><strong>심화 해설(인지과학의 인식론적 도약)</strong>
+<ul>
+<li>인간의 뇌는 두개골로 덮여 있는 거대한 블랙박스. fMRI나 EEG 같은 뇌영상 기법조차 뇌의 혈류량이나 전위차를 보여줄 뿐, ‘신중함’이나 ’주의력’ 같은 심리학적 변수의 구체적 수치를 직접 뽑아주지는 못함.</li>
+<li>계산주의 인지신경과학은 행동 데이터(RT)와 뇌의 내부 기제(parameter) 사이를 연결하는 ’수학적 렌즈(수식)’를 만듦으로써, 두개골을 열지 않고도 인간의 마음을 해독하고 정량화하는 인식론적 도약을 이룩함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 2] 두개골 속의 블랙박스 해독하기</strong> <img src="images/week8/Slide_002.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유(명탐정의 발자국 추리)</strong>
+<ul>
+<li><strong>정방향 시뮬레이션(7주차):</strong> 키 180cm, 몸무게 80kg인 사람(파라미터)이 진흙탕(모델 공식)을 걸어갈 때, 깊이 3cm의 발자국(데이터)이 남을 것이라고 ’예측’하는 과정.</li>
+<li><strong>역방향 모델 피팅(8주차):</strong> 범죄현장에 남겨진 깊이 3cm의 발자국(실제 데이터)만을 뚫어져라 쳐다본 뒤, “이 발자국을 남길 수 있는 범인은 키 180cm에 몸무게 80kg일 수밖에 없다!”라고 거꾸로 ’역추적’해내는 명탐정의 과정.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 3] 데이터를 통한 마음의 역추적(model fitting)</strong> <img src="images/week8/Slide_003.png" class="img-fluid"></p>
+<section id="실습-1-1-타겟이-될-피험자의-가상-행동-데이터-생성" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-1-타겟이-될-피험자의-가상-행동-데이터-생성">[실습 1-1] 타겟이 될 피험자의 가상 행동 데이터 생성</h4>
+<ul>
+<li>역방향 추론 실습을 진행하기 위해, 먼저 우리의 타겟(범인)이 될 ’피험자의 실제 실험 데이터’를 파이썬을 통해 생성하고 저장함.</li>
+</ul>
+<div id="02dbf54c" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np  <span class="co"># 수학 연산과 정규분포 난수(노이즈) 생성을 위한 numpy 라이브러리 임포트함.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-1] 피험자의 행동 데이터 확보==="</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 피험자의 뇌 구조(진짜 파라미터) 세팅 구역</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># (주의: 실제 연구에서 분석자는 이 값들을 모른다고 전제함. 가상의 피험자 생성을 위한 설정임.)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>true_a <span class="op">=</span> <span class="fl">2.0</span>        <span class="co"># 임계값(a): 결정을 내리기 위해 모아야 하는 마음속 확신의 양을 2.0으로 설정함</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>true_v <span class="op">=</span> <span class="fl">0.01</span>       <span class="co"># 표류율(v): 1ms당 들어오는 진짜 정보량. 충분한 고민을 유도하기 위해 0.01로 낮게 설정함</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>true_noise <span class="op">=</span> <span class="fl">0.1</span>    <span class="co"># 노이즈(sigma): 1ms마다 피험자의 주의력을 흔드는 신경학적 잡음의 크기임</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>t_er <span class="op">=</span> <span class="dv">250</span>          <span class="co"># 비의사결정 시간(Ter): 지각 및 운동에 소요되는 순수 물리적 딜레이(250ms) 반영함</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>observed_rt_data <span class="op">=</span> []  <span class="co"># 50번의 시행 결과(반응시간)를 담아둘 빈 리스트를 생성함</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)     <span class="co"># 동일한 난수 발생을 위해 시드(seed)를 42로 고정함</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 피험자의 50회 실험(Trial) 시뮬레이션 구역</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> trial <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>):  <span class="co"># 50번의 반복실험 시작함</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    evidence <span class="op">=</span> <span class="fl">0.0</span>       <span class="co"># 새로운 문항마다 증거 저금통을 0으로 초기화함</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    decision_time <span class="op">=</span> <span class="dv">0</span>    <span class="co"># 뇌 속 순수 인지 고민 시간을 0ms로 초기화함</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:          <span class="co"># 결정이 내려질 때까지 무한 반복되는 고민 루프 가동함</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        decision_time <span class="op">+=</span> <span class="dv">1</span>  <span class="co"># 루프 1회당 물리적 시간 1ms 경과함</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [증거 축적 핵심 로직] </span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 기존 증거에 (표류율 + 랜덤 노이즈)를 더해 1ms 동안의 증거를 누적함</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        evidence <span class="op">+=</span> true_v <span class="op">+</span> np.random.normal(<span class="dv">0</span>, true_noise)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [의사결정 방아쇠 격발]</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 누적 증거가 정답 임계선(+2.0) 또는 오답 임계선(-2.0)을 돌파했는지 검사함</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> evidence <span class="op">&gt;=</span> true_a <span class="kw">or</span> evidence <span class="op">&lt;=</span> <span class="op">-</span>true_a:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 확신 도달 시, 순수 고민 시간(decision_time)에 근육 딜레이(t_er)를 더해 최종 RT 산출함.</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            final_rt <span class="op">=</span> decision_time <span class="op">+</span> t_er</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 완성된 최종 반응시간을 리스트에 추가함.</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            observed_rt_data.append(final_rt) </span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 결정을 내렸으므로 while 루프를 탈출(break)하고 다음 문항으로 넘어감.</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 데이터 수집 완료 및 평균 도출</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>observed_rt_data <span class="op">=</span> np.array(observed_rt_data) <span class="co"># 리스트를 numpy 배열로 변환함.</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>actual_mean_rt <span class="op">=</span> np.mean(observed_rt_data)    <span class="co"># 50개 반응시간 데이터의 평균 도출함.</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 50회 시행 결과, 피험자의 실제 평균 RT: </span><span class="sc">{</span>actual_mean_rt<span class="sc">:.2f}</span><span class="ss"> ms"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 1-1] 피험자의 행동 데이터 확보===
+-&gt; 50회 시행 결과, 피험자의 실제 평균 RT: 443.02 ms</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="오차-제곱합sum-of-squared-errors-sse" class="level3">
+<h3 class="anchored" data-anchor-id="오차-제곱합sum-of-squared-errors-sse">1.2. 오차 제곱합(sum of squared errors, SSE)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>명탐정이 범인의 뇌 속 파라미터를 추리하려면, “내가 임계값(<span class="math inline">\(a\)</span>)을 1.5라고 가정했을 때 모델이 뱉어낼 예측 데이터”와 “실제 현장의 피험자 데이터” 사이의 <strong>차이(오차)</strong>를 정밀하게 수치화해야 함.</li>
+<li>모델의 예측값(<span class="math inline">\(\hat{y}\)</span>)과 실제 데이터(<span class="math inline">\(y\)</span>) 사이의 적합도(얼마나 잘 들어맞는가)를 평가하는 통계학의 가장 보편적 지표가 바로 <strong>오차 제곱합(SSE)</strong>임.</li>
+<li>수식: <span class="math inline">\(SSE = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2\)</span>(실제 데이터와 모델 예측값의 차이를 모두 제곱하여 합산함).</li>
+</ul></li>
+<li><strong>심화 해설(왜 ’절댓값’이 아니라 ’제곱’인가?)</strong>
+<ul>
+<li>단순한 차이(단순 뺄셈)를 합산하면, 양수 오차(+50ms)와 음수 오차(-50ms)가 서로 상쇄되어 0이 되므로, 엉터리 모델을 완벽한 모델로 착각하게 만드는 치명적 오류가 발생함.</li>
+<li>절댓값 대신 굳이 제곱을 사용하는 이유는 <strong>큰 오차에 기하급수적인 패널티(벌점)를 부여하기 위해서</strong>임.</li>
+<li>오차가 10ms일 때 벌점은 100이지만, 오차가 100ms로 커지면 벌점은 10,000이 됨. <span class="math inline">\(\Rightarrow\)</span> 자잘한 오차 여러 개보다 <strong>하나의 끔찍하고 거대한 오차(outlier)를 낸 모델을 가차없이 응징</strong>하여, 모델이 데이터를 전반적으로 고르게 설명하도록 유도하는 수학적 족쇄임.</li>
+</ul></li>
+<li><strong>비유(양궁 과녁의 가혹한 감점 시스템)</strong>
+<ul>
+<li>10점 만점 과녁 중심에서 1cm 빗나갔을 때는 1점만 감점하지만, 10cm를 빗나가서 남의 과녁에 화살을 꽂아버리는 엄청난 실수를 저질렀을 때는 10점이 아니라 100점을 감점해 버리는 가혹한 채점 시스템과 같음.</li>
+<li>SSE 벌점이 <span class="math inline">\(0\)</span>에 가까울수록 내 모델의 파라미터 조합이 현실 피험자의 뇌를 완벽하게 모사했다는 뜻임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 4] SSE의 수학적 원리와 패널티 시스템</strong> <img src="images/week8/Slide_004.png" class="img-fluid"></p>
+<section id="실습-1-2-파이썬으로-구현하는-sse-적합도-평가기" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-2-파이썬으로-구현하는-sse-적합도-평가기">[실습 1-2] 파이썬으로 구현하는 SSE 적합도 평가기</h4>
+<ul>
+<li>동일한 피험자 데이터를 두고, 엉터리 가설을 세운 모델 A와 정교한 가설을 세운 모델 B 중 어떤 모델이 더 적합한지 SSE를 계산하여 수학적 심판을 내림.</li>
+</ul>
+<div id="9f8c8ba6" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-2] 오차 제곱합(SSE)을 통한 모델의 적합도(goodness-of-fit) 심판 ==="</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 두 연구자의 가설(파라미터 추측) 대결 구역</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># [연구자 A의 예측]: 임계값을 지나치게 낮게 추측하여 예측 RT가 250ms로 짧게 산출됨</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>model_A_predicted_rt <span class="op">=</span> <span class="fl">250.0</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># [연구자 B의 예측]: 파라미터 조합을 정교하게 추측하여 피험자의 실제 RT(약 460ms)와 유사하게 산출됨</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>model_B_predicted_rt <span class="op">=</span> <span class="fl">460.0</span> </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 수학적 심판관: SSE(오차 제곱합) 계산 함수 정의</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_sse(actual, predicted):  <span class="co"># 실제 데이터(actual)와 예측치(predicted)를 입력받음</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> actual <span class="op">-</span> predicted         <span class="co"># 실제값에서 예측값을 빼서 순수오차를 계산함</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    squared_error <span class="op">=</span> np.square(error)   <span class="co"># 오차를 제곱하여 부호를 양수로 만들고, 큰 오차에 가혹한 패널티 부여함</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> squared_error               <span class="co"># 계산된 벌점(SSE)을 반환함</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 각 연구자의 벌점 채점 및 최종 결과 발표</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 연구자 A의 250ms 예측치에 대한 SSE 벌점 계산함(actual_mean_rt는 실습 1-1에서 획득)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>sse_A <span class="op">=</span> calculate_sse(actual_mean_rt, model_A_predicted_rt)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 연구자 B의 460ms 예측치에 대한 SSE 벌점 계산함</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>sse_B <span class="op">=</span> calculate_sse(actual_mean_rt, model_B_predicted_rt)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 소수점 둘째 자리까지 포맷팅하여 벌점 출력함</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 엉터리 추측 [모델 A]의 SSE 벌점: </span><span class="sc">{</span>sse_A<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 정교한 추측 [모델 B]의 SSE 벌점: </span><span class="sc">{</span>sse_B<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># SSE 비교를 통해 승리자 선언함</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sse_A <span class="op">&gt;</span> sse_B:</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> 심판 판정: [모델 B]의 SSE 벌점이 훨씬 작으므로, 연구자 B가 피험자의 마음을 완벽히 해독해냄!"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> 심판 판정: [모델 A]가 승리함."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 1-2] 오차 제곱합(SSE)을 통한 모델의 적합도(goodness-of-fit) 심판 ===
+-&gt; 엉터리 추측 [모델 A]의 SSE 벌점: 37256.72
+-&gt; 정교한 추측 [모델 B]의 SSE 벌점: 288.32
+
+ 심판 판정: [모델 B]의 SSE 벌점이 훨씬 작으므로, 연구자 B가 피험자의 마음을 완벽히 해독해냄!</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="과적합overfitting과-오컴의-면도날occams-razor" class="level3">
+<h3 class="anchored" data-anchor-id="과적합overfitting과-오컴의-면도날occams-razor">1.3. 과적합(overfitting)과 오컴의 면도날(Occam’s Razor)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>모델이 현실 데이터를 얼마나 잘 설명하는지(SSE 최소화)에만 집착하면 인지 모델링의 거대한 함정인 <strong>과적합</strong>에 빠지게 됨.</li>
+<li>파라미터의 종류(<span class="math inline">\(a, v, z, T_{er}\)</span> 등)를 10개, 20개로 무한정 늘리면 수학적 유연성이 극대화되어 현재 실험실에서 얻은 데이터의 SSE를 0으로 완벽하게 맞출 수 있음.</li>
+<li>그러나 이는 뇌의 본질적인 인지기제를 파악한 것이 아니라, 그날 피험자가 졸았거나 재채기를 해서 발생한 무의미한 <strong>노이즈(우연적 오차)까지 모조리 학습해버린 상태</strong>임.</li>
+</ul></li>
+<li><strong>심화 해설(설명력과 복잡도의 상충 관계)</strong>
+<ul>
+<li>과적합된 모델은 현재 데이터는 완벽히 설명하지만, 내일 똑같은 실험을 다시 했을 때 얻어질 새로운 데이터(test data)에 대해서는 예측력이 붕괴됨.</li>
+<li>이를 막기 위해 과학철학의 근간인 <strong>오컴의 면도날(Occam’s razor: “현상에 대한 설명은 불필요하게 복잡해져서는 안 된다”)</strong> 원칙을 모델 평가에 도입함.</li>
+<li>현대 통계학에서는 SSE의 최소화를 추구하면서도 동시에 파라미터 개수가 늘어날 때마다 무거운 벌점을 때리는 <strong>AIC(Akaike information criterion)</strong>나 <strong>BIC(Bayesian information criterion)</strong> 지표를 사용하여, <strong>가장 단순하면서도 설명력이 높은</strong> 최적의 모델을 최종 채택함.</li>
+</ul></li>
+<li><strong>비유(기출문제와 수능시험)</strong>
+<ul>
+<li><strong>정상적 학습:</strong> 기출문제를 풀며 수학의 핵심 ’원리’를 깨닫고 수능시험장(새로운 데이터)에 들어가서 고득점을 받음(일반화 성공).</li>
+<li><strong>과적합 학습:</strong> 수학의 원리는 모른 채 기출문제집의 정답 번호와 오타 위치까지 통째로 외워버림. 기출문제 모의고사(현재 데이터)는 100점(SSE=0)을 맞지만, 문제가 조금만 바뀐 수능시험에서는 0점을 맞게 됨.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 5] 과적합과 오컴의 면도날 곡선</strong> <img src="images/week8/Slide_005.png" class="img-fluid"></p>
+<section id="실습-1-3-파라미터-개수에-따른-과적합-현상-관찰" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-3-파라미터-개수에-따른-과적합-현상-관찰">[실습 1-3] 파라미터 개수에 따른 과적합 현상 관찰</h4>
+<ul>
+<li>단순한 모델(파라미터 1개)과 지나치게 복잡한 다항식 모델(파라미터 15개)을 비교하여, 복잡한 모델이 노이즈까지 추적하느라 궤적이 요동치는 과적합 현상을 시각적으로 코딩함.</li>
+</ul>
+<div id="ff55a2e3" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 과적합을 눈으로 확인하기 위한 시각화 라이브러리 임포트</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-3] 오캄의 면도날: 모델 복잡도와 과적합(Overfitting)의 딜레마 ==="</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 훈련용 데이터(기출문제) 생성</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>) <span class="co"># 재현성을 위해 시드 고정</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>x_train <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">15</span>) <span class="co"># 0부터 10까지 15개의 시점(x축) 생성</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 실제 뇌의 원리(정답 곡선)는 부드러운 사인(sin) 곡선이라고 가정함</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>true_trend <span class="op">=</span> np.sin(x_train) </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자의 실제 데이터는 정답 곡선에 무작위 노이즈(그날의 컨디션 등)가 낀 상태임</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> true_trend <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="fl">0.3</span>, <span class="dv">15</span>) </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 두 가지 모델 피팅 시도(다항식 곡선 적합 함수 polyfit 사용)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># [단순한 모델]: 3차 방정식(파라미터 4개 사용) - 핵심 굴곡만 부드럽게 따라감</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>simple_model_params <span class="op">=</span> np.polyfit(x_train, y_train, <span class="dv">3</span>) </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>simple_model_func <span class="op">=</span> np.poly1d(simple_model_params)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># [과적합 모델]: 14차 방정식(파라미터 15개 사용) - 모든 데이터 점을 강제로 지나가도록 억지를 부림</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>overfitted_model_params <span class="op">=</span> np.polyfit(x_train, y_train, <span class="dv">14</span>) </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>overfitted_model_func <span class="op">=</span> np.poly1d(overfitted_model_params)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 훈련 데이터에 대한 SSE(기출문제 점수) 비교</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>sse_simple <span class="op">=</span> np.<span class="bu">sum</span>((y_train <span class="op">-</span> simple_model_func(x_train))<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>sse_overfit <span class="op">=</span> np.<span class="bu">sum</span>((y_train <span class="op">-</span> overfitted_model_func(x_train))<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; [단순 모델]의 훈련 SSE: </span><span class="sc">{</span>sse_simple<span class="sc">:.2f}</span><span class="ss">(적당한 오차 존재)"</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; [과적합 모델]의 훈련 SSE: </span><span class="sc">{</span>sse_overfit<span class="sc">:.2f}</span><span class="ss">(오차가 0에 수렴! 기출문제 완벽 암기!)"</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 통찰: 과적합 모델은 훈련 SSE를 0으로 만들었지만, 15개나 되는 파라미터를 동원해 피험자의 우연한 노이즈(재채기)까지 수학적 진리로 착각해버린 상태임. 새로운 데이터가 들어오면 예측력이 완전히 박살남."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 1-3] 오캄의 면도날: 모델 복잡도와 과적합(Overfitting)의 딜레마 ===
+-&gt; [단순 모델]의 훈련 SSE: 8.28(적당한 오차 존재)
+-&gt; [과적합 모델]의 훈련 SSE: 0.00(오차가 0에 수렴! 기출문제 완벽 암기!)
+
+-&gt; 통찰: 과적합 모델은 훈련 SSE를 0으로 만들었지만, 15개나 되는 파라미터를 동원해 피험자의 우연한 노이즈(재채기)까지 수학적 진리로 착각해버린 상태임. 새로운 데이터가 들어오면 예측력이 완전히 박살남.</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="부-최적화-기법과-최대우도추정optimization-mle" class="level2">
+<h2 class="anchored" data-anchor-id="부-최적화-기법과-최대우도추정optimization-mle">2부: 최적화 기법과 최대우도추정(optimization &amp; MLE)</h2>
+<section id="무식하지만-확실한-탐색-그리드-서치grid-search" class="level3">
+<h3 class="anchored" data-anchor-id="무식하지만-확실한-탐색-그리드-서치grid-search">2.1. 무식하지만 확실한 탐색: 그리드 서치(grid search)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>SSE를 최소화하는 완벽한 파라미터 조합(<span class="math inline">\(a, v\)</span>)은 어떻게 찾아내야 하는가? DDM과 같은 인지 모델은 수식이 복잡하여 미분을 통해 정답을 한 번에 도출하는 해석적 해(analytical solution)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>가 존재하지 않음.</li>
+<li>이때 컴퓨터의 무식하고 압도적인 연산력을 빌려 사용하는 가장 고전적이고 직관적인 기법이 바로 <strong>그리드 서치</strong>임.</li>
+<li>가능한 파라미터의 범위를 바둑판(grid)처럼 잘게 쪼갠 뒤, 컴퓨터가 <strong>모든 경우의 수를 하나씩 모두 대입(전수조사)</strong>해 보면서 SSE 벌점이 가장 낮게 나오는 칸의 좌표를 챔피언으로 찾아내는 탐색법임.</li>
+</ul></li>
+<li><strong>심화 해설(차원의 저주, curse of dimensionality)</strong>
+<ul>
+<li>그리드 서치는 직관적이고 전역 최적해(global minimum)<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>를 확실히 보장하지만, 찾아야 할 파라미터의 종류(차원)가 늘어날수록 연산시간이 우주적으로 폭발하는 <strong>차원의 저주</strong>에 빠지게 됨.</li>
+<li>파라미터 1개를 10칸으로 쪼개면 10번 계산하지만, 4개의 파라미터(<span class="math inline">\(a, v, T_{er}, \sigma\)</span>)를 각각 10칸으로 쪼개 얽히게 만들면 탐색 조합은 <span class="math inline">\(10^4 = 10,000\)</span>번으로 폭발함. 100칸으로 촘촘히 쪼개면 <span class="math inline">\(100^4 = 100,000,000\)</span>번을 연산해야 하므로 연구자의 사전지식을 통한 좁은 범위 설정이 필수적임.</li>
+</ul></li>
+<li><strong>비유(모래사장에서 잃어버린 바늘 찾기)</strong>
+<ul>
+<li>광활한 해운대 모래사장에 떨어뜨린 바늘(최적 파라미터)을 찾아야 함.</li>
+<li>요행을 바라며 아무 데나 땅을 파보는 것이 아니라, 모래사장 전체에 바둑판처럼 줄을 죽죽 긋고(grid), 1번 구역부터 마지막 구역까지 금속 탐지기를 들고 1평씩 꼼꼼하게 전수조사하며 훑고 지나가는 단순무식한 끈기의 탐색 작전임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 6] 파라미터 공간과 2차원 그리드 서치 매트릭스</strong> <img src="images/week8/Slide_006.png" class="img-fluid"></p>
+<section id="실습-2-1-2차원-파라미터-공간의-그리드-서치-구현" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-1-2차원-파라미터-공간의-그리드-서치-구현">[실습 2-1] 2차원 파라미터 공간의 그리드 서치 구현</h4>
+<ul>
+<li>피험자의 평균 RT가 주어졌을 때, 임계값(<span class="math inline">\(a\)</span>)과 표류율(<span class="math inline">\(v\)</span>) 두 가지 파라미터 공간을 이중 루프로 전수조사하여 최적의 조합을 탐색함.</li>
+</ul>
+<div id="700a3a54" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 수치 연산 라이브러리 임포트</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 2-1] 모래사장에서 바늘 찾기: 2차원 그리드 서치 ==="</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 엑셀에서 가져온 피험자의 실제 관측 데이터(맞춰야 할 타겟 정답)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>observed_rt <span class="op">=</span> <span class="fl">405.0</span>  </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 탐색할 2차원 파라미터 공간(grid) 구축</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 전두엽 임계값(a)은 1.0부터 3.0까지 0.5 간격으로 쪼갬(5개 후보)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>a_candidates <span class="op">=</span> np.arange(<span class="fl">1.0</span>, <span class="fl">3.5</span>, <span class="fl">0.5</span>)  </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 시각피질 표류율(v)은 0.1부터 0.5까지 0.1 간격으로 쪼갬(5개 후보)</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>v_candidates <span class="op">=</span> np.arange(<span class="fl">0.1</span>, <span class="fl">0.6</span>, <span class="fl">0.1</span>)  </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"탐색할 임계값(a) 후보: </span><span class="sc">{</span>a_candidates<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"탐색할 표류율(v) 후보: </span><span class="sc">{</span>v_candidates<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 최적의 챔피언 결과를 저장할 빈 변수 초기화</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>best_params <span class="op">=</span> {<span class="st">'a'</span>: <span class="va">None</span>, <span class="st">'v'</span>: <span class="va">None</span>}  <span class="co"># 최적 파라미터 쌍을 담을 딕셔너리</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>min_sse <span class="op">=</span> <span class="bu">float</span>(<span class="st">'inf'</span>)                <span class="co"># 최소 SSE 벌점을 무한대(infinity)로 설정하여 갱신 대기</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 2차원 그리드 서치 이중 루프 가동(5 x 5 = 25번의 전수조사)</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a_guess <span class="kw">in</span> a_candidates:             <span class="co"># 바둑판의 가로축(a) 이동</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> v_guess <span class="kw">in</span> v_candidates:         <span class="co"># 바둑판의 세로축(v) 이동</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [가상 DDM 수학적 렌즈]</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 해당 a와 v의 조합일 때 뇌가 뱉어낼 예측 RT를 단순화된 공식(a/v * 100)으로 모사 계산함</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        simulated_rt <span class="op">=</span>(a_guess <span class="op">/</span> v_guess) <span class="op">*</span> <span class="dv">100</span> </span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 5. 오차 제곱합(SSE) 벌점 계산</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 현실 데이터와 가설 데이터의 차이를 제곱함</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        current_sse <span class="op">=</span> np.square(observed_rt <span class="op">-</span> simulated_rt)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 6. 최적의 챔피언 갱신 로직</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 방금 계산한 벌점(current_sse)이 기존의 최소 벌점(min_sse)보다 작다면 신기록 갱신!</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> current_sse <span class="op">&lt;</span> min_sse:</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>            min_sse <span class="op">=</span> current_sse                    <span class="co"># 최소 벌점 덮어쓰기</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>            best_params[<span class="st">'a'</span>] <span class="op">=</span> a_guess               <span class="co"># 그때의 a 챔피언 등록</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>            best_params[<span class="st">'v'</span>] <span class="op">=</span> v_guess               <span class="co"># 그때의 v 챔피언 등록</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f" 신기록 갱신! a=</span><span class="sc">{</span>a_guess<span class="sc">:.1f}</span><span class="ss">, v=</span><span class="sc">{</span>v_guess<span class="sc">:.1f}</span><span class="ss"> -&gt; 예측 RT: </span><span class="sc">{</span>simulated_rt<span class="sc">:.1f}</span><span class="ss">ms | SSE: </span><span class="sc">{</span>current_sse<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. 25칸의 험난한 전수조사 완료 및 최종 선언</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> [탐색 종료] 전수조사 결과 보고서:"</span>)</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 피험자의 뇌 속에 숨겨져 있던 가장 완벽한 파라미터 조합은 [임계값 a = </span><span class="sc">{</span>best_params[<span class="st">'a'</span>]<span class="sc">:.1f}</span><span class="ss">, 표류율 v = </span><span class="sc">{</span>best_params[<span class="st">'v'</span>]<span class="sc">:.1f}</span><span class="ss">] 임!"</span>)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 그때의 최소 오차(SSE)는 </span><span class="sc">{</span>min_sse<span class="sc">:.1f}</span><span class="ss"> 로 극소점을 찾아냄."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 2-1] 모래사장에서 바늘 찾기: 2차원 그리드 서치 ===
+탐색할 임계값(a) 후보: [1.  1.5 2.  2.5 3. ]
+탐색할 표류율(v) 후보: [0.1 0.2 0.3 0.4 0.5]
+
+ 신기록 갱신! a=1.0, v=0.1 -&gt; 예측 RT: 1000.0ms | SSE: 354025.0
+ 신기록 갱신! a=1.0, v=0.2 -&gt; 예측 RT: 500.0ms | SSE: 9025.0
+ 신기록 갱신! a=1.0, v=0.3 -&gt; 예측 RT: 333.3ms | SSE: 5136.1
+ 신기록 갱신! a=1.5, v=0.4 -&gt; 예측 RT: 375.0ms | SSE: 900.0
+ 신기록 갱신! a=2.0, v=0.5 -&gt; 예측 RT: 400.0ms | SSE: 25.0
+
+ [탐색 종료] 전수조사 결과 보고서:
+-&gt; 피험자의 뇌 속에 숨겨져 있던 가장 완벽한 파라미터 조합은 [임계값 a = 2.0, 표류율 v = 0.5] 임!
+-&gt; 그때의 최소 오차(SSE)는 25.0 로 극소점을 찾아냄.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="최대우도추정maximum-likelihood-estimation-mle" class="level3">
+<h3 class="anchored" data-anchor-id="최대우도추정maximum-likelihood-estimation-mle">2.2. 최대우도추정(maximum likelihood estimation, MLE)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>SSE가 <strong>모델과 데이터의 기하학적 거리(오차)를 최소화</strong>하려는 접근이라면, 현대 통계학과 기계학습의 핵심인 <strong>최대우도추정(MLE)</strong>은 동일한 목적을 <strong>확률적 관점</strong>으로 달성하는 수학적 기법임.</li>
+<li><strong>우도(likelihood, 가능도):</strong> 어떤 특정한 파라미터(<span class="math inline">\(a=2.0\)</span>)를 뇌 속에 세팅해두었을 때, 지금 내 눈앞에 놓인 피험자 데이터가 그대로 나올 <strong>그럴듯함(확률밀도)</strong>을 뜻함.</li>
+<li><strong>MLE의 목적:</strong> 무수히 많은 파라미터 조합을 대입해보면서, <strong>눈앞의 이 데이터가 튀어나올 확률(우도)을 가장 극대화(maximum)시켜주는</strong> 궁극의 원인(파라미터 조합)을 역추적해내는 것임(정규분포 가정 하에서 ‘SSE를 최소화하는 파라미터’ <span class="math inline">\(=\)</span> ‘우도를 극대화하는 파라미터’).</li>
+</ul></li>
+<li><strong>심화 해설(로그 우도, log-likelihood의 마법)</strong>
+<ul>
+<li>여러 개의 데이터가 동시에 발생할 전체 확률(교집합)을 구하려면, 각 데이터의 확률(0~1 사이의 소수)을 끝없이 곱해나가야 함(<span class="math inline">\(0.5 \times 0.2 \times 0.1 \dots\)</span>).</li>
+<li>컴퓨터 메모리는 소수점 아래로 너무 길게 내려가는 숫자를 감당하지 못하고 그냥 0으로 날려버리는 치명적인 에러(<strong>언더플로우, underflow</strong>)를 일으킴.</li>
+<li>이를 방지하기 위해 확률의 곱셈식 양변에 <strong>로그(<span class="math inline">\(\log\)</span>)</strong>를 씌움
+<ul>
+<li><ol type="1">
+<li>원래의 확률 곱셈식(로그를 씌우기 전)</li>
+</ol>
+<ul>
+<li>피험자가 3번의 시행에서 각각 데이터를 하나씩 남겼다고 가정해보자(데이터 A, B, C). 우리가 세운 가설(파라미터)이 맞을 때, 이 세 데이터가 연달아 등장할 전체 확률(우도)을 구하는 공식은 다음과 같음.
+<ul>
+<li>좌변(목표): 총 우도(전체 확률, <span class="math inline">\(L\)</span>).</li>
+<li>우변(계산): 개별 데이터가 등장할 확률들의 곱셈.</li>
+<li>[공식 1] <span class="math inline">\(L = P(A) \times P(B) \times P(C)\)</span></li>
+</ul></li>
+<li>각 데이터가 등장할 확률이 모두 10%(0.1)라고 가정해보자. <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(L = 0.1 \times 0.1 \times 0.1 = 0.001\)</span></li>
+<li>데이터가 3개일 때는 0.001이지만, 데이터가 100개만 되어도 <span class="math inline">\(0.1\)</span>을 100번 곱해야 하므로 우변의 결과값은 <span class="math inline">\(0.0000000000000 \dots 1\)</span>이 되어 컴퓨터가 계산을 포기해버림(언더플로우 에러).</li>
+</ul></li>
+<li><ol start="2" type="1">
+<li>양변에 로그(<span class="math inline">\(\log\)</span>) 씌우기</li>
+</ol>
+<ul>
+<li>이 에러를 막기 위해, 수학자들은 [공식 1]의 <strong>좌변(<span class="math inline">\(L\)</span>)과 우변(<span class="math inline">\(P(A) \times P(B) \dots\)</span>) 양쪽 모두에 똑같이 <span class="math inline">\(\log\)</span> 기호를 씌워줌.</strong></li>
+<li>[공식 2] <span class="math inline">\(\log(L) = \log(P(A) \times P(B) \times P(C))\)</span></li>
+<li>좌변의 변화: 그냥 전체 확률이었던 <span class="math inline">\(L\)</span>이 <span class="math inline">\(\log(L)\)</span>이 됨. 이것이 바로 <strong>로그 우도</strong>임.</li>
+</ul></li>
+<li><ol start="3" type="1">
+<li>로그의 마법(곱셈 <span class="math inline">\(\rightarrow\)</span> 덧셈)</li>
+</ol>
+<ul>
+<li>중고등학교 수학 시간에 배운 로그의 가장 특별한 성질 중 하나는 <strong>진수의 곱셈은 로그의 덧셈으로 쪼개진다</strong>는 것. <span class="math inline">\(\Rightarrow\)</span> <span class="math inline">\(\log(X \times Y) = \log(X) + \log(Y)\)</span></li>
+<li>이 성질을 [공식 2]의 우변에 적용: [최종 공식] <span class="math inline">\(\log(L) = \log(P(A)) + \log(P(B)) + \log(P(C))\)</span></li>
+<li>이제 숫자를 다시 넣어보자(계산의 편의를 위해 밑이 10인 상용로그를 쓴다고 가정. <span class="math inline">\(\log(0.1) = -1\)</span>임).
+<ul>
+<li>변경 전(곱셈): <span class="math inline">\(0.1 \times 0.1 \times 0.1 = 0.001\)</span> <span class="math inline">\(\Rightarrow\)</span> 숫자가 0으로 소멸할 위험.</li>
+<li>변경 후(덧셈): <span class="math inline">\((-1) + (-1) + (-1) = -3\)</span> <span class="math inline">\(\Rightarrow\)</span> 안전하고 깔끔한 덧셈.</li>
+</ul></li>
+</ul></li>
+<li>결론
+<ul>
+<li>수학적으로 어떤 함수의 원래 값(<span class="math inline">\(L\)</span>)을 최대로 만드는 파라미터는 그 함수에 로그를 씌운 값(<span class="math inline">\(\log L\)</span>)을 최대로 만드는 파라미터와 정확히 일치.</li>
+<li>따라서 우리는 컴퓨터가 계산하기 편하도록 우변을 덧셈으로 쪼개어 더한 뒤, 이 좌변의 <strong>로그 우도가 가장 큰 숫자(가장 0에 가까운 음수)가 되게 하는 파라미터를 찾는 것</strong>!</li>
+</ul></li>
+</ul></li>
+<li>로그의 마법 덕분에 위험한 소수점 곱셈(<span class="math inline">\(\times\)</span>)이, 처리하기 아주 빠르고 안전한 덧셈(<span class="math inline">\(+\)</span>)으로 변환됨. 따라서 모든 인지 모델링 연구는 단순 우도가 아닌 <strong>로그 우도를 극대화</strong>하는 알고리즘을 사용함.</li>
+</ul></li>
+<li><strong>비유(찌그러진 동전 도박사의 역추적)</strong>
+<ul>
+<li>눈가리개를 한 상태에서 누군가 동전을 10번 던졌는데 앞면이 9번이나 나왔음(관측 데이터). 정상적인 동전(앞면 확률 0.5)이라면 이런 기괴한 데이터가 나올 확률(우도)은 기적에 가까움.</li>
+<li>이때 우리는 거꾸로 추리(MLE)함. <strong>저 동전은 무게중심이 앞면으로 90%쯤 쏠려있는 조작된 동전(파라미터: 0.9)이어야만, 방금 10번 중 9번 앞면이 나온 현실을 가장 높은 확률로 훌륭하게 설명(극대화)할 수 있다!</strong> 이것이 최대우도추정의 본질임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 7] SSE의 최소화와 MLE의 극대화: 동전의 양면</strong> <img src="images/week8/Slide_007.png" class="img-fluid"></p>
+<section id="실습-2-2-로그-우도log-likelihood를-이용한-파라미터-역추적" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-2-로그-우도log-likelihood를-이용한-파라미터-역추적">[실습 2-2] 로그 우도(Log-Likelihood)를 이용한 파라미터 역추적</h4>
+<ul>
+<li>여러 개의 RT 데이터가 주어졌을 때, 언더플로우를 방지하는 로그 덧셈 기법을 활용하여 이 데이터들을 발생시킬 확률이 가장 높은 파라미터(평균 <span class="math inline">\(\mu\)</span>)를 MLE로 역추적함.</li>
+</ul>
+<div id="3fc20a9f" class="cell" data-execution_count="5">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 넘파이 라이브러리 임포트</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats <span class="co"># 정규분포 확률 밀도(pdf)를 구하기 위한 사이파이 통계 라이브러리 임포트</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 2-2] 최대우도추정(MLE): 데이터가 관측될 확률(우도) 극대화하기 ==="</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 엑셀에서 가져온 피험자의 미스터리한 RT 데이터 5개(관측된 현실)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>data_rt <span class="op">=</span> np.array([<span class="dv">390</span>, <span class="dv">410</span>, <span class="dv">400</span>, <span class="dv">420</span>, <span class="dv">380</span>])</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"관측된 피험자 데이터: </span><span class="sc">{</span>data_rt<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 그리드 서치를 위한 평균(mu) 파라미터 공간 설정</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자 RT를 지배하는 뇌 속 평균 파라미터가 350 ~ 450ms 사이일 것으로 보고 10ms 단위로 범위를 쪼갬</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>mu_candidates <span class="op">=</span> np.arange(<span class="dv">350</span>, <span class="dv">460</span>, <span class="dv">10</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 최적의 챔피언 값을 저장할 변수 초기화(이번엔 최소값이 아니라 '최대' 확률을 찾아야 함)</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>best_mu <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 로그 우도의 최대값을 갱신하기 위해 초기 챔피언 방어선을 마이너스 무한대(-inf)로 뚫어놓음</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>max_log_likelihood <span class="op">=</span> <span class="op">-</span><span class="bu">float</span>(<span class="st">'inf'</span>)  </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 최대우도추정(MLE) 루프 가동(전수조사)</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> mu_guess <span class="kw">in</span> mu_candidates:</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 연산의 단순화를 위해 뇌의 노이즈(표준편차 sigma)는 20으로 고정되었다고 전제함</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    fixed_sigma <span class="op">=</span> <span class="fl">20.0</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [우도 계산 핵심 로직]</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># stats.norm.pdf: 지금 우리가 세운 가설(mu_guess, 가령 평균 RT 350ms)이 피험자의 진짜 뇌 구조(정규분포)라고 가정했을 때, </span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 눈앞의 5개 실제 데이터(data_rt) 각각이 우연히 튀어나올 확률들을 한 번에 계산하여,</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># '단 1개의 리스트(배열)' 안에 5개의 확률값을 나란히 담아 뱉어냄</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    likelihoods <span class="op">=</span> stats.norm.pdf(data_rt, loc<span class="op">=</span>mu_guess, scale<span class="op">=</span>fixed_sigma)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [로그 변환 및 언더플로우 방지 덧셈]</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 5개의 소수점을 덧곱(*)하면 언더플로우가 나므로, np.log를 씌워 로그 공간으로 보낸 뒤 np.sum으로 안전하게 덧셈(+) 합산함</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    log_likelihood <span class="op">=</span> np.<span class="bu">sum</span>(np.log(likelihoods))</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"가설: 평균(mu)이 </span><span class="sc">{</span>mu_guess<span class="sc">}</span><span class="ss">일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): </span><span class="sc">{</span>log_likelihood<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. 최대 우도 갱신(Maximum Likelihood 챔피언전)</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 방금 계산한 로그 우도 확률이 지금까지의 최대 확률 신기록을 깼다면?</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> log_likelihood <span class="op">&gt;</span> max_log_likelihood:</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>        max_log_likelihood <span class="op">=</span> log_likelihood <span class="co"># 확률 신기록 덮어쓰기</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>        best_mu <span class="op">=</span> mu_guess                  <span class="co"># 그때의 위대한 파라미터를 챔피언으로 등극시킴</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. 탐색 완료 및 최종 역추적 결과 보고</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> [탐색 종료] 최대우도추정(MLE) 결과 보고서:"</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 관측된 5개의 데이터를 뱉어낼 확률을 가장 극대화(Maximum)하는 최적의 파라미터(mu)는 [</span><span class="sc">{</span>best_mu<span class="sc">}</span><span class="ss">] 로 추정됨!"</span>)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 통계적 진실 확인: 실제 5개 데이터의 산술 평균인 </span><span class="sc">{</span>np<span class="sc">.</span>mean(data_rt)<span class="sc">}</span><span class="ss">과 정확히 일치함. 즉 MLE 확률 모델이 수학적 추론을 통해 블랙박스 속 파라미터를 스스로 완벽히 역추적해낸 것임."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 2-2] 최대우도추정(MLE): 데이터가 관측될 확률(우도) 극대화하기 ===
+관측된 피험자 데이터: [390 410 400 420 380]
+
+가설: 평균(mu)이 350일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -36.45
+가설: 평균(mu)이 360일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -30.82
+가설: 평균(mu)이 370일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -26.45
+가설: 평균(mu)이 380일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -23.32
+가설: 평균(mu)이 390일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -21.45
+가설: 평균(mu)이 400일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -20.82
+가설: 평균(mu)이 410일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -21.45
+가설: 평균(mu)이 420일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -23.32
+가설: 평균(mu)이 430일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -26.45
+가설: 평균(mu)이 440일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -30.82
+가설: 평균(mu)이 450일 때 -&gt; 이 현실 데이터가 등장할 로그 확률(우도): -36.45
+
+ [탐색 종료] 최대우도추정(MLE) 결과 보고서:
+-&gt; 관측된 5개의 데이터를 뱉어낼 확률을 가장 극대화(Maximum)하는 최적의 파라미터(mu)는 [400] 로 추정됨!
+-&gt; 통계적 진실 확인: 실제 5개 데이터의 산술 평균인 400.0과 정확히 일치함. 즉 MLE 확률 모델이 수학적 추론을 통해 블랙박스 속 파라미터를 스스로 완벽히 역추적해낸 것임.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="자동화된-최적화-알고리즘algorithmic-optimization" class="level3">
+<h3 class="anchored" data-anchor-id="자동화된-최적화-알고리즘algorithmic-optimization">2.3. 자동화된 최적화 알고리즘(algorithmic optimization)</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>그리드 서치는 직관적이지만 파라미터가 5~6개만 되어도 우주가 멸망할 때까지 계산이 끝나지 않는 차원의 저주에 걸림.</li>
+<li>이를 극복하기 위해 현대 컴퓨팅은 일일이 바둑판을 뒤지는 대신, <strong>수학적 미분이나 기하학적 경험칙 등을 활용해 컴퓨터가 스스로 오차가 줄어드는 방향을 찾아가는 자동 최적화 알고리즘(optimization algorithm)</strong>을 사용함.</li>
+<li>대표적 사례: 경사하강법(gradient descent), 넬더-미드 심플렉스(Nelder-Mead simplex), BFGS(Broyden–Fletcher–Goldfarb–Shanno) 등.</li>
+<li>파이썬 함수: 파이썬에서는 <code>scipy.optimize.minimize</code> 함수 단 한 줄로 최적화 알고리즘이라는 거대한 톱니바퀴를 돌릴 수 있음.</li>
+</ul></li>
+<li><strong>심화 해설(어떻게 스스로 길을 찾는가?)</strong>
+<ul>
+<li><strong>넬더-미드 알고리즘:</strong> 미분이 불가능한 복잡한 모델(DDM 등)에서 가장 널리 쓰이는 아메바 탐색법임. 파라미터 공간에 아메바처럼 생긴 다각형(simplex)을 던져놓고, 가장 오차가 큰(나쁜) 모서리를 오차가 작은(좋은) 방향으로 뒤집어엎으며 꿈틀꿈틀 최적점을 향해 스스로 기어내려감.</li>
+<li>그리드 서치처럼 모든 좌표를 계산할 필요 없이, 가장 가파른 내리막만 골라서 순식간에 바닥에 도달하므로 연산속도가 수백 배 빠름.</li>
+</ul></li>
+<li><strong>비유(안대 낀 등산객의 지팡이 더듬기)</strong>
+<ul>
+<li><strong>그리드 서치:</strong> 헬기에서 떨어져 한라산 전체의 모든 좌표를 1미터 간격으로 직접 밟아보며 어디가 제일 고도가 낮은지 전부 수첩에 적는 무식한 방법.</li>
+<li><strong>자동 최적화 알고리즘:</strong> 안대를 낀 등산객이 헬기에서 떨어진 직후, 발바닥과 지팡이로 내 주변 땅의 기울기(오차의 변화량)만 더듬은 뒤 <strong>가장 가파른 내리막 방향으로만 한 걸음씩 잰걸음으로 미끄러져 내려가는</strong> 똑똑하고 효율적인 방법.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 8] 그리드 서치 vs 넬더-미드 알고리즘의 탐색 궤적 비교</strong> <img src="images/week8/Slide_008.png" class="img-fluid"></p>
+<section id="실습-2-3-scipy-라이브러리를-활용한-자동-파라미터-최적화model-fitting-구현" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-3-scipy-라이브러리를-활용한-자동-파라미터-최적화model-fitting-구현">[실습 2-3] Scipy 라이브러리를 활용한 자동 파라미터 최적화(model fitting) 구현</h4>
+<ul>
+<li>무식한 for 루프(그리드 서치)를 버리고, 파이썬의 강력한 <code>scipy.optimize</code> 알고리즘을 호출하여 컴퓨터가 알아서 오차의 밑바닥(최적 파라미터)으로 굴러 내려가도록 구현함.</li>
+</ul>
+<div id="0f091006" class="cell" data-execution_count="6">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># numpy 임포트</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize <span class="co"># 자동 최적화 함수 minimize 임포트</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 2-3] 스마트한 지팡이: scipy를 이용한 자동 파라미터 최적화 ==="</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 엑셀에서 가져온 피험자의 관측 데이터 배열(맞춰야 할 타겟)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>actual_data <span class="op">=</span> np.array([<span class="dv">450</span>, <span class="dv">480</span>, <span class="dv">510</span>, <span class="dv">460</span>, <span class="dv">490</span>])</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 알고리즘에게 던져줄 목적함수(objective function: 알고리즘이 특정 파라미터(정답 후보)를 입력했을 때, 그것이 "얼마나 좋은/나쁜 상태인지"를 하나의 숫자로 평가해주는 수학공식) 정의</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 이 함수는 파라미터 추측값(params)을 입력받아, 그에 따른 SSE 벌점을 뱉어내는 샌드백 역할을 함.</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 최적화 알고리즘의 유일한 목적은 이 함수가 뱉어내는 벌점을 최소(minimize)로 만드는 params를 찾는 것임.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> objective_function(params):</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    a_guess <span class="op">=</span> params[<span class="dv">0</span>] <span class="co"># 알고리즘이 찔러보는 첫 번째 파라미터(임계값 a)</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 추측한 a 값으로 예측 데이터 배열을 찍어냄(단순화를 위해 100 곱하고 250 더하는 선형식으로 모사)</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    simulated_data <span class="op">=</span> a_guess <span class="op">*</span> <span class="dv">100</span> <span class="op">+</span> <span class="dv">250</span> </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 예측 데이터와 실제 데이터 간의 오차 제곱합(SSE) 벌점을 무자비하게 계산함</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    sse <span class="op">=</span> np.<span class="bu">sum</span>(np.square(actual_data <span class="op">-</span> simulated_data))</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sse <span class="co"># 계산된 벌점을 알고리즘에게 반환함</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 탐색 시작점(초기 추측치) 설정</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 안대 낀 등산객을 산의 어느 좌표에 떨어뜨릴 것인가?(대충 a=1.0 쯤일 것이라고 던져줌)</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>initial_guess <span class="op">=</span> [<span class="fl">1.0</span>]</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 최적화 알고리즘(minimize) 가동!</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 목적함수와 시작점(initial_guess)을 던져주고, </span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Nelder-Mead 방식으로 알아서 내리막길을 찾아가라고 명령함</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 알고리즘이 산등성이를 더듬으며 스스로 최소 오차점을 찾아 굴러 내려감...</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> minimize(objective_function, initial_guess, method<span class="op">=</span><span class="st">'Nelder-Mead'</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. 알고리즘 탐색 완료 및 결과 브리핑</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co"># result.x 안에는 알고리즘이 최종적으로 도달한 가장 깊은 골짜기의 파라미터 좌표가 들어 있음</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>optimal_a <span class="op">=</span> result.x[<span class="dv">0</span>]</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"[자동 탐색 종료] 알고리즘 보고서:"</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 며칠이 걸릴 그리드 서치 대신, 알고리즘이 단 몇 밀리초 만에 찾아낸 최적의 파라미터 a = [</span><span class="sc">{</span>optimal_a<span class="sc">:.2f}</span><span class="ss">] 임!"</span>)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 이때 알고리즘이 깎아낸 최소 오차(SSE) 극소값(오차가 도달할 수 있는 가장 밑바닥)은 </span><span class="sc">{</span>result<span class="sc">.</span>fun<span class="sc">:.2f}</span><span class="ss"> 임!"</span>)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 모델 피팅(model fitting)의 최종 진화 형태를 완벽히 코드로 구현함."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== [실습 2-3] 스마트한 지팡이: scipy를 이용한 자동 파라미터 최적화 ===
+-&gt; 알고리즘이 산등성이를 더듬으며 스스로 최소 오차점을 찾아 굴러 내려감...
+
+[자동 탐색 종료] 알고리즘 보고서:
+-&gt; 며칠이 걸릴 그리드 서치 대신, 알고리즘이 단 몇 밀리초 만에 찾아낸 최적의 파라미터 a = [2.28] 임!
+-&gt; 이때 알고리즘이 깎아낸 최소 오차(SSE) 극소값(오차가 도달할 수 있는 가장 밑바닥)은 2280.00 임!
+-&gt; 모델 피팅(model fitting)의 최종 진화 형태를 완벽히 코드로 구현함.</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="주차-요약-및-다음-주-예고" class="level2">
+<h2 class="anchored" data-anchor-id="주차-요약-및-다음-주-예고">8주차 요약 및 다음 주 예고</h2>
+<p><strong>[그림 9] 파라미터 탐색 공간과 최적화의 궤적</strong> <img src="images/week8/Slide_009.png" class="img-fluid"></p>
+<ul>
+<li><strong>요약</strong>
+<ul>
+<li><strong>모델 피팅:</strong> 데이터를 생성하는 장난감 시뮬레이션을 넘어, 실제 피험자의 관측 데이터로부터 두개골 속의 인지 파라미터(<span class="math inline">\(a, v, T_{er}\)</span>)를 정량적으로 끄집어내는 <strong>역방향 추론</strong>.</li>
+<li>이를 달성하기 위해 우리는 모델 예측과 현실의 차이를 가혹하게 평가하는 <strong>오차 제곱합(SSE) 최소화</strong> 기법 그리고 현재의 데이터가 등장할 확률을 극대화하는 <strong>최대우도추정(MLE)</strong> 기법의 철학을 체화함.</li>
+<li>컴퓨터의 연산력을 빌려 파라미터 공간의 격자를 무식하게 훑는 <strong>그리드 서치</strong>와, 미분과 기울기를 통해 스스로 똑똑하게 골짜기를 내려가는 <strong>자동 최적화</strong> 알고리즘을 파이썬으로 구현하여 블랙박스를 해독하는 데 성공함.</li>
+</ul></li>
+<li><strong>다음 주 예고</strong>
+<ul>
+<li>다음 주 <strong>9주차(5/1)는 노동자의 날</strong>로 휴강임.</li>
+<li>그 다음 주 <strong>10주차(5/8)</strong>에는 인지심리학의 베스트셀러 <strong>주의와 간섭: Stroop 과제 모델링</strong>을 다룸.</li>
+<li>우리가 배운 DDM 모델의 표류율(<span class="math inline">\(v\)</span>) 파라미터가 빨간색 잉크로 쓰인 ’초록’이라는 글자 앞에서 어떻게 신경학적 충돌을 일으키고 힘을 깎아 먹는지, 전두엽의 강력한 인지 통제 매커니즘을 컴퓨터로 직접 시뮬레이션해볼 예정임(학기 중반 프로그래밍 과제 대비 필수!)</li>
+</ul></li>
+</ul>
+<p><strong>[그림 10] 넥스트 스텝: Stroop 충돌과 전두엽의 인지 통제</strong> <img src="images/week8/Slide_010.png" class="img-fluid"></p>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><ul>
+<li><strong>해석적 해:</strong> 수학적인 방정식이나 공식을 풀어서 <strong>연필과 종이만으로 한 번에 딱 떨어지게 구하는 완벽한 정답</strong>.
+<ul>
+<li>비유: [근의 공식] vs [숫자 때려 맞히기] <span class="math inline">\(\Rightarrow\)</span> 방정식: <span class="math inline">\(x^2 - 4 = 0\)</span></li>
+<li>해석적 해: 우리는 중학교 때 배운 수학 지식(이항 및 루트)을 이용해 <span class="math inline">\(x^2 = 4\)</span>, 따라서 <span class="math inline">\(x = 2\)</span> 또는 <span class="math inline">\(x = -2\)</span>라는 것을 <strong>1초 만에 완벽한 수식으로</strong> 찾아냄. 이것이 해석적 해를 구한 것.</li>
+<li>수치적 해(numerical solution, 해석적 해의 반대말): 만약 공식을 모른다면? <span class="math inline">\(x\)</span>에 1을 넣어보고(결과 -3), 3을 넣어보고(결과 5), “아, 1과 3 사이인가 보다” 하고 2를 넣어봐서(결과 0) 정답을 찾음. 컴퓨터가 수만 번의 시도를 통해 정답에 가까워지는 이 방식이 수치적 해임.</li>
+<li>인지 모델링(AI)에서의 의미: 딥러닝이나 표류확산 모델 같은 복잡한 시스템은 파라미터가 너무 많고 비선형적으로 얽혀 있어서, <strong>근의 공식처럼 한 번에 정답을 뱉어내는 마법의 수식(해석적 해)이 우주상에 존재하지 않음.</strong> 따라서 컴퓨터의 무식한 연산력을 빌려 일일이 대입해보는 ‘그리드 서치’나, 지팡이로 더듬으며 내려가는 ’경사하강법’ 같은 수치적 방법을 어쩔 수 없이 사용하는 것.</li>
+</ul></li>
+</ul>
+<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
+<li id="fn2"><ul>
+<li><strong>전역 최적해:</strong> 탐색할 수 있는 전체 공간(우주 전체)을 통틀어서 <strong>절대적으로 가장 완벽한 단 하나의 최고(또는 최저)의 정답</strong>.
+<ul>
+<li>비유: [지구상 가장 깊은 바다] vs [우리 동네 웅덩이] <span class="math inline">\(\Rightarrow\)</span> 모델의 오차(SSE 벌점)를 최소화하기 위해 안대를 낀 등산객이 산을 내려간다고 상상해보자. 발바닥의 감각만 믿고 무조건 ’내리막길’로만 걸어감.</li>
+<li>지역 최적해(local minimum): 한참을 내려가다 보니 사방이 오르막인 평평한 곳에 도달함. 안대 낀 등산객은 “아, 오차를 0으로 만드는 바닥을 찾았다!”라고 기뻐함. 하지만 안대를 벗어보니, 그곳은 진짜 산 밑바닥이 아니라 산 중턱에 파인 <strong>작은 웅덩이(지역 최적해)</strong>였음.</li>
+<li>전역 최적해(global minimum): 산 중턱의 웅덩이들을 모두 무시하고, 한라산 전체 지형을 샅샅이 뒤져서 찾아낸 <strong>진짜 가장 고도가 낮은 절대적인 밑바닥</strong>임. 전체 세계(global)에서 단 하나뿐인 완벽한 정답.</li>
+<li>인지 모델링(AI)에서의 의미: 경사하강법 같은 똑똑한 자동탐색 알고리즘은 아주 빠르지만, 가끔 운이 나쁘면 시작위치에 따라 ’동네 웅덩이(지역 최적해)’에 빠져서 거기가 정답인 줄 착각하고 탐색을 멈춰버리는 치명적인 단점이 있음. 반면에 무식하게 바둑판을 전부 뒤지는 <strong>그리드 서치는 시간이 매우 오래 걸리지만, 모든 땅을 다 밟아보기 때문에 무조건 ’전역 최적해’를 찾아낸다는 강력한 보장</strong>이 있음.</li>
+</ul></li>
+</ul>
+<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
