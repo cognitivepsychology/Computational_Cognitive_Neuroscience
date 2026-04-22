@@ -221,7 +221,7 @@ window.Quarto = {
 <ul>
 <li>역방향 추론 실습을 진행하기 위해, 먼저 우리의 타겟(범인)이 될 ’피험자의 실제 실험 데이터’를 파이썬을 통해 생성하고 저장함.</li>
 </ul>
-<div id="02dbf54c" class="cell" data-execution_count="1">
+<div id="63f67403" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np  <span class="co"># 수학 연산과 정규분포 난수(노이즈) 생성을 위한 numpy 라이브러리 임포트함.</span></span>
@@ -310,7 +310,7 @@ window.Quarto = {
 <ul>
 <li>동일한 피험자 데이터를 두고, 엉터리 가설을 세운 모델 A와 정교한 가설을 세운 모델 B 중 어떤 모델이 더 적합한지 SSE를 계산하여 수학적 심판을 내림.</li>
 </ul>
-<div id="9f8c8ba6" class="cell" data-execution_count="2">
+<div id="d158a117" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-2] 오차 제곱합(SSE)을 통한 모델의 적합도(goodness-of-fit) 심판 ==="</span>)</span>
@@ -388,7 +388,7 @@ window.Quarto = {
 <ul>
 <li>단순한 모델(파라미터 1개)과 지나치게 복잡한 다항식 모델(파라미터 15개)을 비교하여, 복잡한 모델이 노이즈까지 추적하느라 궤적이 요동치는 과적합 현상을 시각적으로 코딩함.</li>
 </ul>
-<div id="ff55a2e3" class="cell" data-execution_count="3">
+<div id="83f10d44" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 과적합을 눈으로 확인하기 위한 시각화 라이브러리 임포트</span></span>
@@ -460,7 +460,7 @@ window.Quarto = {
 <ul>
 <li>피험자의 평균 RT가 주어졌을 때, 임계값(<span class="math inline">\(a\)</span>)과 표류율(<span class="math inline">\(v\)</span>) 두 가지 파라미터 공간을 이중 루프로 전수조사하여 최적의 조합을 탐색함.</li>
 </ul>
-<div id="700a3a54" class="cell" data-execution_count="4">
+<div id="d845935a" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 수치 연산 라이브러리 임포트</span></span>
@@ -594,7 +594,7 @@ window.Quarto = {
 <ul>
 <li>여러 개의 RT 데이터가 주어졌을 때, 언더플로우를 방지하는 로그 덧셈 기법을 활용하여 이 데이터들을 발생시킬 확률이 가장 높은 파라미터(평균 <span class="math inline">\(\mu\)</span>)를 MLE로 역추적함.</li>
 </ul>
-<div id="3fc20a9f" class="cell" data-execution_count="5">
+<div id="f78b873d" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 넘파이 라이브러리 임포트</span></span>
@@ -673,13 +673,13 @@ window.Quarto = {
 <ul>
 <li>그리드 서치는 직관적이지만 파라미터가 5~6개만 되어도 우주가 멸망할 때까지 계산이 끝나지 않는 차원의 저주에 걸림.</li>
 <li>이를 극복하기 위해 현대 컴퓨팅은 일일이 바둑판을 뒤지는 대신, <strong>수학적 미분이나 기하학적 경험칙 등을 활용해 컴퓨터가 스스로 오차가 줄어드는 방향을 찾아가는 자동 최적화 알고리즘(optimization algorithm)</strong>을 사용함.</li>
-<li>대표적 사례: 경사하강법(gradient descent), 넬더-미드 심플렉스(Nelder-Mead simplex), BFGS(Broyden–Fletcher–Goldfarb–Shanno) 등.</li>
-<li>파이썬 함수: 파이썬에서는 <code>scipy.optimize.minimize</code> 함수 단 한 줄로 최적화 알고리즘이라는 거대한 톱니바퀴를 돌릴 수 있음.</li>
+<li><strong>대표적 사례:</strong> 경사하강법(gradient descent), 넬더-미드 심플렉스(Nelder-Mead simplex), BFGS(Broyden–Fletcher–Goldfarb–Shanno) 등.</li>
+<li><strong>파이썬 함수:</strong> 파이썬에서는 <code>scipy.optimize.minimize</code> 함수 단 한 줄로 최적화 알고리즘이라는 거대한 톱니바퀴를 돌릴 수 있음.</li>
 </ul></li>
 <li><strong>심화 해설(어떻게 스스로 길을 찾는가?)</strong>
 <ul>
 <li><strong>넬더-미드 알고리즘:</strong> 미분이 불가능한 복잡한 모델(DDM 등)에서 가장 널리 쓰이는 아메바 탐색법임. 파라미터 공간에 아메바처럼 생긴 다각형(simplex)을 던져놓고, 가장 오차가 큰(나쁜) 모서리를 오차가 작은(좋은) 방향으로 뒤집어엎으며 꿈틀꿈틀 최적점을 향해 스스로 기어내려감.</li>
-<li>그리드 서치처럼 모든 좌표를 계산할 필요 없이, 가장 가파른 내리막만 골라서 순식간에 바닥에 도달하므로 연산속도가 수백 배 빠름.</li>
+<li><strong>빠른 연산속도:</strong> 그리드 서치처럼 모든 좌표를 계산할 필요 없이, 가장 가파른 내리막만 골라서 순식간에 바닥에 도달하므로 연산속도가 수백 배 빠름.</li>
 </ul></li>
 <li><strong>비유(안대 낀 등산객의 지팡이 더듬기)</strong>
 <ul>
@@ -693,7 +693,7 @@ window.Quarto = {
 <ul>
 <li>무식한 for 루프(그리드 서치)를 버리고, 파이썬의 강력한 <code>scipy.optimize</code> 알고리즘을 호출하여 컴퓨터가 알아서 오차의 밑바닥(최적 파라미터)으로 굴러 내려가도록 구현함.</li>
 </ul>
-<div id="0f091006" class="cell" data-execution_count="6">
+<div id="b4d1cf39" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># numpy 임포트</span></span>
