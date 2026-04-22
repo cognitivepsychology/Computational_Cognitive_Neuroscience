@@ -185,7 +185,7 @@ window.Quarto = {
 <ul>
 <li><strong>패러다임의 역발상(forward에서 backward로):</strong> 파라미터를 조작해 가상의 행동 데이터를 생성했던 정방향 시뮬레이션(forward modeling)을 뒤집어, 실험실의 실제 행동 데이터로부터 뇌 속에 숨겨진 인지 파라미터를 거꾸로 역추적하는 <strong>역방향 추론(reverse engineering)</strong> 메커니즘을 체화함.</li>
 <li><strong>적합도 평가의 수학적 기준(SSE):</strong> 연구자가 만든 인지 모델의 예측값이 피험자의 실제 데이터와 얼마나 완벽하게 일치하는지를 정량적으로 평가하는 <strong>오차 제곱합(sum of squared errors, SSE)</strong>의 수학적 원리와 기하학적 패널티 시스템을 이해함.</li>
-<li><strong>과적합(overfitting)의 인지적 통제:</strong> 모델의 파라미터가 무한정 늘어날 때 발생하는 과적합의 위험성을 파악하고, 오캄의 면도날(Occam’s razor) 철학을 바탕으로 모델의 설명력과 복잡도 사이의 균형을 통제함.</li>
+<li><strong>과적합(overfitting)의 인지적 통제:</strong> 모델의 파라미터가 무한정 늘어날 때 발생하는 과적합의 위험성을 파악하고, 오컴의 면도날(Occam’s razor) 철학을 바탕으로 모델의 설명력과 복잡도 사이의 균형을 통제함.</li>
 <li><strong>확률적 최적화(MLE):</strong> 단순한 오차 최소화를 넘어, ’현재의 데이터가 관측될 확률을 극대화한다’는 통계학의 근간인 <strong>최대우도추정(maximum likelihood estimation, MLE)</strong> 기법을 인지 모델링에 도입함.</li>
 <li><strong>파라미터 탐색 알고리즘 직접 구현:</strong> 무식하지만 확실한 전수조사 기법인 <strong>그리드 서치(grid search)</strong>와, 알고리즘 기반의 <strong>자동 최적화(optimization)</strong> 함수를 파이썬으로 직접 코딩하여 피험자의 숨겨진 마음을 해독함.</li>
 </ul>
@@ -221,7 +221,7 @@ window.Quarto = {
 <ul>
 <li>역방향 추론 실습을 진행하기 위해, 먼저 우리의 타겟(범인)이 될 ’피험자의 실제 실험 데이터’를 파이썬을 통해 생성하고 저장함.</li>
 </ul>
-<div id="63f67403" class="cell" data-execution_count="1">
+<div id="dccd82a0" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np  <span class="co"># 수학 연산과 정규분포 난수(노이즈) 생성을 위한 numpy 라이브러리 임포트함.</span></span>
@@ -310,7 +310,7 @@ window.Quarto = {
 <ul>
 <li>동일한 피험자 데이터를 두고, 엉터리 가설을 세운 모델 A와 정교한 가설을 세운 모델 B 중 어떤 모델이 더 적합한지 SSE를 계산하여 수학적 심판을 내림.</li>
 </ul>
-<div id="d158a117" class="cell" data-execution_count="2">
+<div id="5d212283" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-2] 오차 제곱합(SSE)을 통한 모델의 적합도(goodness-of-fit) 심판 ==="</span>)</span>
@@ -388,12 +388,12 @@ window.Quarto = {
 <ul>
 <li>단순한 모델(파라미터 1개)과 지나치게 복잡한 다항식 모델(파라미터 15개)을 비교하여, 복잡한 모델이 노이즈까지 추적하느라 궤적이 요동치는 과적합 현상을 시각적으로 코딩함.</li>
 </ul>
-<div id="83f10d44" class="cell" data-execution_count="3">
+<div id="b9bc5e3f" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="co"># 과적합을 눈으로 확인하기 위한 시각화 라이브러리 임포트</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-3] 오캄의 면도날: 모델 복잡도와 과적합(Overfitting)의 딜레마 ==="</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== [실습 1-3] 오캄의 면도날: 모델 복잡도와 과적합의 딜레마 ==="</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 훈련용 데이터(기출문제) 생성</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>) <span class="co"># 재현성을 위해 시드 고정</span></span>
@@ -422,7 +422,7 @@ window.Quarto = {
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 통찰: 과적합 모델은 훈련 SSE를 0으로 만들었지만, 15개나 되는 파라미터를 동원해 피험자의 우연한 노이즈(재채기)까지 수학적 진리로 착각해버린 상태임. 새로운 데이터가 들어오면 예측력이 완전히 박살남."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>=== [실습 1-3] 오캄의 면도날: 모델 복잡도와 과적합(Overfitting)의 딜레마 ===
+<pre><code>=== [실습 1-3] 오캄의 면도날: 모델 복잡도와 과적합의 딜레마 ===
 -&gt; [단순 모델]의 훈련 SSE: 8.28(적당한 오차 존재)
 -&gt; [과적합 모델]의 훈련 SSE: 0.00(오차가 0에 수렴! 기출문제 완벽 암기!)
 
@@ -460,7 +460,7 @@ window.Quarto = {
 <ul>
 <li>피험자의 평균 RT가 주어졌을 때, 임계값(<span class="math inline">\(a\)</span>)과 표류율(<span class="math inline">\(v\)</span>) 두 가지 파라미터 공간을 이중 루프로 전수조사하여 최적의 조합을 탐색함.</li>
 </ul>
-<div id="d845935a" class="cell" data-execution_count="4">
+<div id="95a9c1f3" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 수치 연산 라이브러리 임포트</span></span>
@@ -594,7 +594,7 @@ window.Quarto = {
 <ul>
 <li>여러 개의 RT 데이터가 주어졌을 때, 언더플로우를 방지하는 로그 덧셈 기법을 활용하여 이 데이터들을 발생시킬 확률이 가장 높은 파라미터(평균 <span class="math inline">\(\mu\)</span>)를 MLE로 역추적함.</li>
 </ul>
-<div id="f78b873d" class="cell" data-execution_count="5">
+<div id="9f495326" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 넘파이 라이브러리 임포트</span></span>
@@ -693,7 +693,7 @@ window.Quarto = {
 <ul>
 <li>무식한 for 루프(그리드 서치)를 버리고, 파이썬의 강력한 <code>scipy.optimize</code> 알고리즘을 호출하여 컴퓨터가 알아서 오차의 밑바닥(최적 파라미터)으로 굴러 내려가도록 구현함.</li>
 </ul>
-<div id="b4d1cf39" class="cell" data-execution_count="6">
+<div id="c55f0fef" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># numpy 임포트</span></span>
