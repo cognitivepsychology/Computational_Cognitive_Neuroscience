@@ -14,3 +14,5 @@
 * **[week6_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week6_2026.html):** 6주차 수업자료: 학습의 원리 #2: 델타 규칙(delta rule)과 오차 역전파 기초. 해당 자료를 열람하려면 링크를 클릭할 것.
 
 * **[week7_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week7_2026.html):** 7주차 수업자료: 의사결정 모델링: 표류확산 모델(DDM)과 속도-정확성 타협. 해당 자료를 열람하려면 링크를 클릭할 것.
+
+* **[week8_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week8_2026.html):** 8주차 수업자료: 모델 평가와 파라미터 추정: 그리드 서치와 최적화. 해당 자료를 열람하려면 링크를 클릭할 것.
