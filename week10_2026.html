@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>계산주의와 인지신경과학 10주차_주의와 간섭: Stroop 과제와 활성화 확산 모델</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="week10_2026_files/libs/clipboard/clipboard.min.js"></script>
+<script src="week10_2026_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="week10_2026_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="week10_2026_files/libs/quarto-html/popper.min.js"></script>
+<script src="week10_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="week10_2026_files/libs/quarto-html/anchor.min.js"></script>
+<link href="week10_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="week10_2026_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="week10_2026_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="week10_2026_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="week10_2026_files/libs/bootstrap/bootstrap-e0048d6574ccc2aa33e6fadbbc53b6fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#주차-수업-목표" id="toc-주차-수업-목표" class="nav-link active" data-scroll-target="#주차-수업-목표">10주차 수업 목표</a></li>
+  <li><a href="#부-의미-기억과-활성화-확산-모델" id="toc-부-의미-기억과-활성화-확산-모델" class="nav-link" data-scroll-target="#부-의미-기억과-활성화-확산-모델">1부: 의미 기억과 활성화 확산 모델</a>
+  <ul>
+  <li><a href="#의미-네트워크와-지식의-표상" id="toc-의미-네트워크와-지식의-표상" class="nav-link" data-scroll-target="#의미-네트워크와-지식의-표상">1.1. 의미 네트워크와 지식의 표상</a></li>
+  </ul></li>
+  <li><a href="#그림-2-계층적-네트워크-모델에서-활성화-확산-모델로의-진화" id="toc-그림-2-계층적-네트워크-모델에서-활성화-확산-모델로의-진화" class="nav-link" data-scroll-target="#그림-2-계층적-네트워크-모델에서-활성화-확산-모델로의-진화"><strong>[그림 2] 계층적 네트워크 모델에서 활성화 확산 모델로의 진화</strong></a>
+  <ul>
+  <li><a href="#실습-1-1-파이썬을-활용한-활성화-확산-점화-효과-시뮬레이션" id="toc-실습-1-1-파이썬을-활용한-활성화-확산-점화-효과-시뮬레이션" class="nav-link" data-scroll-target="#실습-1-1-파이썬을-활용한-활성화-확산-점화-효과-시뮬레이션">[실습 1-1] 파이썬을 활용한 활성화 확산 점화 효과 시뮬레이션</a></li>
+  <li><a href="#시간적-감쇠와-기저-활성화의-구현" id="toc-시간적-감쇠와-기저-활성화의-구현" class="nav-link" data-scroll-target="#시간적-감쇠와-기저-활성화의-구현">1.2. 시간적 감쇠와 기저 활성화의 구현</a>
+  <ul>
+  <li><a href="#실습-1-2-거리에-따른-확산-지연-및-감쇠망각-현상-시뮬레이션" id="toc-실습-1-2-거리에-따른-확산-지연-및-감쇠망각-현상-시뮬레이션" class="nav-link" data-scroll-target="#실습-1-2-거리에-따른-확산-지연-및-감쇠망각-현상-시뮬레이션">[실습 1-2] 거리에 따른 확산 지연 및 감쇠(망각) 현상 시뮬레이션</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#부-stroop-과제와-전두엽-인지-제어-시뮬레이션" id="toc-부-stroop-과제와-전두엽-인지-제어-시뮬레이션" class="nav-link" data-scroll-target="#부-stroop-과제와-전두엽-인지-제어-시뮬레이션">2부: Stroop 과제와 전두엽 인지 제어 시뮬레이션</a>
+  <ul>
+  <li><a href="#주의와-간섭-stroop-효과의-해부" id="toc-주의와-간섭-stroop-효과의-해부" class="nav-link" data-scroll-target="#주의와-간섭-stroop-효과의-해부">2.1. 주의와 간섭: Stroop 효과의 해부</a>
+  <ul>
+  <li><a href="#실습-2-1-자동화된-경로와-통제된-경로의-가중치-충돌-시뮬레이션" id="toc-실습-2-1-자동화된-경로와-통제된-경로의-가중치-충돌-시뮬레이션" class="nav-link" data-scroll-target="#실습-2-1-자동화된-경로와-통제된-경로의-가중치-충돌-시뮬레이션">[실습 2-1] 자동화된 경로와 통제된 경로의 가중치 충돌 시뮬레이션</a></li>
+  </ul></li>
+  <li><a href="#전두엽prefrontal-cortex전전두피질-또는-전전두엽-pfc의-인지-제어와-편향된-경쟁" id="toc-전두엽prefrontal-cortex전전두피질-또는-전전두엽-pfc의-인지-제어와-편향된-경쟁" class="nav-link" data-scroll-target="#전두엽prefrontal-cortex전전두피질-또는-전전두엽-pfc의-인지-제어와-편향된-경쟁">2.2. 전두엽(prefrontal cortex[전전두피질 또는 전전두엽], PFC)의 인지 제어와 편향된 경쟁</a>
+  <ul>
+  <li><a href="#실습-2-2-전두엽의-하향식-통제가-결합된-의사결정-증거축적-시뮬레이션" id="toc-실습-2-2-전두엽의-하향식-통제가-결합된-의사결정-증거축적-시뮬레이션" class="nav-link" data-scroll-target="#실습-2-2-전두엽의-하향식-통제가-결합된-의사결정-증거축적-시뮬레이션">[실습 2-2] 전두엽의 하향식 통제가 결합된 의사결정 증거축적 시뮬레이션</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#주차-요약-및-다음-주-예고" id="toc-주차-요약-및-다음-주-예고" class="nav-link" data-scroll-target="#주차-요약-및-다음-주-예고">10주차 요약 및 다음 주 예고</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">계산주의와 인지신경과학 10주차_주의와 간섭: Stroop 과제와 활성화 확산 모델</h1>
+<p class="subtitle lead">고려대학교 일반대학원 심리학과</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026년 5월 8일 금요일 4-5교시</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="주차-수업-목표" class="level2">
+<h2 class="anchored" data-anchor-id="주차-수업-목표">10주차 수업 목표</h2>
+<p><strong>[그림 1] 의미 기억망과 인지적 충돌의 뇌 메커니즘</strong> <img src="images/week10/Slide_001.png" class="img-fluid"></p>
+<ul>
+<li><strong>활성화 확산 모델(spreading activation model) 체화:</strong> 인간의 심성 어휘집(mental lexicon)과 의미 기억이 어떻게 상호 연결되어 있는지 파악하고, 단어 간의 점화 효과(priming effect)가 뇌의 네트워크를 타고 퍼져나가는 과정을 파이썬의 행렬 연산을 통해 수학적으로 구현함.</li>
+<li><strong>거리, 감쇠(decay), 그리고 기저 활성화의 이해:</strong> 거리가 멀어질수록, 시간이 지날수록 기억의 활성화 에너지가 소실되는 자연적 망각 기제와 단어의 사용 빈도에 따라 달라지는 신경망의 기저 활성화(baseline activation) 차이를 코드로 시뮬레이션함.</li>
+<li><strong>Stroop 과제와 인지적 충돌 해부:</strong> 인지심리학의 영원한 베스트셀러인 Stroop 과제를 통해, ‘자동화된 경로(단어 읽기)’와 ’통제된 경로(색상 명명)’ 간의 비대칭적 가중치 충돌이 발생시키는 정보 처리의 병목 현상을 수치화함.</li>
+<li><strong>전두엽의 하향식 인지 제어(Top-down Control) 구현:</strong> 무의식적으로 튀어나오려는 강력한 오답(단어) 경로를 억제하고, 약한 정답(색상) 경로에 주의(attention) 자원을 퍼붓는 전두엽의 작업기억 노드를 모델링하여 편향된 경쟁(biased competition)을 해결함.</li>
+</ul>
+</section>
+<section id="부-의미-기억과-활성화-확산-모델" class="level2">
+<h2 class="anchored" data-anchor-id="부-의미-기억과-활성화-확산-모델">1부: 의미 기억과 활성화 확산 모델</h2>
+<section id="의미-네트워크와-지식의-표상" class="level3">
+<h3 class="anchored" data-anchor-id="의미-네트워크와-지식의-표상">1.1. 의미 네트워크와 지식의 표상</h3>
+</section>
+</section>
+<section id="그림-2-계층적-네트워크-모델에서-활성화-확산-모델로의-진화" class="level2">
+<h2 class="anchored" data-anchor-id="그림-2-계층적-네트워크-모델에서-활성화-확산-모델로의-진화"><strong>[그림 2] 계층적 네트워크 모델에서 활성화 확산 모델로의 진화</strong></h2>
+<p><img src="images/week10/Slide_002.png" class="img-fluid"></p>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li><strong>인지적 경제성의 한계와 진화:</strong> 인간의 심성 어휘집(mental lexicon)은 컴퓨터의 폴더 시스템처럼 개별적이거나 수직적으로 깔끔하게 정리되어 있지 않음. 초기 인지심리학의 계층적 네트워크 모델(Collins &amp; Quillian, 1969)은 ’동물-새-참새’라는 엄격한 상하위 위계 구조를 가정했으나, 이는 사람들이 ’타조(비전형적)’보다 ’참새(전형적)’를 더 빨리 새라고 판단하는 <strong>전형성 효과(typicality effect)</strong>를 설명하는 데 치명적인 한계를 보였음.</li>
+<li><strong>활성화 확산 모델(spreading activation model)의 도입:</strong> 이를 극복하기 위해 Collins와 Loftus(1975)는 엄격한 위계 구조를 과감히 폐기하고, 의미적 연관성을 기준으로 개념들이 거대한 거미줄처럼 얽혀 있는 복잡계 네트워크를 제안함. 이 모델에서 개별 지식(사과, 빨강 등)은 각각의 <strong>노드(node)</strong>로, 개념 간의 연관성은 <strong>연결선(edge/link)</strong>으로 표상됨.</li>
+<li><strong>연결선의 길이와 의미적 거리(semantic distance):</strong> 모든 개념이 동일한 간격으로 연결된 것은 아님. 두 개념이 함께 자주 사용되거나 의미적으로 밀접할수록(예: 의사-간호사) 연결선이 짧고 굵게(높은 가중치) 형성되며, 연관성이 적을수록(예: 의사-우주선) 선이 길고 가늘게 형성됨. 뇌 속의 이 기하학적 거리(가중치)가 곧 정보 처리 속도의 차이를 결정하는 핵심 변수임.</li>
+<li><strong>에너지의 점화와 방사형 확산:</strong> 시각적 단어나 청각적 소리 등의 외부 자극을 통해 특정 노드에 자극이 주어지면, 해당 노드는 점화(fire)되어 전기적 흥분 에너지(activation)를 뿜어냄. 이 에너지는 하나의 경로로만 흐르는 것이 아니라, 물리적으로 연결된 모든 선을 타고 주변 노드들을 향해 잉크가 번지듯 <strong>방사형으로 동시에 퍼져나감(병렬 처리)</strong>.</li>
+<li><strong>교차 확산(intersection)과 발화 임계값(threshold):</strong> 확산된 에너지는 주변 노드의 기저 상태를 자극함. 만약 ‘빨강’과 ’과일’이라는 두 자극이 동시에 주어지면, 양쪽에서 출발한 에너지가 네트워크망을 타고 흐르다가 교차점인 ’사과’ 노드에서 합산됨. 이렇게 누적된 에너지가 뇌의 특정 발화 임계값을 돌파하는 순간, 비로소 해당 개념이 의식 위로 떠오르며 반응(버튼 누르기, 소리 내어 읽기 등)으로 이어지게 됨.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 3] 어휘 판단 과제(lexical decision task)와 의미적 점화 효과</strong> <img src="images/week10/Slide_003.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(프라이밍 효과의 신경학적 기원과 언어심리학적 적용)</strong>
+<ul>
+<li>언어심리학의 대표적인 실험 패러다임인 <strong>어휘 판단 과제(lexical decision task, LDT)</strong>에서 피험자에게 ’의사(점화어)’라는 단어를 아주 짧게 먼저 보여준 뒤 ’간호사(표적어)’를 보여주면, 무관한 단어인 ’책상’을 보여준 뒤 ’간호사’를 보여줄 때보다 반응 시간이 유의미하게 단축되는 <strong>의미적 점화 효과(semantic priming effect)</strong>가 관찰됨.</li>
+<li>계산주의적 관점에서 점화 효과는 결코 신비로운 심리 현상이 아님. ‘의사’ 노드에서 폭발한 활성화 에너지가 연결망을 타고 ‘간호사’ 노드에 미리 흘러 들어가, 간호사 노드의 전위값을 발화 임계치 바로 턱밑까지 미리 끌어올려 놓았기(pre-activation) 때문으로 수학적으로 완벽히 증명됨.</li>
+<li>최근 자연언어 처리 분야에서 단어의 의미를 고차원 공간의 벡터로 변환하는 Word2Vec 등의 임베딩 기술은, 본질적으로 인간의 뇌가 단어 간의 거리를 가중치로 계산하는 활성화 확산 모델의 철학을 기계학습으로 구현한 것임.</li>
+</ul></li>
+<li><strong>비유(물탱크와 파이프라인 시스템)</strong>
+<ul>
+<li>인간의 뇌를 수천 개의 투명한 물탱크(개념 노드)가 복잡한 파이프(가중치)로 연결된 거대한 지하 수도 시스템이라고 가정함.</li>
+<li>‘의사’라는 물탱크에 100리터의 물(외부 자극)을 갑자기 들이부으면, 아주 굵은 파이프가 연결된 ’간호사’ 물탱크로는 물이 순식간에 콸콸 쏟아져 들어가 금방 차오름. 반면 얇은 파이프가 연결되거나 아예 끊어져 있는 ‘우주선’ 물탱크로는 물이 한 방울도 가지 않음. 이것이 인간이 연관된 단어를 더 빨리 떠올리는 물리적 이유임.</li>
+</ul></li>
+</ul>
+<section id="실습-1-1-파이썬을-활용한-활성화-확산-점화-효과-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-1-파이썬을-활용한-활성화-확산-점화-효과-시뮬레이션">[실습 1-1] 파이썬을 활용한 활성화 확산 점화 효과 시뮬레이션</h4>
+<ul>
+<li>4개의 주요 개념(의사, 간호사, 책상, 의자)으로 구성된 소규모 뇌 네트워크를 구축하고, 파이썬의 <code>numpy</code> 행렬 곱셈을 이용해 한 노드의 흥분이 수만 개의 파이프를 타고 동시에 다른 노드로 전이되는 병렬 처리 과정을 코딩함.</li>
+<li><code>np.clip</code>의 기능과 의미
+<ul>
+<li><strong>프로그래밍적 기능:</strong> <code>numpy.clip(array, min_value, max_value)</code> 함수는 파이썬이 임의로 기준을 정하는 것이 아니라, <strong>연구자가 코드에 직접 입력한 최소값(<code>min_value</code>)과 최대값(<code>max_value</code>) 파라미터를 절대적인 기준</strong>으로 삼아 데이터를 강제 조정함.
+<ul>
+<li><strong>작동 규칙:</strong> 데이터가 지정된 최소값보다 작으면 최소값으로 강제로 끌어올리고, 최대값보다 크면 최대값으로 깎아내리며, 두 기준 사이의 정상 범위에 있으면 값을 건드리지 않고 그대로 유지함.</li>
+<li><strong>설정 예시:</strong> 본 수업의 코드처럼 연구자가 <code>np.clip(activation, 0.0, 1.0)</code>이라고 최소값을 0.0, 최대값을 1.0으로 명시했다면, 배열 안의 <code>-0.5</code>는 지정된 하한선인 <code>0.0</code>으로 끌어올려지고, <code>1.5</code>는 상한선인 <code>1.0</code>으로 깎아내려짐.</li>
+</ul></li>
+<li><strong>인지신경과학적 의미:</strong> 아래 실습에서 굳이 파라미터를 <code>0.0</code>과 <code>1.0</code>으로 세팅한 이유는, 무한대로 뻗어 나가려는 수학 연산 결과를 <strong>‘실제 인간의 뇌세포가 작동 가능한 물리적 범위’</strong> 안으로 묶어두기 위함임.
+<ul>
+<li><strong>최소값 <code>0.0</code>의 의미:</strong> 모델의 수학적 연산 과정에서 활성화 값이 음수(<code>-0.5</code>)가 나올 수는 있지만, 실제 생물학적 뇌에서는 아무리 강한 억제성 신호를 받더라도 <code>0</code> 이하의 에너지(마이너스 에너지)라는 것은 존재할 수 없음. 완전히 쉬고 있는 상태인 <strong><code>0.0</code>이 물리적인 하한선</strong>임.</li>
+<li><strong>최대값 <code>1.0</code>의 의미:</strong> 반대로 외부 자극이 너무 강해 연산 결과가 <code>2.0</code>이나 <code>3.0</code>으로 비정상적으로 치솟더라도, 생물학적 세포막은 물리적 한계가 있어 일정 수준 이상의 전위(발화)를 무한정 일으킬 수 없음(<strong>신경학적 과흥분 상한선인 <code>1.0</code></strong>이 존재).</li>
+<li><strong>결론:</strong> <code>np.clip</code>은 단순한 수학적 에러나 버그 방지가 아니라, 거대한 행렬 연산이 뇌의 생물학적 한계를 벗어나지 않도록 통제하는 핵심 인지 모델링 도구임.</li>
+</ul></li>
+</ul></li>
+</ul>
+<div id="67b9fa86" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 행렬과 벡터 연산을 고속으로 병렬 처리하기 위해 파이썬의 numpy 라이브러리를 불러옴</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 뇌 신경망 가중치 행렬 구축</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># [노드 인덱스 규칙] 0: 의사, 1: 간호사, 2: 책상, 3: 의자</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># np.array를 사용하여 4x4 크기의 2차원 행렬을 생성함. 이 행렬이 인간의 장기기억 네트워크를 표상함</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 각 행은 에너지가 '출발'하는 노드, 열은 에너지가 '도착'하는 노드를 의미함</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.array([</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 0번(의사) 노드에서 출발하는 파이프라인 가중치 설정함</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.3</span>, <span class="fl">0.8</span>, <span class="fl">0.1</span>, <span class="fl">0.0</span>],  <span class="co"># 의사-&gt;의사(0.3: 자기 유지), 의사-&gt;간호사(0.8: 강한 연관), 의사-&gt;책상(0.1: 약한 연관), 의사-&gt;의자(0.0: 무관함)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1번(간호사) 노드에서 출발하는 파이프라인 가중치 설정함</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.8</span>, <span class="fl">0.3</span>, <span class="fl">0.0</span>, <span class="fl">0.1</span>],  <span class="co"># 간호사-&gt;의사(0.8: 강한 연관), 간호사-&gt;간호사(0.3: 자기 유지), 간호사-&gt;책상(0.0), 간호사-&gt;의자(0.1)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2번(책상) 노드에서 출발하는 파이프라인 가중치 설정함</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.1</span>, <span class="fl">0.0</span>, <span class="fl">0.3</span>, <span class="fl">0.9</span>],  <span class="co"># 책상-&gt;의사(0.1), 책상-&gt;간호사(0.0), 책상-&gt;책상(0.3: 자기 유지), 책상-&gt;의자(0.9: 강한 연관)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3번(의자) 노드에서 출발하는 파이프라인 가중치 설정함</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.0</span>, <span class="fl">0.1</span>, <span class="fl">0.9</span>, <span class="fl">0.3</span>]   <span class="co"># 의자-&gt;의사(0.0), 의자-&gt;간호사(0.1), 의자-&gt;책상(0.9: 강한 연관), 의자-&gt;의자(0.3: 자기 유지)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 초기 뇌 상태 및 시뮬레이션 파라미터 세팅</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 실험이 시작되기 전, 외부 자극이 없는 평온한 뇌 상태를 모두 0.0으로 초기화한 1차원 벡터를 생성함</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>activation <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 시간의 흐름을 나타내는 단위. 총 2번의 턴(Cycle 0, Cycle 1)에 걸쳐 연산을 반복하게 됨</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>cycles <span class="op">=</span> <span class="dv">2</span>  </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 외부 시각 자극(input) 주입 설정</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자가 모니터에서 '의사'라는 단어를 본 순간, 0번(의사) 노드에만 1.0의 강한 에너지가 꽂힘을 벡터로 표상함</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>external_input <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>]) </span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 활성화 확산 연산 루프(for문 가동)</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 설정한 사이클 횟수(2번)만큼 아래 들여쓰기 된 코드들을 반복 실행함</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(cycles):</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 현재 몇 번째 사이클이 돌아가고 있는지 화면에 출력함 (파이썬에서 변수 t는 0부터 시작함)</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"--- [Cycle </span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">] 확산 연산 진행 중 ---"</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 뇌가 원래 가지고 있던 활성화 에너지에 외부 모니터에서 들어온 자극 에너지를 단순 덧셈(+) 기호로 합산함</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    activation <span class="op">=</span> activation <span class="op">+</span> external_input</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [행렬 곱셈의 핵심] 현재 뇌의 에너지 벡터(activation)와 가중치 행렬 네트워크(weights)를 np.dot 함수로 한 번에 곱함</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 이 한 줄의 코드가 수만 개의 뉴런이 순차적이 아닌 '동시에' 에너지를 주고받는 뇌의 병렬 처리를 완벽히 모사함</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    spread_energy <span class="op">=</span> np.dot(activation, weights)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 곱셈 결과값이 신경학적 발화 상한선인 1.0을 넘거나 하한선인 0.0 이하로 떨어지지 않게 np.clip 함수로 강제 제한함</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 이 통제된 결과값을 새로운 활성화 상태로 덮어쓰기(업데이트)함</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    activation <span class="op">=</span> np.clip(spread_energy, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 모니터에 제시된 '의사' 단어는 찰나의 순간(Cycle 0) 직후 사라지므로, 다음 턴의 외부 자극을 모두 0.0으로 초기화해줌</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    external_input <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 각 노드의 활성화 상태를 소수점 둘째 자리(.2f)까지만 깔끔하게 잘라서 화면에 출력함</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"의사 노드 활성화: </span><span class="sc">{</span>activation[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># t가 0일 때(첫 번째 사이클)와 아닐 때를 if-else 조건문으로 나누어, 상황에 맞는 분석 문구를 출력하게 함</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> t <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 외부 자극이 처음 퍼져나간 직후이므로, 간호사 노드에 점화가 일어났음을 명시함</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"간호사 노드 활성화: </span><span class="sc">{</span>activation[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> (&lt;- 진정한 의미적 점화 발생!)"</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 두 번째 사이클에서는 대각선 가중치 덕분에 에너지가 남아 있음을 명시함</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"간호사 노드 활성화: </span><span class="sc">{</span>activation[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> (&lt;- 대각선 가중치 덕분에 0.0으로 증발하지 않고 에너지가 잔존함)"</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 책상과 의자 노드의 활성화 상태도 마저 출력함 (\n을 넣어 다음 사이클 출력 전에 빈 줄을 하나 띄움)</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"책상 노드 활성화: </span><span class="sc">{</span>activation[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"의자 노드 활성화: </span><span class="sc">{</span>activation[<span class="dv">3</span>]<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="co"># 모든 for문 반복이 끝난 후 최종적인 인지과학적 통찰을 텍스트로 출력함</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 결과 분석: 대각선 가중치(0.3)를 도입한 결과, Cycle 1에서도 간호사 노드의 에너지가 완전히 소실되지 않고 0.48로 잔존함. 이는 인지과학적으로 '의사'라는 점화어의 여파가 뇌에 일정 시간 머물러 있음을 훨씬 더 수학적이고 현실적으로 모사한 것임."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--- [Cycle 0] 확산 연산 진행 중 ---
+의사 노드 활성화: 0.30
+간호사 노드 활성화: 0.80 (&lt;- 진정한 의미적 점화 발생!)
+책상 노드 활성화: 0.10
+의자 노드 활성화: 0.00
+
+--- [Cycle 1] 확산 연산 진행 중 ---
+의사 노드 활성화: 0.74
+간호사 노드 활성화: 0.48 (&lt;- 대각선 가중치 덕분에 0.0으로 증발하지 않고 에너지가 잔존함)
+책상 노드 활성화: 0.06
+의자 노드 활성화: 0.17
+
+-&gt; 결과 분석: 대각선 가중치(0.3)를 도입한 결과, Cycle 1에서도 간호사 노드의 에너지가 완전히 소실되지 않고 0.48로 잔존함. 이는 인지과학적으로 '의사'라는 점화어의 여파가 뇌에 일정 시간 머물러 있음을 훨씬 더 수학적이고 현실적으로 모사한 것임.</code></pre>
+</div>
+</div>
+</section>
+<section id="시간적-감쇠와-기저-활성화의-구현" class="level3">
+<h3 class="anchored" data-anchor-id="시간적-감쇠와-기저-활성화의-구현">1.2. 시간적 감쇠와 기저 활성화의 구현</h3>
+<p><strong>[그림 4] 활성화 에너지의 시간적 감쇠 곡선</strong> <img src="images/week10/Slide_004.png" class="img-fluid"></p>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li><strong>활성화 에너지 통제의 필요성</strong>
+<ul>
+<li>활성화 에너지가 사라지지 않고 무한정 퍼져나가기만 한다면, 단어 하나를 들었을 때 머릿속의 모든 지식이 도미노처럼 연쇄 폭발을 일으켜 뇌가 뇌전증(epilepsy)과 같은 과부하에 걸릴 것임.</li>
+<li>부채 효과((fan effect)
+<ul>
+<li>창안자: 인지심리학자 J. R. Anderson이 제안한 ACT-R 이론의 핵심 개념임. 뇌가 특정 개념(노드)을 점화시킬 때 뿜어낼 수 있는 <strong>활성화 에너지의 총량은 한정(fixed capacity)되어 있음</strong>.</li>
+<li>구체적 메커니즘: 만약 ‘의사’라는 단어(노드) 하나에 ’병원’, ‘청진기’, ‘주사기’, ‘하얀 가운’ 등 너무 많은 정보가 부채꼴 모양으로 연결되어 있다면, 한정된 에너지가 여러 갈래의 파이프라인으로 쪼개져서(N분의 1) 흘러가게 됨.</li>
+<li>인지적 결과: 결과적으로 특정 타겟 노드(예: ‘청진기’)에 도달하는 활성화 에너지의 양이 옅어져서, 이 에너지가 발화 임계값을 돌파하는 데 시간이 훨씬 오래 걸리게 됨(기억 인출 지연 현상).</li>
+<li>비유: 수압(활성화 에너지)이 일정한 하나의 거대한 수도관에 호스를 1개 연결했을 때와 10개 연결했을 때를 상상해보자. 10개를 연결하면 각 호스에서 흘러나오는 물줄기의 세기가 몹시 약해져 빈 물통(타겟 노드)을 채우는 데 시간이 오래 걸리는 것과 같은 물리적 이치임.</li>
+</ul></li>
+</ul></li>
+<li><strong>시간적 감쇠(decay)</strong>
+<ul>
+<li>설명: 이를 통제하기 위해 인간의 신경망은 시간이 지남에 따라 활성화 수치가 원래의 기저 수준(0)으로 서서히 줄어드는 시간적 감쇠 메커니즘을 가짐.</li>
+<li>원리: 감쇠율에 의해, 자극원으로부터 거리가 먼 개념(연결 다리를 여러 번 건너야 하는 노드)일수록 도착하는 에너지가 기하급수적으로 약해지며, 일정 시간이 지나면 완벽한 망각 상태로 돌아감.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 5] 언어 사용 빈도와 노드의 기저 활성화 수준</strong> <img src="images/week10/Slide_005.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(기저 활성화와 단어 빈도 효과)</strong>
+<ul>
+<li>계산 모델에서 감쇠 파라미터(decay rate)는 보통 0과 1 사이의 값으로 설정됨(예: 0.5). 매 사이클마다 이전 활성화 값에 이 비율을 곱하여 에너지를 인위적으로 깎아냄. 이 수치가 높으면(예: 0.9) 조현병 환자들에게서 나타나는 사고의 비약(loosening of associations) 현상을 설명할 수 있고, 너무 낮으면(예: 0.1) 건망증을 모델링할 수 있음.</li>
+<li><strong>언어심리학적 확장: 단어 빈도 효과</strong>
+<ul>
+<li>고빈도어: 모든 노드의 기저 활성화(baseline activation)가 0인 것은 아님. 우리가 평소 자주 사용하는 고빈도어(예: ‘사람’, ‘물’)는 기저 활성화 수준이 이미 0.3 정도로 높게 세팅되어 있어 작은 자극에도 쉽게 임계값을 넘음.</li>
+<li>저빈도어: 저빈도어(예: ‘궤변’, ‘환원’)는 기저 수준이 0에 가까워 인식하는 데 시간이 오래 걸림.</li>
+</ul></li>
+</ul></li>
+<li><strong>비유(잔잔한 호수에 던진 돌멩이와 저항)</strong>
+<ul>
+<li>잔잔한 호수(평온한 뇌)에 거대한 돌멩이(단어 자극)를 던지면 동심원 모양의 파문이 일어남.</li>
+<li>돌멩이가 떨어진 바로 옆 수면(직접 연결된 간호사 노드)은 높게 일렁이지만, 멀리 퍼져나갈수록 물 자체의 점성과 마찰 저항(감쇠율) 때문에 파동이 점점 깎여나가, 결국 호숫가에 닿을 땐 아무런 흔적도 남지 않음. 뇌도 이와 같은 저항 시스템을 통해 미치지 않고 평온을 유지함.</li>
+</ul></li>
+</ul>
+<section id="실습-1-2-거리에-따른-확산-지연-및-감쇠망각-현상-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-2-거리에-따른-확산-지연-및-감쇠망각-현상-시뮬레이션">[실습 1-2] 거리에 따른 확산 지연 및 감쇠(망각) 현상 시뮬레이션</h4>
+<ul>
+<li>이전 실습의 코드에 <code>decay_rate</code> 파라미터를 추가하고 시간 사이클을 길게 늘려, 네트워크 전체로 퍼지던 에너지가 시간이 지남에 따라 어떻게 사그라드는지 관찰함.</li>
+</ul>
+<div id="f418a528" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 뇌 신경망 가중치 행렬 세팅(이전과 동일한 80% 상호 흥분 상태)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.array([</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.0</span>, <span class="fl">0.8</span>, <span class="fl">0.1</span>, <span class="fl">0.0</span>],  <span class="co"># 의사(0) -&gt; 간호사(0.8), 책상(0.1)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.8</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.1</span>],  <span class="co"># 간호사(1) -&gt; 의사(0.8), 의자(0.1)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.1</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.9</span>],  <span class="co"># 책상(2) -&gt; 의사(0.1), 의자(0.9)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.0</span>, <span class="fl">0.1</span>, <span class="fl">0.9</span>, <span class="fl">0.0</span>]   <span class="co"># 의자(3) -&gt; 간호사(0.1), 책상(0.9)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 초기 뇌 상태 및 파라미터 세팅</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 0번(의사) 노드가 외부 자극을 받아 이미 1.0으로 최대 흥분한 상태에서 시뮬레이션을 시작함</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>activation <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>]) </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># [핵심 수정 사항] 매 사이클마다 노드가 머금고 있는 에너지의 단 10%만 남기고 90%를 증발시켜 버리는 강력한 망각 파라미터 적용함</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>decay_rate <span class="op">=</span> <span class="fl">0.1</span> </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 에너지가 어떻게 억제되며 사그라드는지 관찰하기 위해 5번의 턴을 돌림</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>long_cycles <span class="op">=</span> <span class="dv">5</span>  </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 시간적 감쇠 및 확산 시뮬레이션 루프</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(long_cycles):</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [1단계: 억제성 망각] </span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 현재 노드가 머금고 있던 기존 에너지를 decay_rate(0.1) 만큼 대폭 깎아냄</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 폭주를 막는 가장 중요한 브레이크 역할을 함</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    retained_energy <span class="op">=</span> activation <span class="op">*</span> decay_rate</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [2단계: 흥분성 확산] </span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 기존 활성화 상태를 바탕으로 네트워크 가중치를 타고 이웃 노드에서 새롭게 밀려들어오는 에너지를 계산함</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    spread_energy <span class="op">=</span> np.dot(activation, weights)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [3단계: 최종 전위 합산]</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 90%가 깎여나간 초라한 기존 에너지와, 새로 유입된 에너지를 합산함</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    activation <span class="op">=</span> retained_energy <span class="op">+</span> spread_energy</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 신경학적 발화 상한선(1.0)과 하한선(0.0)을 넘지 않도록 np.clip 함수로 강제 제한함</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    activation <span class="op">=</span> np.clip(activation, <span class="fl">0.0</span>, <span class="fl">1.0</span>) </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 매 밀리초(ms)마다 각 노드의 에너지가 어떻게 변하는지 소수점 둘째 자리까지 출력함</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"[Time </span><span class="sc">{</span>t<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">ms] 의사(</span><span class="sc">{</span>activation[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">) | 간호사(</span><span class="sc">{</span>activation[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">) | 책상(</span><span class="sc">{</span>activation[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss">) | 의자(</span><span class="sc">{</span>activation[<span class="dv">3</span>]<span class="sc">:.2f}</span><span class="ss">)"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co"># 최종 인지과학적 분석 결과 출력함</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 결과 분석: 망각률을 0.1(90% 소멸)로 강력하게 설정하자, 의사와 간호사가 에너지를 주고받는 '핑퐁 현상'은 여전히 발생하여 수치가 오르락내리락하지만, 1.0으로 치솟는 뇌전증성 폭주는 완벽히 억제되었음. 전체 시스템의 에너지가 통제된 상태에서 서서히 0(평온 상태)을 향해 식어가는 건강한 뇌의 제어 메커니즘이 수치적으로 증명됨."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[Time 1ms] 의사(0.10) | 간호사(0.80) | 책상(0.10) | 의자(0.00)
+[Time 2ms] 의사(0.66) | 간호사(0.16) | 책상(0.02) | 의자(0.17)
+[Time 3ms] 의사(0.20) | 간호사(0.56) | 책상(0.22) | 의자(0.05)
+[Time 4ms] 의사(0.49) | 간호사(0.22) | 책상(0.09) | 의자(0.26)
+[Time 5ms] 의사(0.23) | 간호사(0.44) | 책상(0.29) | 의자(0.13)
+
+-&gt; 결과 분석: 망각률을 0.1(90% 소멸)로 강력하게 설정하자, 의사와 간호사가 에너지를 주고받는 '핑퐁 현상'은 여전히 발생하여 수치가 오르락내리락하지만, 1.0으로 치솟는 뇌전증성 폭주는 완벽히 억제되었음. 전체 시스템의 에너지가 통제된 상태에서 서서히 0(평온 상태)을 향해 식어가는 건강한 뇌의 제어 메커니즘이 수치적으로 증명됨.</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>왜 이런 ’핑퐁 현상’이 발생할까?</strong>
+<ul>
+<li><strong>1. 수학적 원리:</strong> ’주고받기’의 시차 발생. <span class="math inline">\(\Rightarrow\)</span> 의사와 간호사 사이에는 <code>0.8</code>이라는 아주 굵은 파이프(가중치)가 연결되어 있음. 에너지가 한쪽에서 다른 쪽으로 넘어가는 데는 1턴(1ms)의 시차가 발생함.
+<ul>
+<li>[시작 상태] 의사(1.0) / 간호사(0.0) <span class="math inline">\(\Rightarrow\)</span> 의사는 에너지가 꽉 차 있고 간호사는 비어 있음.</li>
+<li>[Time 1ms] 의사(0.10) / 간호사(0.80)
+<ul>
+<li>의사는 자신이 가진 에너지 1.0 중 90%를 망각하고 10%(<code>0.1</code>)만 남김. 대신 간호사에게 막대한 에너지(<code>0.8</code>)를 던져줌.</li>
+<li>결과: 에너지가 간호사 쪽으로 확 쏠림 <span class="math inline">\(\Rightarrow\)</span> 간호사 고점, 의사 저점.</li>
+</ul></li>
+<li>[Time 2ms] 의사(0.66) / 간호사(0.16)
+<ul>
+<li>반격
+<ul>
+<li>이제 간호사가 에너지를 많이 가졌으므로, 간호사가 의사에게 막대한 에너지(<code>0.8 * 0.8 = 0.64</code>)를 되돌려 던져줌.</li>
+<li><code>0.8 * 0.8</code>: 앞의 <code>0.8</code>이 간호사 노드가 충전하고 있던 현재 활성화 에너지량이라면, 뒤의 <code>0.8</code>은 간호사에서 의사로 향하는 경로에 설정된 생물학적 가중치(파이프 굵기)임.</li>
+</ul></li>
+<li>폭락: 간호사 자신은 자기가 갖고 있던 0.8의 10%(<code>0.08</code>)만 남기고, 의사(0.1)에게서 받은 쥐꼬리만한 에너지(<code>0.08</code>)를 더해 <code>0.16</code>으로 폭락함.</li>
+<li>결과: 간호사가 가진 0.8의 에너지가 0.8 굵기의 파이프를 타고 의사에게 흘러갔기 때문에 <span class="math inline">\(0.8 \times 0.8 = 0.64\)</span>라는 막대한 에너지가 의사에게 쏟아진 것임. <span class="math inline">\(\Rightarrow\)</span> 의사 고점, 간호사 저점.</li>
+<li>의문점: 왜 의사의 최종 에너지는 0.64가 아니라 0.66인가?</li>
+<li>숨은 변수들
+<ul>
+<li>이 부분은 인공 신경망이 하나씩 순서대로 연산하는 것이 아니라, 수만 개의 뉴런이 <strong>동시에 에너지를 주고받는 병렬 처리</strong> 구조라는 점을 보여주는 대목임.</li>
+<li>[Time 2ms]가 될 때, 의사 노드는 간호사 하나하고만 상호작용하는 것이 아님. 의사 노드의 최종 에너지(<code>0.66</code>)는 다음 세 가지 요소가 동시에 합산되어 만들어진 결과임.
+<ul>
+<li>[요소 A] 본인의 잔존 에너지
+<ul>
+<li>[Time 1ms]에서 의사의 에너지는 <code>0.1</code>이었음.</li>
+<li>턴이 넘어가면서 이 에너지의 10%만 남고 90%가 망각됨.</li>
+<li>계산: <span class="math inline">\(0.1 \times 0.1 = \mathbf{0.01}\)</span></li>
+</ul></li>
+<li>[요소 B] 간호사의 강력한 반격(Spread 1)
+<ul>
+<li>[Time 1ms]에서 간호사의 에너지 <code>0.8</code>이 가중치 <code>0.8</code>을 타고 의사에게 쏟아져 들어옴.</li>
+<li>계산: <span class="math inline">\(0.8 \times 0.8 = \mathbf{0.64}\)</span></li>
+</ul></li>
+<li>[요소 C] 책상의 소심한 반격(Spread 2) <span class="math inline">\(\leftarrow\)</span> <strong>이것이 0.66을 만든 주범!</strong>
+<ul>
+<li>앞선 로그를 보면, [Time 1ms]에서 책상 노드 역시 <code>0.1</code>의 에너지를 받아 흥분해 있었음.</li>
+<li>가중치 행렬을 보면 책상에서 의사로 향하는 가중치 파이프가 <code>0.1</code> 굵기로 연결되어 있음.</li>
+<li>계산: <span class="math inline">\(0.1 \times 0.1 = \mathbf{0.01}\)</span></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li>최종 합산 수식
+<ul>
+<li>의사의 [Time 2ms] 에너지 = 본인 잔존(<span class="math inline">\(0.01\)</span>) + 간호사 유입(<span class="math inline">\(0.64\)</span>) + 책상 유입(<span class="math inline">\(0.01\)</span>) = <span class="math inline">\(\mathbf{0.66}\)</span></li>
+</ul></li>
+</ul></li>
+<li>[Time 3ms] 의사(0.20) / 간호사(0.56) <span class="math inline">\(\Rightarrow\)</span> 다시 의사가 에너지를 간호사에게 크게 넘겨줌(간호사 고점, 의사 저점).</li>
+<li>결론: 두 노드가 서로 “네가 가져!”, “아니야, 네가 가져!” 하면서 <strong>에너지 공을 탁구 치듯 주고받기(oscillation) 때문</strong>에 수치가 교차하며 오르락내리락하는 것임. 하지만 매 턴마다 공의 크기(에너지)가 허공으로 90%씩 깎여나가기(decay) 때문에, 핑퐁을 거듭할수록 파도의 높이가 점점 낮아지다가 결국 0으로 수렴하게 됨.</li>
+</ul></li>
+<li><strong>2. 인지신경과학적 의미: 잔향 회로(reverberatory circuit)</strong>
+<ul>
+<li>생물학적 타당성: 실제 인간의 뇌에서도 강하게 연결된 두 개념 집단(예: 의사와 간호사)이 자극을 받으면, 활성화가 한 번에 식지 않음. A가 B를 깨우고, 깨어난 B가 다시 A를 깨우는 <strong>잔향(reverberation)</strong> 현상이 발생함.</li>
+<li>생각의 꼬리 물기: 어떤 충격적인 사건이나 강렬한 기억을 떠올렸을 때, 관련된 생각들이 엎치락뒤치락하며 머릿속을 맴도는 현상(반추)이 바로 이 진동(oscillation) 현상임.</li>
+<li>통제된 진동: 만약 망각률이 없다면 이 진동이 뇌전증성 폭주로 이어졌겠지만, 적절한 망각(0.1)이 브레이크를 잡아주기 때문에 <strong>관련된 생각을 잠시 주고받으며 떠올리다가, 서서히 잊어버리고 다음 과제(생각)로 넘어갈 수 있는</strong> 건강하고 유연한 인지 시스템이 수학적으로 완벽하게 모사된 것임.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="부-stroop-과제와-전두엽-인지-제어-시뮬레이션" class="level2">
+<h2 class="anchored" data-anchor-id="부-stroop-과제와-전두엽-인지-제어-시뮬레이션">2부: Stroop 과제와 전두엽 인지 제어 시뮬레이션</h2>
+<section id="주의와-간섭-stroop-효과의-해부" class="level3">
+<h3 class="anchored" data-anchor-id="주의와-간섭-stroop-효과의-해부">2.1. 주의와 간섭: Stroop 효과의 해부</h3>
+<p><strong>[그림 6] Stroop 과제의 전통적 패러다임: 일치 vs 불일치 조건</strong> <img src="images/week10/Slide_006.png" class="img-fluid"></p>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>J. R. Stroop이 1935년에 고안한 이 과제는 인간의 인지 제어 능력을 측정하는 심리학 역사상 가장 위대한 패러다임 중 하나임.</li>
+<li>실험의 규칙은 단순함. 피험자는 화면에 제시된 글자의 ’의미(word)’는 무조건 억제하고 무시한 채, 글자가 칠해져 있는 잉크 ’색상(color)’만을 최대한 빨리 소리 내어 말해야 함.</li>
+<li><strong>일치 조건:</strong> <span style="color:red;"><strong>빨강</strong></span>(빨간색 잉크로 쓴 ‘빨강’) <span class="math inline">\(\Rightarrow\)</span> 두 정보가 일치하므로 충돌 없이 반응 속도가 매우 빠름.</li>
+<li><strong>불일치 조건:</strong> <span style="color:blue;"><strong>빨강</strong></span>(파란색 잉크로 쓴 ‘빨강’) <span class="math inline">\(\Rightarrow\)</span> 단어의 의미와 잉크 색상이 심각한 인지적 충돌을 일으키며, 피험자는 머뭇거리고 반응이 지연되거나 아예 ’빨강’이라고 오답을 내뱉게 됨. 이를 <strong>Stroop 간섭</strong>이라 부름.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 7] 단어 경로와 색상 경로의 비대칭적 가중치 모델</strong> <img src="images/week10/Slide_007.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(Cohen, Dunbar &amp; McClelland 모델과 비대칭성)</strong>
+<ul>
+<li>계산주의 모델링 관점에서의 의문: “불일치 조건에서 왜 항상 ’글자 읽기’가 ’색상 명명’을 방해하고, 그 반대(색상이 글자 읽기를 방해함)는 성립하지 않는가?”</li>
+<li>이는 두 인지 처리 경로의 <strong>가중치의 극단적인 비대칭성</strong> 때문임. 수십 년 동안 매일같이 활자를 읽으며 살아온 성인에게 <strong>’단어 인식 <span class="math inline">\(\rightarrow\)</span> 음성 출력’의 경로는 Hebb 학습 규칙에 의해 가중치가 극도로 단단하게 굳어진 자동화된 고속도로</strong>임.</li>
+<li>반면 세상의 사물이나 잉크를 보고 굳이 그 색상 이름을 소리 내어 말하는 경험은 유치원 이후로 살면서 거의 해본 적이 없음. 따라서 <strong>’색상 인식 <span class="math inline">\(\rightarrow\)</span> 음성 출력’의 경로는 가중치가 헐거워진 비포장도로</strong>에 불과함.</li>
+<li>결국 불일치 자극이 눈에 들어오면, 훈련된 고속도로(글자 경로)를 타고 쏟아지는 막강한 오답 신호가 비포장도로(색상 경로)를 타고 힘겹게 올라오는 연약한 정답 신호를 찍어 누르기 때문에 간섭이 필연적으로 발생함.</li>
+</ul></li>
+<li><strong>비유(8차선 아우토반과 좁은 흙길)</strong>
+<ul>
+<li>시각 피질에서 뇌의 출력 기관(성대)으로 향하는 길이 두 갈래로 나뉘어 있음.</li>
+<li>단어를 읽는 경로는 제한속도 150km/h로 포장된 8차선 아우토반(자동화)이고, 색상을 말하는 경로는 자전거 한 대가 겨우 지나가는 좁은 산속 흙길(통제 필요)임. 망막에 자극이 맺히자마자 아우토반을 탄 자동차(글자 오답)가 순식간에 도착지에 먼저 도달해버리므로 뇌 안에 엄청난 교통사고(충돌)가 일어나는 것임.</li>
+</ul></li>
+</ul>
+<section id="실습-2-1-자동화된-경로와-통제된-경로의-가중치-충돌-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-1-자동화된-경로와-통제된-경로의-가중치-충돌-시뮬레이션">[실습 2-1] 자동화된 경로와 통제된 경로의 가중치 충돌 시뮬레이션</h4>
+<ul>
+<li><strong>단순 달리기 경주가 아닌 검투사 결투:</strong> 뇌의 반응 출력층(response layer)에서 ’빨강’을 말하려는 뉴런과 ’파랑’을 말하려는 뉴런은 각자 점수만 쌓는 것이 아님. 두 집단은 생물학적으로 강하게 얽혀 있어, <strong>내가 흥분할수록 경쟁자에게 강력한 억제성 독극물(마이너스 에너지)을 쏘아 보내 상대의 발화를 강제로 짓밟아버림.</strong></li>
+<li><strong>간섭의 수학적 완성:</strong> 8차선 고속도로를 타고 폭포수처럼 쏟아져 들어온 글자(오답) 신호는 단지 정답보다 빨리 도착하는 데 그치지 않음. 흙길을 타고 뒤늦게 힘겹게 올라오는 색상(정답) 신호에게 강력한 억제 공격을 퍼부어, 아예 싹조차 트지 못하게 전위값을 <code>0</code> 밑으로 박살내버림.</li>
+<li>상호 억제가 낳은 오답 경로의 정답 경로 압살 시뮬레이션을 파이썬 코드를 통해 구현함.</li>
+</ul>
+<div id="314f3cc5" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 뇌의 장기기억 가중치 및 상호 억제 파라미터 세팅</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>w_word <span class="op">=</span> <span class="fl">0.9</span>   <span class="co"># 단어(오답) 경로의 생물학적 깡패 가중치(고속도로)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>w_color <span class="op">=</span> <span class="fl">0.2</span>  <span class="co"># 색상(정답) 경로의 연약한 가중치(흙길)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 경쟁하는 두 출력 노드 간의 억제(inhibition) 가중치</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 한쪽이 강해지면 상대방을 얼마나 강하게 깎아내릴 것인가를 결정하는 파라미터임</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>inhib_weight <span class="op">=</span> <span class="fl">0.5</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 불일치 조건 자극 제시 및 출력 노드 초기화</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>input_word <span class="op">=</span> <span class="fl">1.0</span>   <span class="co"># 뇌 망막에 맺힌 글자 자극('빨강')</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>input_color <span class="op">=</span> <span class="fl">1.0</span>  <span class="co"># 뇌 망막에 맺힌 잉크 자극(파란색)</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 성대(입술)를 움직이기 위한 두 가지 반응 후보 노드의 초기 상태를 0.0으로 비움</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>resp_wrong <span class="op">=</span> <span class="fl">0.0</span>   <span class="co"># 오답('빨강') 반응 노드</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>resp_correct <span class="op">=</span> <span class="fl">0.0</span> <span class="co"># 정답('파랑') 반응 노드</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>cycles <span class="op">=</span> <span class="dv">4</span> <span class="co"># 간섭이 진행되는 과정을 4ms 동안 지켜봄</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"과제 지시: '글자를 무시하고 잉크 색상(파랑)을 말하세요!'</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 상호 억제가 포함된 정보 처리 루프 가동</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(cycles):</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [1단계: 흥분성 유입] 각 경로의 고유한 가중치를 타고 들어오는 순수 입력 에너지임</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    excite_wrong <span class="op">=</span> input_word <span class="op">*</span> w_word</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    excite_correct <span class="op">=</span> input_color <span class="op">*</span> w_color</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [2단계: 상호 억제 공격] 상대방의 '현재 활성화 수준'에 비례하여 나에게 날아오는 공격(마이너스 에너지)을 계산함</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 오답 노드가 정답 노드에게 가하는 공격</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    attack_from_wrong <span class="op">=</span> resp_wrong <span class="op">*</span> inhib_weight </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 정답 노드가 오답 노드에게 가하는 공격</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    attack_from_correct <span class="op">=</span> resp_correct <span class="op">*</span> inhib_weight </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [3단계: 최종 전위 업데이트] (기존 에너지) + (새로운 흥분) - (상대방의 억제 공격)</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    resp_wrong <span class="op">=</span> resp_wrong <span class="op">+</span> excite_wrong <span class="op">-</span> attack_from_correct</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    resp_correct <span class="op">=</span> resp_correct <span class="op">+</span> excite_correct <span class="op">-</span> attack_from_wrong</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 신경학적 발화 상한선(1.0)과 하한선(0.0)을 넘지 않도록 제한함</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 하한선 0.0 클리핑 덕분에 억제 공격을 받아 전위가 마이너스로 뚫고 내려가는 것을 막아줌</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    resp_wrong <span class="op">=</span> np.clip(resp_wrong, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    resp_correct <span class="op">=</span> np.clip(resp_correct, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"[Time </span><span class="sc">{</span>t<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">ms] 오답 노드 활성화: </span><span class="sc">{</span>resp_wrong<span class="sc">:.2f}</span><span class="ss"> | 정답 노드 활성화: </span><span class="sc">{</span>resp_correct<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 정답 노드가 억제 공격을 버티지 못하고 0.0으로 소멸해버렸을 때의 해설을 출력함</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> resp_correct <span class="op">==</span> <span class="fl">0.0</span>:</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"  -&gt; 경고: 오답 경로의 무자비한 억제 공격으로 인해 정답 경로가 완전히 파괴됨!"</span>)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 심화 통찰: Time 1ms에는 정답 노드도 0.2의 에너지를 얻었음. 하지만 Time 2ms부터 덩치가 커진 오답 노드(0.9)가 0.45(0.9 * 0.5)라는 막대한 억제 폭격을 가하면서, 정답 노드의 에너지는 순식간에 0.0으로 짓밟힘. 전두엽(PFC)이 보호막(추가 주의 자원)을 씌워주지 않으면, 인간의 뇌는 2ms 만에 자동화된 습관(글자 읽기)에 완벽히 굴복한다는 뇌과학적 진실이 입증됨."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>과제 지시: '글자를 무시하고 잉크 색상(파랑)을 말하세요!'
+
+[Time 1ms] 오답 노드 활성화: 0.90 | 정답 노드 활성화: 0.20
+[Time 2ms] 오답 노드 활성화: 1.00 | 정답 노드 활성화: 0.00
+  -&gt; 경고: 오답 경로의 무자비한 억제 공격으로 인해 정답 경로가 완전히 파괴됨!
+[Time 3ms] 오답 노드 활성화: 1.00 | 정답 노드 활성화: 0.00
+  -&gt; 경고: 오답 경로의 무자비한 억제 공격으로 인해 정답 경로가 완전히 파괴됨!
+[Time 4ms] 오답 노드 활성화: 1.00 | 정답 노드 활성화: 0.00
+  -&gt; 경고: 오답 경로의 무자비한 억제 공격으로 인해 정답 경로가 완전히 파괴됨!
+
+-&gt; 심화 통찰: Time 1ms에는 정답 노드도 0.2의 에너지를 얻었음. 하지만 Time 2ms부터 덩치가 커진 오답 노드(0.9)가 0.45(0.9 * 0.5)라는 막대한 억제 폭격을 가하면서, 정답 노드의 에너지는 순식간에 0.0으로 짓밟힘. 전두엽(PFC)이 보호막(추가 주의 자원)을 씌워주지 않으면, 인간의 뇌는 2ms 만에 자동화된 습관(글자 읽기)에 완벽히 굴복한다는 뇌과학적 진실이 입증됨.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="전두엽prefrontal-cortex전전두피질-또는-전전두엽-pfc의-인지-제어와-편향된-경쟁" class="level3">
+<h3 class="anchored" data-anchor-id="전두엽prefrontal-cortex전전두피질-또는-전전두엽-pfc의-인지-제어와-편향된-경쟁">2.2. 전두엽(prefrontal cortex[전전두피질 또는 전전두엽], PFC)의 인지 제어와 편향된 경쟁</h3>
+<p><strong>[그림 8] 전상대상피질(ACC)과 배외측전전두피질(DLPFC)의 상호작용</strong> <img src="images/week10/Slide_008.png" class="img-fluid"></p>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>글자의 압도적이고 폭력적인 방해 공작에도 불구하고 정상적인 인지 기능을 가진 성인이라면 시간이 몇 백 ms가 더 걸릴지언정 결국 올바른 색상(정답)을 더듬거리며 말해냄.</li>
+<li>생물학적 가중치의 열세를 극복하고 이 기적을 가능하게 만드는 사령탑이 바로 <strong>전두엽(PFC)의 하향식 인지 제어</strong> 기제임.</li>
+<li>뇌 영상(fMRI) 연구에 따르면, 충돌 상황이 발생하면 전상대상피질(ACC)이 알람을 울려 갈등을 감지하고, 이에 반응하여 배외측전전두피질(DLPFC)이 “현재 규칙은 색상을 읽는 것이다!”라는 <strong>과제 요구</strong> 노드를 강하게 활성화함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 9] 편향된 경쟁 모델 아키텍처</strong> <img src="images/week10/Slide_009.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(편향된 경쟁 모델)</strong>
+<ul>
+<li>Desimone과 Duncan의 편향된 경쟁 모델(biased competition model)에 따르면, 뇌 안에서 두 가지 정보가 다툴 때 전두엽의 task 노드는 그저 구경만 하는 것이 아님. 자신이 지시받은 목표와 관련된 특정 경로(색상 처리 피질)에만 주의 자원(attention)이라는 추가적인 흥분 에너지를 폭포수처럼 쏟아부어줌(bias).</li>
+<li>생물학적인 하드웨어 가중치는 형편없는 흙길(0.2)일지라도, 뇌의 최고 사령탑(전두엽[PFC])이 레이저 빔(top-down bias)을 쏘아 길을 전폭적으로 밝혀주기 때문에, 강력한 자동화 경로(0.9)와 맞서 싸워 결국 이겨낼 수 있는 <strong>편향된 경쟁 상태</strong>가 조성됨.</li>
+</ul></li>
+<li><strong>비유(헬기를 탄 교통경찰의 개입)</strong>
+<ul>
+<li>좁은 흙길(색상 경로)과 8차선 고속도로(단어 경로)가 만나는 교차로의 신호등이 망가졌음. 당연히 덩치 큰 고속도로 차들이 무법자처럼 교차로를 쌩쌩 점령해버림(인지 간섭 발생).</li>
+<li>이때 하늘에서 헬기를 타고 전두엽이라는 이름의 <strong>강력한 특수 교통경찰(task demand)</strong>이 강림함. 경찰은 고속도로 차들을 호루라기로 강제로 멈춰 세우고(오답 억제), 흙길에서 대기하며 옴달싹달 못하던 자전거들이 지나갈 수 있도록 초록불의 서치라이트를 계속 비춰줌(정답 경로 증폭). 이 사령관의 개입 덕분에 교통 체증(Stroop 간섭)이 비로소 해소되고 정답을 뱉어낼 수 있게 됨.</li>
+</ul></li>
+</ul>
+<section id="실습-2-2-전두엽의-하향식-통제가-결합된-의사결정-증거축적-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-2-전두엽의-하향식-통제가-결합된-의사결정-증거축적-시뮬레이션">[실습 2-2] 전두엽의 하향식 통제가 결합된 의사결정 증거축적 시뮬레이션</h4>
+<ul>
+<li>7주차에 다루었던 의사결정 증거축적 모델(DDM)의 <strong>증거 저금통</strong> 개념에 매 ms마다 증거를 누적하는 개념과 전두엽의 하향식 통제(PFC bias) 파라미터를 새롭게 결합함. <span class="math inline">\(\Rightarrow\)</span> 피험자가 정답을 향해 마음속 확신을 차곡차곡 모아가는 증거 저금통에, 전두엽이 특정 조건(과제 요구)에만 부가적인 에너지를 쏟아주어 더 빨리 임계값(<span class="math inline">\(a\)</span>)을 돌파하도록 돕는 수학적 융합을 의미함.</li>
+<li>시간 루프(while문)를 돌면서 아주 약한 정답 신호가 전두엽의 전폭적인 응원을 받아 결국 거대한 오답 신호를 역전하고 임계값을 돌파하는 과정을 코딩으로 증명함.</li>
+</ul>
+<div id="2dfc6b43" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 뇌의 장기기억 가중치 세팅(비대칭성 유지)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>w_word <span class="op">=</span> <span class="fl">0.9</span>   <span class="co"># 단어 오답 경로의 강력한 가중치(고속도로)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>w_color <span class="op">=</span> <span class="fl">0.2</span>  <span class="co"># 색상 정답 경로의 연약한 가중치(흙길)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 전두엽(PFC)의 하향식 추가 지원(레이저 빔)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>pfc_control_signal <span class="op">=</span> <span class="fl">0.8</span>  </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># [현실성 추가 1] DDM 파라미터 스케일 조정</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 1ms당 쌓이는 정보의 양을 실제 뇌와 유사하게 1/100 수준으로 확 낮춤(표류율 스케일링)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>scale_factor <span class="op">=</span> <span class="fl">0.01</span>  </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 뇌세포의 지글거리는 무작위 잡음 크기(반응시간의 변동성을 만듦)</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>noise_level <span class="op">=</span> <span class="fl">0.005</span>  </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># [현실성 추가 2] 비의사결정 시간(T_er)</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 순수 고민 시간 외에, 시각 지각과 성대 발성에 소요되는 기본 물리적 딜레이(250ms)</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>t_er <span class="op">=</span> <span class="dv">250</span>  </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 인지적 증거 저금통 변수 초기화</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>evidence_for_wrong_word <span class="op">=</span> <span class="fl">0.0</span>  </span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>evidence_for_correct_color <span class="op">=</span> <span class="fl">0.0</span> </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>decision_threshold <span class="op">=</span> <span class="fl">5.0</span> <span class="co"># 입 밖으로 소리를 내기 위한 목표 임계값</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>decision_time <span class="op">=</span> <span class="dv">0</span>        <span class="co"># 뇌 속 순수 인지 고민 시간을 잴 타이머(0ms부터 시작)</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"과제 시작: [파란색 잉크]로 쓰인 ['빨강'] 글자 등장! (피험자 끙끙거리며 고민 중...)</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 현실적인 증거 축적 루프(매 1ms마다 실행됨)</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    decision_time <span class="op">+=</span> <span class="dv">1</span> <span class="co"># 루프 1회당 뇌 속 시간 1ms 경과</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [오답 경로] 시각 자극(1.0) * 가중치(0.9)에 스케일 팩터(0.01)와 무작위 노이즈를 더함</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># np.random.normal(0, noise_level)은 평균 0, 표준편차 0.005의 미세한 잡음을 매 순간 발생시킴</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    incoming_wrong <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">*</span> w_word <span class="op">*</span> scale_factor) <span class="op">+</span> np.random.normal(<span class="dv">0</span>, noise_level)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [정답 경로] (자극*가중치 + 전두엽 지원)에 스케일 팩터와 잡음을 더함</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    incoming_correct <span class="op">=</span> ((<span class="fl">1.0</span> <span class="op">*</span> w_color) <span class="op">+</span> pfc_control_signal) <span class="op">*</span> scale_factor <span class="op">+</span> np.random.normal(<span class="dv">0</span>, noise_level)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 각자의 저금통에 미세한 증거들을 1ms마다 차곡차곡 누적함</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    evidence_for_wrong_word <span class="op">+=</span> incoming_wrong</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    evidence_for_correct_color <span class="op">+=</span> incoming_correct</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 누적된 확신량이 목표 임계값(5.0)을 마침내 뚫었는지 검사함</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> evidence_for_correct_color <span class="op">&gt;=</span> decision_threshold:</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [현실성 추가 3] 최종 반응시간(RT) 계산 = 순수 고민 시간 + 기본 물리적 딜레이(T_er)</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>        final_rt <span class="op">=</span> decision_time <span class="op">+</span> t_er</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"-&gt; 전두엽의 하향식 버프 승리! 정답('파랑') 도출."</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"-&gt; [분석] 순수 고민 시간(</span><span class="sc">{</span>decision_time<span class="sc">}</span><span class="ss">ms) + 지각/운동 딜레이(</span><span class="sc">{</span>t_er<span class="sc">}</span><span class="ss">ms) = 최종 반응시간(RT): </span><span class="sc">{</span>final_rt<span class="sc">}</span><span class="ss"> ms"</span>)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> evidence_for_wrong_word <span class="op">&gt;=</span> decision_threshold:</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>        final_rt <span class="op">=</span> decision_time <span class="op">+</span> t_er</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"-&gt; 전두엽 통제 실패. 자동화의 힘에 굴복하여 오답('빨강') 도출."</span>)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"-&gt; [분석] 최종 반응시간(RT): </span><span class="sc">{</span>final_rt<span class="sc">}</span><span class="ss"> ms"</span>)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">-&gt; 심화 통찰: 스케일과 딜레이를 반영하자 최종 반응시간이 약 750ms 내외로 산출됨. 이는 실제 인지심리학 실험실에서 성인 피험자가 불일치 조건에서 보여주는 평균 반응시간(700~800ms)과 완벽하게 일치함. 코드가 '인간의 진짜 뇌'를 모사하는 데 성공했음."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>과제 시작: [파란색 잉크]로 쓰인 ['빨강'] 글자 등장! (피험자 끙끙거리며 고민 중...)
+
+-&gt; 전두엽의 하향식 버프 승리! 정답('파랑') 도출.
+-&gt; [분석] 순수 고민 시간(494ms) + 지각/운동 딜레이(250ms) = 최종 반응시간(RT): 744 ms
+
+-&gt; 심화 통찰: 스케일과 딜레이를 반영하자 최종 반응시간이 약 750ms 내외로 산출됨. 이는 실제 인지심리학 실험실에서 성인 피험자가 불일치 조건에서 보여주는 평균 반응시간(700~800ms)과 완벽하게 일치함. 코드가 '인간의 진짜 뇌'를 모사하는 데 성공했음.</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="주차-요약-및-다음-주-예고" class="level2">
+<h2 class="anchored" data-anchor-id="주차-요약-및-다음-주-예고">10주차 요약 및 다음 주 예고</h2>
+<p><strong>[그림 10] 넥스트 스텝: 시간의 흐름과 맥락 모델의 구현</strong> <img src="images/week10/Slide_010.png" class="img-fluid"></p>
+<ul>
+<li><strong>요약</strong>
+<ul>
+<li>활성화 확산 모델을 구축하여 개념과 개념이 긴밀히 연결된 장기기억 네트워크의 가중치 행렬 구조를 이해하고, 자극이 퍼져나가는 <strong>점화 효과</strong>를 언어심리학적 관점에서 수치로 구현함.</li>
+<li>수십 년간의 읽기 훈련을 통해 단단히 고착화된 가중치(글자 읽기)와 평소 잘 쓰지 않아 퇴화한 가중치(색상 명명) 사이의 비대칭성을 통해 <strong>Stroop 인지 충돌</strong>의 수학적 본질을 파악함.</li>
+<li>억제하려 해도 스프링처럼 튀어나오는 자동화된 반응을 억누르고, 과제 요구 노드를 강하게 활성화해 약한 경로에 편향된 에너지를 집중 공급하는 전두엽의 <strong>하향식 통제</strong>를 DDM과 연계하여 완벽히 시뮬레이션함.</li>
+</ul></li>
+<li><strong>다음 주(11주차) 예고</strong>
+<ul>
+<li>인간의 가장 신비한 인지 기능 중 하나인 <strong>기억 인출과 망각</strong>의 심화 계산 메커니즘을 다룸.</li>
+<li>단기 기억 저장소의 한계와 장기 기억으로의 전이 과정에서 발생하는 초두 효과(primacy effect)와 최신 효과(recency effect)를 아우르는 <strong>계열 위치 효과(serial position effect)</strong>을 수행함.</li>
+<li><strong>계열 위치 효과</strong>
+<ul>
+<li>설명: 피험자에게 20개 정도의 긴 단어 목록을 차례대로 들려주고 순서에 상관없이 기억나는 대로 적어보라(자유 회상)고 하면, 단어가 제시된 순서(위치)에 따라 기억해내는 비율이 U자 형태의 곡선을 그리는 현상임. 이는 크게 다음 두 가지 효과의 합작품임.</li>
+<li>초두 효과
+<ul>
+<li>정의: 목록의 맨 <strong>앞부분</strong>에 제시된 단어들을 유의미하게 잘 기억하는 현상.</li>
+<li>원리: 먼저 들어온 정보들은 피험자가 다음 단어들이 쏟아지기 전에 마음속으로 되뇌일(rehearsal) 시간이 충분함. 따라서 용량이 극히 제한된 단기 기억 저장소를 무사히 통과하여, 영구적인 <strong>장기 기억 저장소로 안전하게 전이되었기 때문</strong>임.</li>
+</ul></li>
+<li>최신 효과
+<ul>
+<li>정의: 목록의 맨 <strong>마지막</strong>에 제시된 단어들을 잘 기억하는 현상.</li>
+<li>원리: 가장 마지막에 들었기 때문에, 뇌의 임시 보관소인 <strong>단기 기억 저장소에 아직 생생하게 남아 있어</strong> 장기 기억으로 넘어가지 않고도 즉각적인 인출(출력)이 가능하기 때문임.</li>
+</ul></li>
+</ul></li>
+<li><strong>맥락 모델(context model):</strong> 시간의 흐름에 따른 내적 상태(감정, 환경 등)의 점진적 변화가 어떻게 뇌 속에서 기억의 꼬리표 역할을 하는지를 수학적 벡터로 계산하는 맥락 모델을 파이썬 코드로 직접 설계해봄.</li>
+</ul></li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
