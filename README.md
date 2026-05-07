@@ -16,3 +16,5 @@
 * **[week7_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week7_2026.html):** 7주차 수업자료: 의사결정 모델링: 표류확산 모델(DDM)과 속도-정확성 타협. 해당 자료를 열람하려면 링크를 클릭할 것.
 
 * **[week8_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week8_2026.html):** 8주차 수업자료: 모델 평가와 파라미터 추정: 그리드 서치와 최적화. 해당 자료를 열람하려면 링크를 클릭할 것.
+
+* **[week10_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week10_2026.html):** 10주차 수업자료: 주의와 간섭: Stroop 과제와 활성화 확산 모델. 해당 자료를 열람하려면 링크를 클릭할 것.
