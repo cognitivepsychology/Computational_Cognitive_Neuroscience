@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>계산주의와 인지신경과학 12주차_단어인지와 어휘접속: 상호작용 활성화 모델 구현 및 단어 우월 효과</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="week12_2026_files/libs/clipboard/clipboard.min.js"></script>
+<script src="week12_2026_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="week12_2026_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="week12_2026_files/libs/quarto-html/popper.min.js"></script>
+<script src="week12_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="week12_2026_files/libs/quarto-html/anchor.min.js"></script>
+<link href="week12_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="week12_2026_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="week12_2026_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="week12_2026_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="week12_2026_files/libs/bootstrap/bootstrap-e0048d6574ccc2aa33e6fadbbc53b6fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#주차-수업-목표" id="toc-주차-수업-목표" class="nav-link active" data-scroll-target="#주차-수업-목표">12주차 수업 목표</a></li>
+  <li><a href="#부-시각적-단어-인지와-상향식-정보-처리-네트워크" id="toc-부-시각적-단어-인지와-상향식-정보-처리-네트워크" class="nav-link" data-scroll-target="#부-시각적-단어-인지와-상향식-정보-처리-네트워크">1부: 시각적 단어 인지와 상향식 정보 처리 네트워크</a>
+  <ul>
+  <li><a href="#단어-인지의-위계적-구조-선분에서-글자까지" id="toc-단어-인지의-위계적-구조-선분에서-글자까지" class="nav-link" data-scroll-target="#단어-인지의-위계적-구조-선분에서-글자까지">1.1. 단어 인지의 위계적 구조: 선분에서 글자까지</a>
+  <ul>
+  <li><a href="#실습-1-1-선분feature-추출-및-상향식-자극-배열-셋업" id="toc-실습-1-1-선분feature-추출-및-상향식-자극-배열-셋업" class="nav-link" data-scroll-target="#실습-1-1-선분feature-추출-및-상향식-자극-배열-셋업">[실습 1-1] 선분(feature) 추출 및 상향식 자극 배열 셋업</a></li>
+  </ul></li>
+  <li><a href="#층간-흥분성억제성-연결과-상향식-네트워크" id="toc-층간-흥분성억제성-연결과-상향식-네트워크" class="nav-link" data-scroll-target="#층간-흥분성억제성-연결과-상향식-네트워크">1.2. 층간 흥분성/억제성 연결과 상향식 네트워크</a>
+  <ul>
+  <li><a href="#실습-1-2-선분-글자-가중치-행렬-생성-및-상향식-순-입력net-input-산출" id="toc-실습-1-2-선분-글자-가중치-행렬-생성-및-상향식-순-입력net-input-산출" class="nav-link" data-scroll-target="#실습-1-2-선분-글자-가중치-행렬-생성-및-상향식-순-입력net-input-산출">[실습 1-2] 선분-글자 가중치 행렬 생성 및 상향식 순 입력(net input) 산출</a></li>
+  </ul></li>
+  <li><a href="#층내-측면-억제-메커니즘" id="toc-층내-측면-억제-메커니즘" class="nav-link" data-scroll-target="#층내-측면-억제-메커니즘">1.3. 층내 측면 억제 메커니즘</a>
+  <ul>
+  <li><a href="#실습-1-3-활성화-한계maxmin-미분-방정식을-적용한-글자-인식-수렴-시뮬레이션" id="toc-실습-1-3-활성화-한계maxmin-미분-방정식을-적용한-글자-인식-수렴-시뮬레이션" class="nav-link" data-scroll-target="#실습-1-3-활성화-한계maxmin-미분-방정식을-적용한-글자-인식-수렴-시뮬레이션">[실습 1-3] 활성화 한계(Max/Min) 미분 방정식을 적용한 글자 인식 수렴 시뮬레이션</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#부-하향식-피드백과-단어-우월-효과-시뮬레이션" id="toc-부-하향식-피드백과-단어-우월-효과-시뮬레이션" class="nav-link" data-scroll-target="#부-하향식-피드백과-단어-우월-효과-시뮬레이션">2부: 하향식 피드백과 단어 우월 효과 시뮬레이션</a>
+  <ul>
+  <li><a href="#지각을-지배하는-지식-단어-우월-효과의-패러다임" id="toc-지각을-지배하는-지식-단어-우월-효과의-패러다임" class="nav-link" data-scroll-target="#지각을-지배하는-지식-단어-우월-효과의-패러다임">2.1. 지각을 지배하는 지식: 단어 우월 효과의 패러다임</a>
+  <ul>
+  <li><a href="#실습-2-1-글자-단어-간-양방향-피드백-가중치-행렬-구축" id="toc-실습-2-1-글자-단어-간-양방향-피드백-가중치-행렬-구축" class="nav-link" data-scroll-target="#실습-2-1-글자-단어-간-양방향-피드백-가중치-행렬-구축">[실습 2-1] 글자-단어 간 양방향 피드백 가중치 행렬 구축</a></li>
+  </ul></li>
+  <li><a href="#상호작용-활성화-모델의-전역적-동역학" id="toc-상호작용-활성화-모델의-전역적-동역학" class="nav-link" data-scroll-target="#상호작용-활성화-모델의-전역적-동역학">2.2. 상호작용 활성화 모델의 전역적 동역학</a>
+  <ul>
+  <li><a href="#실습-2-2-상하향식-양방향-통합-네트워크-및-iam-루프-시뮬레이션" id="toc-실습-2-2-상하향식-양방향-통합-네트워크-및-iam-루프-시뮬레이션" class="nav-link" data-scroll-target="#실습-2-2-상하향식-양방향-통합-네트워크-및-iam-루프-시뮬레이션">[실습 2-2] 상하향식 양방향 통합 네트워크 및 IAM 루프 시뮬레이션</a></li>
+  </ul></li>
+  <li><a href="#정보이론적-잉여성과-노이즈-강건성" id="toc-정보이론적-잉여성과-노이즈-강건성" class="nav-link" data-scroll-target="#정보이론적-잉여성과-노이즈-강건성">2.3. 정보이론적 잉여성과 노이즈 강건성</a>
+  <ul>
+  <li><a href="#실습-2-3-고립-글자-vs.-단어-속-글자의-활성화-궤적-비교-및-단어-우월-효과-시각화-증명" id="toc-실습-2-3-고립-글자-vs.-단어-속-글자의-활성화-궤적-비교-및-단어-우월-효과-시각화-증명" class="nav-link" data-scroll-target="#실습-2-3-고립-글자-vs.-단어-속-글자의-활성화-궤적-비교-및-단어-우월-효과-시각화-증명">[실습 2-3] 고립 글자 vs.&nbsp;단어 속 글자의 활성화 궤적 비교 및 단어 우월 효과 시각화 증명</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#주차-요약-및-다음-주-예고" id="toc-주차-요약-및-다음-주-예고" class="nav-link" data-scroll-target="#주차-요약-및-다음-주-예고">12주차 요약 및 다음 주 예고</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">계산주의와 인지신경과학 12주차_단어인지와 어휘접속: 상호작용 활성화 모델 구현 및 단어 우월 효과</h1>
+<p class="subtitle lead">고려대학교 일반대학원 심리학과</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026년 5월 22일 금요일 4-5교시</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>[그림 1] 단어인지와 어휘접속: 상호작용 활성화 모델과 단어 우월 효과</strong> <img src="images/week12/Slide_001.png" class="img-fluid"></p>
+<section id="주차-수업-목표" class="level2">
+<h2 class="anchored" data-anchor-id="주차-수업-목표">12주차 수업 목표</h2>
+<ul>
+<li><strong>시각적 단어 인지의 위계적 네트워크 파악:</strong> 단순한 기하학적 선분(feature) 자극이 조합되어 알파벳 글자(letter)를 활성화하고, 궁극적으로 뇌 속의 거대한 단어(word) 층위를 일깨우는 구조적 메커니즘을 시스템 차원에서 이해함.</li>
+<li><strong>상호작용 활성화 모델(interactive activation model, IAM)의 수학적 구현:</strong> 맥클랜드와 루멜하트(McClelland &amp; Rumelhart, 1981)가 제안한 다층 신경망 모델을 바탕으로, 상향식/하향식 연산과 억제성 연결이 어떻게 계산되는지 파이썬 코드로 구현함.</li>
+<li><strong>단어 우월 효과(word superiority effect, WSE) 시뮬레이션:</strong> 무의미한 고립 글자보다 의미 있는 단어 속에 포함된 알파벳을 더 빠르고 정확하게 인지하는 현상을 하향식 피드백(top-down feedback) 연산을 통해 수학적으로 증명함.</li>
+</ul>
+</section>
+<section id="부-시각적-단어-인지와-상향식-정보-처리-네트워크" class="level2">
+<h2 class="anchored" data-anchor-id="부-시각적-단어-인지와-상향식-정보-처리-네트워크">1부: 시각적 단어 인지와 상향식 정보 처리 네트워크</h2>
+<section id="단어-인지의-위계적-구조-선분에서-글자까지" class="level3">
+<h3 class="anchored" data-anchor-id="단어-인지의-위계적-구조-선분에서-글자까지">1.1. 단어 인지의 위계적 구조: 선분에서 글자까지</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>인간이 종이 위에 인쇄된 잉크 자국을 보고 특정한 의미를 가진 ’단어’로 인식하기까지의 과정은 여러 단계의 정보 처리 위계를 거침.</li>
+<li>시각 피질에 맺힌 최초의 정보는 단지 수직선, 수평선, 사선, 곡선과 같은 원초적인 기하학적 ‘선분(feature)’ 자극에 불과함.</li>
+<li>이 파편화된 선분들이 모여 특정 알파벳 ‘글자(letter)’ 노드를 구성하고, 글자들이 모여 우리의 심성 어휘집(mental lexicon)에 있는 특정한 ‘단어(word)’ 노드를 차례대로 활성화시킴.</li>
+<li>초창기 인지심리학의 정보처리 모형은 눈으로 본 단순한 시각 자극이 ’선분 <span class="math inline">\(\rightarrow\)</span> 글자 <span class="math inline">\(\rightarrow\)</span> 단어(의미)’라는 정해진 순서대로만 해석되어 올라가는 상향식 처리만을 강조했음.</li>
+</ul></li>
+<li><strong>심화 해설(3계층 아키텍처의 수학적 표상)</strong>
+<ul>
+<li>계산 모델링에서 이 위계적 구조는 총 3개의 독립적인 벡터(배열) 층으로 묘사됨.
+<ul>
+<li><ol type="1">
+<li>선분 층(feature level): 입력 자극의 물리적 형태를 감지함. 예를 들어, 글자 ‘A’를 보기 위해서는’/(우상향 사선)‘,’(우하향 사선)‘,’-(가운데 수평선)’을 담당하는 3개의 선분 노드들이 1.0으로 활성화되어야 함.</li>
+</ol></li>
+<li><ol start="2" type="1">
+<li>글자 층(letter level): 26개의 알파벳 각각을 담당하는 노드들의 집합임. 각 글자 노드는 하위 선분 노드들의 활성화 값을 가중합(weighted sum)으로 받아들여 자신의 에너지를 갱신함.</li>
+</ol></li>
+<li><ol start="3" type="1">
+<li>단어 층(word level): 뇌 속에 저장된 수만 개의 영단어 각각에 대응하는 거대 노드들의 집합임. 하위 글자 노드들이 조합되어 특정 단어의 철자 구조와 완벽히 일치할 때 폭발적인 에너지를 뿜어냄.</li>
+</ol></li>
+</ul></li>
+<li>이 3계층 구조는 수학적으로 각 층을 연결하는 가중치 행렬(<span class="math inline">\(W\)</span>)을 통해 하위 층의 출력값이 상위 층의 입력값으로 전달되는 다층 신경망 연산으로 구현됨.</li>
+</ul></li>
+<li><strong>비유(건축물의 설계와 레고 블록)</strong>
+<ul>
+<li>단어를 인지하는 과정은 ’레고 블록 조립’에 비유할 수 있음.</li>
+<li>바닥에 흩어져 있는 1칸짜리, 2칸짜리 작은 블록 부품들(선분) 자체로는 아무 의미가 없지만, 이것들을 특정 규칙에 맞게 결합하면 단단한 하나의 벽면(글자)이 됨.</li>
+<li>그리고 이 벽면 네 개를 정교하게 결합하여 지붕을 얹으면 비로소 온전한 집(단어)이라는 유의미한 최종 결과물이 탄생하는 원리와 같음.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 2] 시각적 단어 인지를 위한 3단계 위계적 정보처리 구조</strong> <img src="images/week12/Slide_002.png" class="img-fluid"></p>
+<section id="실습-1-1-선분feature-추출-및-상향식-자극-배열-셋업" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-1-선분feature-추출-및-상향식-자극-배열-셋업">[실습 1-1] 선분(feature) 추출 및 상향식 자극 배열 셋업</h4>
+<ul>
+<li>왜 ’T’는 마이너스(-0.25)가 나왔을까?
+<ul>
+<li>순 입력은 눈으로 본 자극(input)과 뇌의 템플릿 가중치(qeight)를 곱하고 더하는 내적(dot product) 연산으로 계산됨.
+<ul>
+<li>입력된 망막 자극: [수직선 0.1, 수평선 0.9, 좌사선 0.8, 우사선 0.7]</li>
+<li>글자 ’T’가 뇌 속에서 요구하는 조건(가중치): 수직/수평선은 가산점(+0.5), 사선은 감점(-0.5)</li>
+</ul></li>
+<li>이를 계산해보면 다음과 같은 치열한 덧셈 뺄셈이 벌어짐.
+<ul>
+<li>가산점 획득(+0.50): 눈에 수직선(0.1)과 수평선(0.9)이 보이므로, 여기에 +0.5씩 곱해져 총 0.50점의 긍정 에너지를 받음.</li>
+<li>감점 폭격(-0.75): 하지만 눈에 좌사선(0.8)과 우사선(0.7)도 뚜렷하게 보임. ’T’라는 글자에는 절대 사선이 들어가면 안 되므로, 여기에 -0.5씩 곱해져 총 -0.75점의 거대한 페널티를 받음.</li>
+<li>최종 합산: 0.50(가산점) + (-0.75)(감점) = -0.25</li>
+</ul></li>
+<li>결론
+<ul>
+<li>수평선이 뚜렷하게 보였음에도 불구하고, ’T’에 절대 있어서는 안 될 불필요한 사선 자극들이 너무 강력하게 들어오는 바람에 감점 폭격이 가산점을 압도해버려 마이너스가 된 것.</li>
+<li>“이 자극은 절대 ’T’일 리가 없다!”라고 적극적으로 억압하고 기각하는 상태를 의미.</li>
+<li>뇌는 들어오면 안 되는 정보에 대해 마이너스 감점을 때림으로써, 오답 후보(‘T’)를 초기 단계에서부터 수면 아래로 무자비하게 수몰시켜버림. <span class="math inline">\(\Rightarrow\)</span> 그 덕분에 사선을 필요로 하는 진짜 정답 후보(‘A’)만이 방해받지 않고 빠르게 승리하여, 우리가 찰나의 순간에 단일한 글자를 명확하게 인식할 수 있게 되는 것</li>
+</ul></li>
+</ul></li>
+</ul>
+<div id="91cb22b4" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 1-1] 선분(feature) 추출 및 상향식 자극 배열 셋업</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 고차원 다차원 행렬 및 수치 연산을 빠르게 수행하기 위해 NumPy 라이브러리를 고유 별칭인 np로 불러옴</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 시뮬레이션 결과를 직관적인 2차원 그래프나 차트로 시각화하기 위해 Matplotlib의 pyplot 모듈을 plt로 불러옴</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 시스템 계층 크기 및 노드 정의</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 모델이 추출할 기하학적 선분의 총 개수를 4개로 정의함(0:수직선[|], 1:수평선[-], 2:좌사선[\], 3:우사선[/])</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>num_features <span class="op">=</span> <span class="dv">4</span> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 신경망 시스템이 최종 분류 및 인지할 대상 글자(알파벳) 노드의 총 개수를 3개로 정의함</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>num_letters <span class="op">=</span> <span class="dv">3</span>  </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 각 글자 노드의 순서와 매칭되는 문자열 라벨을 리스트 형태로 저장하여 나중에 시각화나 텍스트 출력 시 사용함</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>letter_names <span class="op">=</span> [<span class="st">'T'</span>, <span class="st">'A'</span>, <span class="st">'X'</span>]</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 각 글자의 이상적인 선분 템플릿(딕셔너리 사전) 정의</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 각 알파벳 글자가 물리적으로 어떤 선분들의 조합으로 구성되어 있는지 이상적인 이진 템플릿(딕셔너리 사전)으로 선언함</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ideal_letter_templates <span class="op">=</span> {</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 글자 'T'는 0번(수직선)과 1번(수평선) 선분만 존재하고 사선들은 전혀 없음 [1, 1, 0, 0] 배열 표상</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">'T'</span>: np.array([<span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>]), </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 글자 'A'는 수직선은 없고 1번(수평선), 2번(좌사선), 3번(우사선)이 결합된 형태 [0, 1, 1, 1] 배열 표상</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">'A'</span>: np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>]),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 글자 'X'는 수직선과 수평선 없이 오직 2번(좌사선)과 3번(우사선) 교차선만 존재함 [0, 0, 1, 1] 배열 표상</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">'X'</span>: np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 외부 시각 입력(stimulus) 셋업</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자의 눈을 통해 실제로 인쇄물이나 스크린에서 입력된 불완전하고 노이즈가 낀 현실 세계의 선분 자극 에너지 벡터를 생성함</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 순서대로 수직선은 거의 안 보이고(0.1), 수평선은 매우 선명하며(0.9), 사선들은 다소 흐릿하게(0.8, 0.7) 망막에 맺힌 상황을 뜻함</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>input_stimulus <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.9</span>, <span class="fl">0.8</span>, <span class="fl">0.7</span>]) </span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co"># 입력 자극 배열이 정상적으로 세팅되었음을 포맷 스트링 형식을 이용하여 콘솔창에 문자열과 함께 출력함</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 1단계 셋업 완료: 눈을 통해 입력된 선분 자극 벡터는 </span><span class="sc">{</span>input_stimulus<span class="sc">}</span><span class="ss"> 임."</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co"># 해당 선분 자극들이 다음 단계인 상향식 전파를 통해 글자 층으로 도달할 것임을 안내하는 텍스트와 줄바꿈(\n)을 함께 출력함</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 이 시각적 자극 에너지가 이제 상향식 경로를 타고 글자 층으로 쏘아 올려질 예정임.</span><span class="ch">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>-&gt; 1단계 셋업 완료: 눈을 통해 입력된 선분 자극 벡터는 [0.1 0.9 0.8 0.7] 임.
+-&gt; 이 시각적 자극 에너지가 이제 상향식 경로를 타고 글자 층으로 쏘아 올려질 예정임.
+</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="층간-흥분성억제성-연결과-상향식-네트워크" class="level3">
+<h3 class="anchored" data-anchor-id="층간-흥분성억제성-연결과-상향식-네트워크">1.2. 층간 흥분성/억제성 연결과 상향식 네트워크</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>시각적 단어 인지 시스템이 무수한 시각 정보의 홍수 속에서 결정을 내리기 위해서는 정답을 밀어주는 힘뿐만 아니라 오답을 적극적으로 제거하는 힘이 필수적임.</li>
+<li>흥분성 연결(excitatory connection)
+<ul>
+<li>서로 호환되는 정보끼리는 에너지를 주고받으며 활성화를 증폭시킴</li>
+<li>예: 수직선 ‘|’ 선분이 눈에 들어오면, 글자 ‘T’, ‘H’, ‘E’ 노드에 긍정적인 활성화 에너지를 줌.</li>
+</ul></li>
+<li>억제성 연결(inhibitory connection)
+<ul>
+<li>서로 모순되거나 엉뚱한 정보끼리는 활성화를 깎아내리며 억압함.</li>
+<li>예: 곡선 ‘O’ 선분이 눈에 들어오면, 곡선이 필요 없는 글자 ‘T’나 ’E’ 노드에는 강력한 마이너스 자극을 주어 활동을 즉시 소거함.</li>
+</ul></li>
+</ul></li>
+<li><strong>심화 해설(네트워크 가중치 행렬 모델링)</strong>
+<ul>
+<li>상향식으로 글자 층이 받는 ‘순 입력(net input)’
+<ul>
+<li>정의: 순 입력이란 특정 뉴런이 자신과 연결된 수많은 하위 뉴런들로부터 전달받은 모든 ’흥분성 가산점(+)’과 ’억제성 감점(-)’을 가중치에 따라 수학적으로 곱하고 모두 더하여 산출해낸 최종적인 ’수신 에너지 총합’을 가리킴.</li>
+<li>산출 공식: 행렬 내적 연산인 <span class="math inline">\(net_i = \sum (W_{ij} \times a_j)\)</span>로 산출됨.
+<ul>
+<li><span class="math inline">\(a_j\)</span>(activation of node j): 밑에서 신호를 쏘아보내는 하위 노드(예: 선분 노드) <span class="math inline">\(j\)</span>가 현재 띠고 있는 활성화 에너지의 양(예: 수평선 자극이 눈에 뚜렷하게 들어와 활성화 값이 0.9라면, <span class="math inline">\(a_j = 0.9\)</span>가 됨).</li>
+<li><span class="math inline">\(W_{ij}\)</span>(weight): 하위 노드 <span class="math inline">\(j\)</span>에서 상위 노드 <span class="math inline">\(i\)</span>로 향하는 연결 가중치(통로의 크기나 성질: 흥분성이면 양수, 억제성이면 음수).</li>
+<li><span class="math inline">\(\times\)</span>(곱셈): 하위 노드가 뿜어내는 에너지(<span class="math inline">\(a_j\)</span>)가 가중치 통로(<span class="math inline">\(W_{ij}\)</span>)를 통과하면서 곱해짐.</li>
+<li><span class="math inline">\(\sum\)</span>(합산): 글자 노드 <span class="math inline">\(i\)</span>는 하나의 선분 노드에서만 에너지를 받는 게 아니라 수직선, 수평선, 사선 등 여러 선분 노드로부터 에너지를 동시에 받음. 이 모든 하위 노드들이 보내온 에너지를 하나로 다 더한다(합산한다)는 뜻.</li>
+</ul></li>
+</ul></li>
+<li>이 가중치 네트워크에서 흥분성 연결은 양수(+ 수치)로, 억제성 연결은 음수(- 수치)로 인코딩됨.</li>
+<li>인간의 망막에 맺힌 불완전한 자극 벡터가 이 가중치 행렬을 통과하는 순간, 자신의 템플릿(이상적인 철자 기준)과 가장 유사한 글자 노드는 양수 에너지를 듬뿍 받아 점수가 치솟고, 템플릿과 어긋나는 글자 노드는 음수 타격을 받아 수면 아래로 가라앉게 됨.</li>
+</ul></li>
+<li><strong>비유(면접관의 가산점과 감점 시스템)</strong>
+<ul>
+<li>층간 연결 가중치는 ’면접관의 채점표’와 같음.</li>
+<li>흥분성 연결: 특정 부서(글자 ‘A’)에서 원하는 인재상(선분 템플릿)이 있을 때, 지원자가 그 요건을 갖추고 오면 가산점(+)을 줌.</li>
+<li>억제성 연결: 하지만 지원자가 부서 성격과 완전히 반대되는 불필요한 스펙을 들이밀면, 오히려 면접관은 감점(-) 처리를 해버림.</li>
+<li>뇌 역시 단순히 들어온 선분의 개수만 세는 것이 아니라, “내가 원하지 않는 선분이 들어왔는가?”를 깐깐하게 따져 감점 테러를 가함으로써 오류를 방지함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 3] 뇌 속의 상향식 흥분 및 억제성 연결망 구조</strong> <img src="images/week12/Slide_003.png" class="img-fluid"></p>
+<section id="실습-1-2-선분-글자-가중치-행렬-생성-및-상향식-순-입력net-input-산출" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-2-선분-글자-가중치-행렬-생성-및-상향식-순-입력net-input-산출">[실습 1-2] 선분-글자 가중치 행렬 생성 및 상향식 순 입력(net input) 산출</h4>
+<div id="b3f65144" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 1-2] 선분-글자 가중치 행렬 생성 및 상향식 순 입력(net input) 산출</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 층간 가중치 행렬 생성(feature -&gt; letter)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3개의 글자 노드가 4개의 선분 노드로부터 에너지를 전달받는 통로인 3행 4열 [3 x 4] 크기의 가중치 행렬 공간을 모두 0으로 가득 채워 생성함</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>W_feature_letter <span class="op">=</span> np.zeros((num_letters, num_features))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 서로 호환되고 필요한 정보가 교차될 때 점수를 밀어주고 연결을 강화할 양수(+) 형태의 흥분성 시냅스 연결 강도 값을 정의함</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>excitatory_weight <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 서로 모순되거나 불필요한 노이즈 자극이 들어왔을 때 점수를 깎아내릴 음수(-) 형태의 억제성 시냅스 연결 강도 값을 정의함</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>inhibitory_weight <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ideal_letter_templates 딕셔너리의 키(글자이름)와 값(선분배열) 쌍을 꺼내며, 동시에 인덱스 번호 i(0, 1, 2)[글자 개수 3개]를 부여해가며 반복 루프를 가동함</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (letter, features) <span class="kw">in</span> <span class="bu">enumerate</span>(ideal_letter_templates.items()):</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 해당 글자가 가진 4개의 기하학적 선분 원소들을 하나씩 순회하며, 그 원소의 인덱스 위치인 j(0, 1, 2, 3)[선분 종류 4개]와 선분 유무 값 f를 매칭함</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j, f <span class="kw">in</span> <span class="bu">enumerate</span>(features):</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 만약 이상적인 템플릿 정보에서 해당 위치의 선분 값(f)이 1.0이라는 것은 글자를 구성하는 필수적인 뼈대라는 의미임</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> f <span class="op">==</span> <span class="fl">1.0</span>:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 3행 4열의 가중치 행렬 중 i번째 글자와 j번째 선분이 만나는 고유 교차점에 흥분성 가중치(+0.5) 가산점을 부여함</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>            W_feature_letter[i, j] <span class="op">=</span> excitatory_weight</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 만약 템플릿상에 선분이 존재하지 않는다(0.0)는 것은 해당 글자를 인지하는 데 들어오면 안 되는 방해물이라는 의미임</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            <span class="co"># i번째 글자와 j번째 선분의 연결 가중치 교차점에 억제성 가중치(-0.5) 감점 테러 값을 강제로 할당함</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>            W_feature_letter[i, j] <span class="op">=</span> inhibitory_weight</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 행렬 내적을 통한 상향식 활성화 에너지(net input) 산출</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># [연결주의 핵심 연산] 구축된 [3 x 4] 크기의 층간 가중치 행렬과 [4 x 1] 형태의 망막 입력 자극 벡터를 행렬 내적(np.dot) 연산으로 충돌시킴</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 이 연산을 통해 각 4개 선분이 보낸 신호가 통로를 지나며 가중치가 곱해지고 최종적으로 3개 글자 노드 각각에 도달하는 '순 입력' 배열이 탄생함</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>net_input_letters <span class="op">=</span> np.dot(W_feature_letter, input_stimulus)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 산출 결과 출력 </span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 상향식 계산이 끝났으므로 수신 결과를 보여주기 위한 대제목 세션 문구를 콘솔창에 한 줄 줄바꿈하여 깨끗하게 출력함</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">[각 글자 노드가 하위 선분 층으로부터 받은 순 입력 결과]"</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 순 입력 결과 배열(net_input_letters)에 담긴 3개의 원소를 하나씩 순회하면서 인덱스 번호 i와 계산 결과 점수 net을 추출하는 루프를 돎</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, net <span class="kw">in</span> <span class="bu">enumerate</span>(net_input_letters):</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 글자 이름 리스트(letter_names)에서 iㅇ번째 매칭 문자열을 꺼내와 해당 글자가 얻어낸 상향식 에너지를 소수점 둘째 자리(.2f)까지 출력함</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"글자 '</span><span class="sc">{</span>letter_names[i]<span class="sc">}</span><span class="ss">' 노드의 상향식 수신 에너지: </span><span class="sc">{</span>net<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[각 글자 노드가 하위 선분 층으로부터 받은 순 입력 결과]
+글자 'T' 노드의 상향식 수신 에너지: -0.25
+글자 'A' 노드의 상향식 수신 에너지: 1.15
+글자 'X' 노드의 상향식 수신 에너지: 0.25</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="층내-측면-억제-메커니즘" class="level3">
+<h3 class="anchored" data-anchor-id="층내-측면-억제-메커니즘">1.3. 층내 측면 억제 메커니즘</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>뇌가 애매한 자극을 인지할 때, 여러 글자 후보들이 동시에 비슷한 에너지를 받아 활성화되면 뇌는 혼란(결정 장애)에 빠지게 됨.</li>
+<li><strong>상호작용 활성화 모델(interactive activation model, IAM):</strong> 이러한 문제를 해결하하기 위해 동일한 층위에 있는 노드들끼리 서로를 물어뜯고 공격하는 <strong>측면 억제(lateral inhibition)</strong> 메커니즘을 가동함.</li>
+<li><strong>측면 억제:</strong> 글자 ‘A’의 에너지가 조금이라도 높아지면, ’A’ 노드는 즉각적으로 같은 위치에 있는 ‘T’, ‘X’ 등 다른 25개의 알파벳 노드들에게 강력한 마이너스 억제 신호를 쏘아보내 경쟁자들을 강제로 짓눌러버림.</li>
+<li>이 억제 과정을 통해 뇌는 가장 유력한 단 하나의 후보만 살아남게 만드는 승자독식 상태로 빠르게 수렴함.</li>
+</ul></li>
+<li><strong>심화 해설(활성화 한계치와 미분 방정식)</strong>
+<ul>
+<li>계산 모델에서 노드의 활성화 값(<span class="math inline">\(a(t)\)</span>)은 무한정 폭주하지 않으며, 생물학적 뉴런의 물리적 한계인 최대 활성화 값(Max: 통상 1.0)과 최소 비활성화 값(Min: 통상 -0.2) 사이에서만 진동하도록 강제됨.</li>
+<li>노드가 매 시점(<span class="math inline">\(t\)</span>)마다 받는 활성화 변화량(<span class="math inline">\(\Delta a\)</span>)은 다음과 같은 미분 방정식으로 제어됨.
+<ul>
+<li>순 입력(<span class="math inline">\(net\)</span>)이 양수일 때: <span class="math inline">\(\Delta a = (Max - a(t)) \times net - decay \times (a(t) - rest)\)</span></li>
+<li>순 입력(<span class="math inline">\(net\)</span>)이 음수일 때: <span class="math inline">\(\Delta a = (a(t) - Min) \times net - decay \times (a(t) - rest)\)</span></li>
+<li>방정식의 앞부분(<span class="math inline">\((Max - a(t))\)</span>): 현재 에너지가 천장(Max)에 다가갈수록 여유 공간이 줄어들어 에너지 상승 폭을 브레이크 밟듯 점진적으로 둔화시키는 안전장치임.</li>
+<li>방정식의 뒷부분(<span class="math inline">\(decay\)</span> 항): 자극이 없을 때 뉴런이 자연적으로 열을 식히며 평범한 기저 상태(<span class="math inline">\(rest\)</span>, 0.0)로 서서히 돌아가는 지수 감쇠 작용을 묘사함.</li>
+</ul></li>
+</ul></li>
+<li><strong>비유(오디션 프로그램의 치열한 서바이벌)</strong>
+<ul>
+<li>층내 측면 억제는 서바이벌 오디션 프로그램의 ’네거티브 공세’와 같음.</li>
+<li>무대 위에 선 수십 명의 후보들(알파벳 노드)은 오직 단 한 명만 1등으로 데뷔할 수 있음. 따라서 내 점수가 1점이라도 올라가면, 그 즉시 내 권력을 이용해 양옆에 있는 경쟁자들에게 감점 폭탄을 투하하여 무대 밑으로 끌어내려버리는 치열한 생존 게임을 벌임.</li>
+<li>또한 미분 방정식의 한계치(Max)는 온도 조절기의 ’리미터’와 같아서, 아무리 인기가 폭발하는 후보라도 점수가 무한대로 치솟아 시스템을 붕괴시키는 것을 막아주는 물리적 제어기 역할을 함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 4] 동일 층위 내 경쟁 노드 간의 측면 억제 구조</strong> <img src="images/week12/Slide_004.png" class="img-fluid"></p>
+<section id="실습-1-3-활성화-한계maxmin-미분-방정식을-적용한-글자-인식-수렴-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-3-활성화-한계maxmin-미분-방정식을-적용한-글자-인식-수렴-시뮬레이션">[실습 1-3] 활성화 한계(Max/Min) 미분 방정식을 적용한 글자 인식 수렴 시뮬레이션</h4>
+<p><strong>[그림 5] 미분 방정식에 기반한 활성화 갱신 곡선 및 에너지 수렴 궤적</strong> <img src="images/week12/Slide_005.png" class="img-fluid"></p>
+<div id="3645cff7" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 1-3] 활성화 한계(Max/Min) 미분 방정식을 적용한 글자 인식 수렴 시뮬레이션</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 생물학적 활성화 한계 및 파라미터 세팅</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 생물학적 뉴런이 가질 수 있는 이론상의 최대 포화 흥분 임계값(에너지 천장)을 1.0으로 엄격하게 선언함</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>MAX_ACT <span class="op">=</span> <span class="fl">1.0</span>     </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 강한 거부나 측면 억제를 받았을 때 가라앉을 수 있는 뉴런의 최대 비활성화 임계값(에너지 바닥)을 -0.2로 선언함</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>MIN_ACT <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>    </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 외부 자극이 차단되거나 시간이 충분히 흘렀을 때 자연스럽게 복원되는 뉴런의 평상시 기본 휴식 레벨을 0.0으로 설정함</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>REST_ACT <span class="op">=</span> <span class="fl">0.0</span>    </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 자극 유입이 멈춘 상태에서 매 사이클마다 뉴런이 머금고 있던 열(에너지)을 공중으로 소멸시키는 감쇠율을 5%로 정의함</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>DECAY_RATE <span class="op">=</span> <span class="fl">0.05</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 동일한 글자 층위 내에서 생존 경쟁을 하는 라이벌 노드를 무자비하게 후려칠 음수(-) 형태의 측면 억제 강도 계수를 -0.1로 설정함</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>LATERAL_INHIBITION <span class="op">=</span> <span class="op">-</span><span class="fl">0.1</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 글자 노드들이 서로 경쟁하여 단 하나의 최종 결론(정답)에 도달하기까지, 시뮬레이션을 몇 스텝/턴(15번) 동안 가동할지를 고정함</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>num_steps <span class="op">=</span> <span class="dv">15</span> </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 시간의 흐름(15스텝)에 따라 3개 글자 노드의 활성화 상태 변화 추이를 모니터링하고 기록해둘 3행 15열 크기의 영행렬 저장판을 생성함</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>activation_history <span class="op">=</span> np.zeros((num_letters, num_steps))</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 시뮬레이션의 실시간 연산에 사용될 3개 글자 노드의 현재 활성화 에너지를 초기값인 휴식 레벨(0.0) 3개로 구성하여 넘파이 배열로 선언함</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>current_activations <span class="op">=</span> np.array([REST_ACT, REST_ACT, REST_ACT])</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 측면 억제 네트워크 연산 루프 가동</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 루프가 가동되며 서바이벌 승자독식이 시작됨을 알리는 서두 텍스트를 콘솔창에 출력함</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"[시간 흐름에 따른 글자 층 활성화 수렴 및 승자독식 과정]"</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 시간 변수 t가 0부터 14까지 1턴씩 전진하면서 총 15번의 실시간 뉴런 활성화 업데이트 루프를 수행함</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(num_steps):</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 이번 시간 턴에서 3개의 글자 뉴런 각각이 최종적으로 획득할 미세한 활성화 변동분(delta a)을 저장해둘 임시 빈 배열을 매 턴마다 초기화함</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    delta_a <span class="op">=</span> np.zeros(num_letters)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 0번('T'), 1번('A'), 2번('X') 글자 노드를 하나씩 인덱스 번호 i를 이용하여 순차적으로 순회하며 미분 방정식을 연산함</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_letters):</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 실습 1-2에서 이미 계산을 완료해둔 고정된 상향식 선분 수신 점수 배열에서 i번째에 해당하는 글자 고유의 상향식 유입 에너지를 꺼내옴</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        net_i <span class="op">=</span> net_input_letters[i]</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 동일 계층 내 다른 알파벳 노드들이 현재 발화하고 있는 에너지가 나에게 가할 총 측면 억제 누적 타격 수치를 0.0으로 초기화함</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        lateral_penalty <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 계층 내의 모든 경쟁자 뉴런들을 인덱스 j(0, 1, 2)[글자 개수 3개]를 돌려가며 하나씩 검사하고 나를 향한 공격 신호를 합산함</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(num_letters):</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 공격 주체 뉴런 j가 나 자신(i)이 아니어야 하고, 동시에 j 뉴런이 수면 위로 활성화(&gt;0)되어 있는 강력한 생존 상태여야만 공격을 인정함</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> i <span class="op">!=</span> j <span class="kw">and</span> current_activations[j] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 경쟁 후보 j의 현재 활성화 크기에 비례하여 측면 억제 계수(-0.1)를 곱한 뒤 내가 받을 누적 타격치에 차곡차곡 더해줌(-)</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                lateral_penalty <span class="op">+=</span> LATERAL_INHIBITION <span class="op">*</span> current_activations[j]</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 상향식으로 밀어 올려주는 긍정 에너지(net_i)와 옆집 경쟁자들이 가해온 측면 억제 감점(lateral_penalty)을 결합하여 '총 순 입력'을 도출함</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>        total_net <span class="op">=</span> net_i <span class="op">+</span> lateral_penalty</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [미분 방정식 분기 처리] 계산된 최종 총 순 입력이 0보다 큰 양수(+)인 경우, 뉴런을 흥분시키는 힘이 더 우세한 상황임</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> total_net <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 흥분 미분 방정식 가동: 남은 천장 공간(MAX - 현재)에 총 순 입력을 곱하고, 기저로 돌아가려는 자연 소멸(decay)을 뺌</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>            delta_a[i] <span class="op">=</span> (MAX_ACT <span class="op">-</span> current_activations[i]) <span class="op">*</span> total_net <span class="op">-</span> DECAY_RATE <span class="op">*</span> (current_activations[i] <span class="op">-</span> REST_ACT)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 총 순 입력이 0 이하인 음수(-)인 경우, 나를 짓누르고 강제로 억압하는 억제성 에너지가 신경망 내에서 더 우세한 상황임</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 억제 미분 방정식 가동: 남은 바닥 공간(현재 - Min)에 총 순 입력을 곱하고(음수 곱이므로 하락 유도), 마찬가지로 자연 감쇠를 반영함</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>            delta_a[i] <span class="op">=</span> (current_activations[i] <span class="op">-</span> MIN_ACT) <span class="op">*</span> total_net <span class="op">-</span> DECAY_RATE <span class="op">*</span> (current_activations[i] <span class="op">-</span> REST_ACT)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3개 글자 노드의 독립적인 미분 방정식 연산이 끝나면 현재 실시간 활성화 에너지 배열(current_activations)에 활성화 에너지 변동분(delta_a)을 한 번에 더해줌</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>    current_activations <span class="op">+=</span> delta_a</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 업데이트가 완료된 따끈따끈한 현재 시점의 활성화 상태 벡터 전체를 3행 15열 기록판(activation_history)의 t번째 열에 박제해둠</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>    activation_history[:, t] <span class="op">=</span> current_activations</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 너무 잦은 출력을 방지하기 위해, 매 5턴 단위(5, 10, 15번째 스텝)가 완성되는 순간에만 현재 뇌 내의 점수를 콘솔창에 찍어줌</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t<span class="op">+</span><span class="dv">1</span>) <span class="op">%</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 원소 값을 포맷팅하여 소수점 셋째 자리(.3f)까지 깨끗하게 정렬된 가시성 좋은 텍스트 정보로 출력함</span></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Step </span><span class="sc">{</span>t<span class="op">+</span><span class="dv">1</span><span class="sc">:2d}</span><span class="ss"> | 'T': </span><span class="sc">{</span>current_activations[<span class="dv">0</span>]<span class="sc">:.3f}</span><span class="ss"> | 'A': </span><span class="sc">{</span>current_activations[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss"> | 'X': </span><span class="sc">{</span>current_activations[<span class="dv">2</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 승자독식 궤적 시각화</span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a><span class="co"># 동적 평형 수렴 과정 전체를 플롯하기 위해 가로 7인치, 세로 4인치 비율의 새로운 시각화 캔버스 창을 오픈함</span></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="co"># 차례대로 글자 'T'(회색), 'A'(진홍색), 'X'(어두운 파란색)에 매칭하여 매끄러운 궤적 선을 그려낼 색상 명칭 리스트를 선언함</span></span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'gray'</span>, <span class="st">'crimson'</span>, <span class="st">'darkblue'</span>]</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="co"># 3개의 알파벳 후보 각각의 역사 기록을 한 줄씩 꺼내어 2차원 시계열 선 그래프로 표현하기 위한 단독 루프를 수행함</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_letters):</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>    <span class="co"># X축은 1부터 15까지의 정수 스텝, Y축은 해당 i번째 뉴런의 15턴 동안의 활성화 궤적 배열을 지정하여 마커가 달린 실선으로 플로팅함</span></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>    plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, num_steps <span class="op">+</span> <span class="dv">1</span>), activation_history[i, :], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span>colors[i], label<span class="op">=</span><span class="ss">f"Letter '</span><span class="sc">{</span>letter_names[i]<span class="sc">}</span><span class="ss">'"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="co"># 인지 모델링 연구 논문 스타일 규격에 맞춰 그래프의 대제목을 굵고 크게 명시함</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Lateral Inhibition and Winner-Takes-All Dynamics"</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Processing Time (Steps)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>) <span class="co"># X축 하단 라벨에 정보 처리의 진전 단위를 뜻하는 '처리 시간(스텝)'을 명시함</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Activation Level"</span>, fontsize<span class="op">=</span><span class="dv">12</span>) <span class="co"># Y축 좌측 라벨에 뉴런의 실시간 에너지를 뜻하는 '활성화 수준'을 명시함</span></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>plt.axhline(MAX_ACT, color<span class="op">=</span><span class="st">'red'</span>, linestyle<span class="op">=</span><span class="st">':'</span>, label<span class="op">=</span><span class="st">'Max (1.0)'</span>) <span class="co"># 에너지가 도달할 수 있는 천장 한계선 위치에 빨간색 점선을 가로로 그어줌</span></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>plt.axhline(MIN_ACT, color<span class="op">=</span><span class="st">'blue'</span>, linestyle<span class="op">=</span><span class="st">':'</span>, label<span class="op">=</span><span class="st">'Min (-0.2)'</span>) <span class="co"># 억제되어 도달할 수 있는 바닥 한계선 위치에 파란색 점선을 가로로 그어줌</span></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">'center right'</span>, fontsize<span class="op">=</span><span class="dv">11</span>) <span class="co"># 각 선이 어떤 글자 후보인지 구별할 수 있도록 범례 박스를 우측 중앙 공간에 띄움</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>) <span class="co"># 수치 판단을 수월하게 돕기 위해 배경판에 투명도 50%의 옅은 대쉬 형태의 격자 가이드망을 깔아줌</span></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>plt.show() <span class="co"># 모든 시각화 요소가 완벽하게 결합된 최종 동적 수렴 수치 그래프를 화면 위에 띄워 완성함</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[시간 흐름에 따른 글자 층 활성화 수렴 및 승자독식 과정]
+Step  5 | 'T': -0.165 | 'A': 0.957 | 'X': 0.547
+Step 10 | 'T': -0.178 | 'A': 0.956 | 'X': 0.689
+Step 15 | 'T': -0.179 | 'A': 0.956 | 'X': 0.734</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week12_2026_files/figure-html/cell-4-output-2.png" width="602" height="381" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="부-하향식-피드백과-단어-우월-효과-시뮬레이션" class="level2">
+<h2 class="anchored" data-anchor-id="부-하향식-피드백과-단어-우월-효과-시뮬레이션">2부: 하향식 피드백과 단어 우월 효과 시뮬레이션</h2>
+<section id="지각을-지배하는-지식-단어-우월-효과의-패러다임" class="level3">
+<h3 class="anchored" data-anchor-id="지각을-지배하는-지식-단어-우월-효과의-패러다임">2.1. 지각을 지배하는 지식: 단어 우월 효과의 패러다임</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>1969년 제안된 라이커-휠러 패러다임(Reicher-Wheeler paradigm)은 인간의 시각적 단어 인지 연구에 큰 영향을 끼친 중요한 발견임.</li>
+<li>피험자에게 매우 짧은 시간(수십 ms) 동안 타겟 자극을 보여준 뒤 시각적 마스크(mask: 노이즈)로 덮어버림. 그 후 “방금 본 자극의 마지막 글자가 ’D’였습니까, ’K’였습니까?”라고 질문함.</li>
+<li>놀랍게도, 피험자들은 고립된 알파벳 ‘K’ 한 글자만 단독으로 보여주었을 때보다, 의미 있는 영단어인 ‘WORK’ 속에 포함된 ’K’를 찾으라고 할 때 훨씬 더 빠르고 정확하게 정답을 맞힘.</li>
+<li>심지어 철자를 무작위로 섞은 무의미한 철자열 ‘ORWK’ 속의 ’K’보다도, 유의미한 단어 속의 ’K’를 훨씬 잘 알아봄. 의미 있는 맥락이 개별 지각을 압도하는 이 현상을 단어 우월 효과(word superiority effect, WSE)라고 부름.</li>
+</ul></li>
+<li><strong>심화 해설(상향식 모델의 모순과 하향식 피드백의 도입)</strong>
+<ul>
+<li>기존의 순차적인 상향식 정보처리 모델(선분 <span class="math inline">\(\rightarrow\)</span> 글자 <span class="math inline">\(\rightarrow\)</span> 단어)로는 이 단어 우월 효과를 절대 설명할 수 없음.</li>
+<li>만약 하위 글자를 완벽히 해독한 후에야 상위 단어를 파악할 수 있다면, 논리적으로 볼 때 고립된 글자 1개를 읽는 것이 복잡한 단어 4글자를 다 읽어내는 것보다 무조건 더 빠르고 쉬워야 하기 때문임.</li>
+<li>이 치명적인 모순을 해결하기 위해 계산주의 인지과학은 하향식 피드백이라는 개념을 수학 모델에 도입함.</li>
+<li>망막에서 들어온 불완전한 상향식 시각 정보(초기 시각 피질에서 추출되는 가장 기초적인 정보인 선분 정보)가 단어 층위를 미세하게 자극하는 순간, 활성화되기 시작한 거대 단어 노드(예: ‘WORK’)는 즉시 자신의 아랫단에 있는 철자 노드들(W, O, R, K)을 향해 거꾸로 엄청난 양의 <strong>흥분성 피드백 에너지</strong>를 쏟아부음.</li>
+<li>결과적으로 ‘K’ 노드는 밑에서 올라오는 선분 자극뿐만 아니라, 위에서 폭포수처럼 쏟아져 내려오는 단어의 의미적 지원 사격을 동시에 받게 되어 활성화 임계치를 순식간에 돌파하게 됨.</li>
+</ul></li>
+<li><strong>비유(흐릿한 사진 속 친구 얼굴 찾기)</strong>
+<ul>
+<li>단어 우월 효과는 안개 낀 단체 사진 속에서 내 친구를 알아보는 상황과 정확히 일치함.</li>
+<li>얼굴 윤곽선(선분) 하나만 허공에 덩그러니 떠 있으면 그게 누구인지 단번에 맞히기 매우 힘듦.</li>
+<li>하지만 그 사람이 내가 평소에 항상 어울려 놀던 친구 4인방의 단체 사진(단어라는 맥락) 속에 서 있다면, 뇌는 흐릿한 실루엣만 보고도 단번에 “아! K구나!” 하고 확신하게 됨. 나의 기존 지식(친구 4인방)이 지각의 빈틈(흐릿한 사진)을 메워주는 ’하향식 피드백’의 마법임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 6] 라이커-휠러의 단어 우월 효과 실험 패러다임</strong> <img src="images/week12/Slide_006.png" class="img-fluid"></p>
+<section id="실습-2-1-글자-단어-간-양방향-피드백-가중치-행렬-구축" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-1-글자-단어-간-양방향-피드백-가중치-행렬-구축">[실습 2-1] 글자-단어 간 양방향 피드백 가중치 행렬 구축</h4>
+<p><strong>[그림 7] 단어 층에서 글자 층으로 내려꽂히는 하향식 피드백 가중치 구조</strong> <img src="images/week12/Slide_007.png" class="img-fluid"></p>
+<div id="5bf5b61a" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 2-1] 글자-단어 간 양방향 피드백 가중치 행렬 구축</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 상위 단어 층 노드 초기화</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 심성 어휘집(지식 층위) 사전에 등재되어 인지 시스템이 식별 가능한 총 영단어 개수를 2개로 한정하여 정의함</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>num_words <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 심성 어휘집 사전 내부의 각 단어 노드 순서와 완벽히 짝을 이루는 구체적인 텍스트 문자열 이름 사전을 리스트 형태로 구성함</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>word_names <span class="op">=</span> [<span class="st">"TAX"</span>, <span class="st">"CAT"</span>]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 글자 층 &lt;-&gt; 단어 층 가중치 행렬 구축(top-down)</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 단어 층(2개 노드)에서 하위 글자 층(3개 노드: T, A, X)으로 거꾸로 쏟아져내릴 하향식 피드백 3행 2열 [3 x 2] 가중치 행렬판을 생성하고 0으로 초기화함</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>W_word_letter <span class="op">=</span> np.zeros((num_letters, num_words))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 불완전하고 흐릿한 시각 자극을 단어 맥락으로 메워 강력하게 '자동완성'해줄 하향식 흥분 가중치 상수(+0.6)를 설정함</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>feedback_weight <span class="op">=</span> <span class="fl">0.6</span> </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># [TAX 단어 노드 셋업] 단어 'TAX'(인덱스 0)가 활성화되면 첫 번째 위치의 글자 'T'(인덱스 0) 노드를 향해 거꾸로 보상 에너지 통로(+0.6)를 개설함</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>W_word_letter[<span class="dv">0</span>, <span class="dv">0</span>] <span class="op">=</span> feedback_weight </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 단어 'TAX'(인덱스 0)가 활성화되면 두 번째 위치의 글자 'A'(인덱스 1) 노드를 향해 거꾸로 보상 에너지 통로(+0.6)를 개설함</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>W_word_letter[<span class="dv">1</span>, <span class="dv">0</span>] <span class="op">=</span> feedback_weight </span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 단어 'TAX'(인덱스 0)가 활성화되면 세 번째 위치의 글자 'X'(인덱스 2) 노드를 향해 거꾸로 보상 에너지 통로(+0.6)를 개설함</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>W_word_letter[<span class="dv">2</span>, <span class="dv">0</span>] <span class="op">=</span> feedback_weight </span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co"># [CAT 단어 노드 셋업] 단어 'CAT'(인덱스 1)이 활성화되면 자신의 구성 알파벳 중 오직 중간 글자인 'A'(인덱스 1) 노드만을 향해 보상 에너지 통로(+0.6)를 개설함</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>W_word_letter[<span class="dv">1</span>, <span class="dv">1</span>] <span class="op">=</span> feedback_weight </span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 상위 지식이 하위 지각을 역으로 지배하는 '거꾸로 연결망 통로'가 차질 없이 개설되었음을 증명하는 텍스트 문구를 콘솔창에 출력함</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 3단계 셋업 완료: 단어 층에서 글자 층으로 쏟아지는 하향식 피드백 가중치 행렬(W_word_letter)이 구축됨."</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 이 연산 통로를 통해 지식의 공명(자동완성)이 일어날 구체적인 인지과학적 메커니즘을 직관적으로 풀어낸 보충 설명 문장을 추가 출력함</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 만약 'TAX'라는 단어가 지식 층에서 활성화된다면, 하위 층의 'T', 'A', 'X' 노드들은 0.6이라는 폭포수 에너지를 위에서부터 추가로 지원받게 됨."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>-&gt; 3단계 셋업 완료: 단어 층에서 글자 층으로 쏟아지는 하향식 피드백 가중치 행렬(W_word_letter)이 구축됨.
+-&gt; 만약 'TAX'라는 단어가 지식 층에서 활성화된다면, 하위 층의 'T', 'A', 'X' 노드들은 0.6이라는 폭포수 에너지를 위에서부터 추가로 지원받게 됨.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="상호작용-활성화-모델의-전역적-동역학" class="level3">
+<h3 class="anchored" data-anchor-id="상호작용-활성화-모델의-전역적-동역학">2.2. 상호작용 활성화 모델의 전역적 동역학</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>완전한 형태의 상호작용 활성화 모델은 외부 자극이 한 방향으로만 흐르는 정적인 시스템이 아님.</li>
+<li>상향식 에너지(망막 <span class="math inline">\(\rightarrow\)</span> 뇌)와 하향식 에너지(지식 <span class="math inline">\(\rightarrow\)</span> 지각), 그리고 층내 측면 억제(경쟁자 간의 싸움)가 좁은 신경망 골목에서 실시간으로 맹렬하게 충돌하고 섞이면서 네트워크 전체가 동적 평형(dynamic equilibrium) 상태로 수렴해가는 역동적인 동역학 시스템임.</li>
+<li>수많은 톱니바퀴가 맞물려 돌아가며 네트워크 전체가 가장 안정적인 특정 단어 인식 상태로 수렴하는 것이 상호작용 활성화 모델 시뮬레이션의 최종 목표임.</li>
+</ul></li>
+<li><strong>심화 해설(통합 순 입력과 양방향 피드백 궤적)</strong>
+<ul>
+<li>매 스텝(<span class="math inline">\(t\)</span>)마다 특정 글자 노드가 받는 총 통합 순 입력(total net input, <span class="math inline">\(N(t)\)</span>)은 아래 세 가지 힘의 총합임.
+<ul>
+<li><ol type="1">
+<li>선분에서 올라오는 상향식 지원 사격: <span class="math inline">\(+ \sum W_{feature\_letter} \times a_{feature}\)</span></li>
+</ol></li>
+<li><ol start="2" type="1">
+<li>단어에서 내려오는 하향식 융단 폭격: <span class="math inline">\(+ \sum W_{word\_letter} \times a_{word}\)</span></li>
+</ol></li>
+<li><ol start="3" type="1">
+<li>동일 층위 내 경쟁자들의 측면 억제: <span class="math inline">\(- \sum W_{lateral} \times a_{lateral}\)</span></li>
+</ol></li>
+</ul></li>
+<li>이 세 가지 힘들이 하나로 합쳐진 <span class="math inline">\(N(t)\)</span> 값이 앞서 배운 활성화 한계 미분 방정식(<span class="math inline">\(\Delta a\)</span>)에 대입되어 글자 노드(뉴런)(예: ‘X’나 ’K’)의 에너지를 갱신함.</li>
+<li>특히 글자가 단어를 깨우고, 그 단어가 다시 글자에 피드백을 주며, 그 강해진 글자가 또다시 단어를 더 강하게 깨우는 이 ’재진입 루프(reentrant loop)’야말로 인간 지각의 경이로운 속도를 설명하는 계산주의의 핵심 기제임.</li>
+</ul></li>
+<li><strong>비유(깊은 메아리 계곡과 합창)</strong>
+<ul>
+<li>이 네트워크의 양방향 재진입 루프는 깊은 산속의 ’메아리 계곡’과 비슷함.</li>
+<li>내가 바닥에서 위를 향해 소리를 지르면(상향식 시각 자극), 그 소리가 산봉우리(단어 지식)에 부딪혀 증폭된 메아리가 되어 다시 바닥으로 거세게 쏟아져 내려옴(하향식 피드백).</li>
+<li>밑에서 올라가는 소리와 위에서 내려오는 소리들이 계속 중첩되면서, 계곡 전체가 특정한 화음 주파수로 강하게 웅웅거리며 공명함. 뇌 역시 이렇게 <strong>지각</strong>과 <strong>지식</strong>이 공명할 때 “단어를 알아보았다”는 인식적 통찰을 획득함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 8] 상호작용 활성화 모델의 전체 아키텍처 및 재진입 루프</strong> <img src="images/week12/Slide_008.png" class="img-fluid"></p>
+<section id="실습-2-2-상하향식-양방향-통합-네트워크-및-iam-루프-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-2-상하향식-양방향-통합-네트워크-및-iam-루프-시뮬레이션">[실습 2-2] 상하향식 양방향 통합 네트워크 및 IAM 루프 시뮬레이션</h4>
+<p><strong>[그림 9] 상향식 자극과 하향식 피드백 에너지가 통합되어 산출되는 총 활성화 에너지 구조</strong> <img src="images/week12/Slide_009.png" class="img-fluid"></p>
+<div id="1a27a679" class="cell" data-execution_count="5">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 2-2] 상하향식 양방향 통합 네트워크 및 상호작용 활성화 모델 루프 시뮬레이션</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 두 가지 극단적 실험 조건 셋업</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 라이커-휠러 실험 패러다임에 따른 단어 우월 효과(WSE)의 발생 격차를 관찰하기 위해 연합 시간 단위를 20스텝으로 확장 정의함</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>num_steps_wse <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># [실험 조건 1 기록장] 아무 맥락 없이 외롭게 홀로 화면에 나타난 '고립된 글자 X' 노드의 20턴간 활성화 변화량을 저장할 배열을 생성함</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>act_X_isolated <span class="op">=</span> np.zeros(num_steps_wse)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># [실험 조건 2 기록장] 유의미한 단어 'TAX'와 함께 나타나는 '단어 속 글자 X' 노드의 20턴간 활성화 변화량을 저장할 배열을 생성함</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>act_X_in_word <span class="op">=</span> np.zeros(num_steps_wse)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 고립 조건하에서 구동될 'X' 뉴런의 실시간 활성화 변수를 평상시 휴식 레벨 상태(0.0)로 초기화하여 선언함</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>current_X_isolated <span class="op">=</span> REST_ACT</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 맥락 조건하에서 구동될 'X' 뉴런의 실시간 활성화 변수를 평상시 휴식 레벨 상태(0.0)로 초기화하여 선언함</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>current_X_in_word <span class="op">=</span> REST_ACT</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 고정 입력 에너지 및 피드백 에너지 산출</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 눈(망막)을 통해 들어온 'X' 글자의 실제 기하학적 선분이 지닌 상향식 에너지를 양쪽 조건 모두 동일하게 애매하고 흐릿한 강도인 0.3으로 고정 세팅함</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>bottom_up_X <span class="op">=</span> <span class="fl">0.3</span> </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 실습 2-1에서 완성해둔 하향식 가중치 행렬판의 2행 0열('TAX' 단어가 가리키는 세 번째 철자 'X' 위치) 통로에서의 피드백 전하량(feedback_weight: 0.6)을 복사해옴</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>top_down_X <span class="op">=</span> W_word_letter[<span class="dv">2</span>, <span class="dv">0</span>] </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 양방향 네트워크 미분 방정식 루프 가동</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 라이커-휠러 패러다임의 계산주의적 재현 시뮬레이션 엔진이 백그라운드에서 가동하기 시작함을 보여주는 문구를 화면에 띄움</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"[시뮬레이션 가동: 고립 글자 조건 vs 유의미한 단어 속 글자 조건]"</span>)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 시간 변수 t가 0부터 19까지 전진하며 상향식 단독 처리와 상하향식 양방향 공명 처리를 병렬적으로 대비 연산하는 메인 루프를 수행함</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(num_steps_wse):</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- [조건 1: 외로운 싸움] 상향식 단독 조건에서 'X' 뉴런이 받는 순 입력은 오직 망막에서 올라온 물리적 자극(0.3) 하나가 전부임</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    net_iso <span class="op">=</span> bottom_up_X  </span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 고립 조건 미분 방정식 연산: 에너지가 더 올라갈 수 있는 '남은 여유 공간'(MAX - 현재)에 입력값(net_iso)을 곱하고, 자연적으로 에너지가 식는 감쇠 패널티를 빼서 최종 변동분을 구함</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    delta_iso <span class="op">=</span> (MAX_ACT <span class="op">-</span> current_X_isolated) <span class="op">*</span> net_iso <span class="op">-</span> DECAY_RATE <span class="op">*</span> (current_X_isolated <span class="op">-</span> REST_ACT)</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 계산된 고립 조건 변동분(delta_iso)을 고립 조건의 현재 실시간 활성화 에너지 변수에 계속 누적하여 갱신해줌</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    current_X_isolated <span class="op">+=</span> delta_iso</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 한 단계 성장한 고립 조건 'X' 뉴런의 실시간 에너지를 고립 조건 글자 history 기록장(act_X_isolated)의 t 번째 방에 고스란히 저장함</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    act_X_isolated[t] <span class="op">=</span> current_X_isolated</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- [조건 2: 금수저 지원] 상하향식 양방향 조건에서 'X' 뉴런이 받는 에너지는 망막 자극(0.3)에 상위 지식의 피드백(+0.6)이 합산되어 0.9로 증폭됨</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    net_word <span class="op">=</span> bottom_up_X <span class="op">+</span> top_down_X </span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 더 거대해진 통합 순 입력(net_word)을 바탕으로 폭발적인 활성화 에너지 갱신</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    delta_word <span class="op">=</span> (MAX_ACT <span class="op">-</span> current_X_in_word) <span class="op">*</span> net_word <span class="op">-</span> DECAY_RATE <span class="op">*</span> (current_X_in_word <span class="op">-</span> REST_ACT)</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 단어 지식의 '보너스 점수'가 반영되어 큼직하게 계산된 에너지 변동분(delta_word)을 현재 활성화 수치에 누적하여 갱신함</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    current_X_in_word <span class="op">+=</span> delta_word</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 지식의 지원 사격으로 폭발적으로 성장한 맥락 조건 'X' 뉴런의 에너지를 단어 속 글자 history 기록장(act_X_in_word)의 t 번째 방에 적립함</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    act_X_in_word[t] <span class="op">=</span> current_X_in_word</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co"># 루프의 모든 미분 업데이트가 오류 없이 완벽히 끝났음을 나타내고 다음 단계 시각화를 안내하는 종결 문구를 출력함</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 20스텝 동안의 양방향 미분 방정식 연산이 모두 완료됨. 단어 우월 효과의 수학적 실체를 시각화하겠음.</span><span class="ch">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[시뮬레이션 가동: 고립 글자 조건 vs 유의미한 단어 속 글자 조건]
+-&gt; 20스텝 동안의 양방향 미분 방정식 연산이 모두 완료됨. 단어 우월 효과의 수학적 실체를 시각화하겠음.
+</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="정보이론적-잉여성과-노이즈-강건성" class="level3">
+<h3 class="anchored" data-anchor-id="정보이론적-잉여성과-노이즈-강건성">2.3. 정보이론적 잉여성과 노이즈 강건성</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>일상생활에서 우리가 읽는 텍스트는 폰트가 깨져 있거나, 커피 얼룩이 묻어 있거나, 간판의 네온사인이 몇 개 꺼져 있는 등 치명적인 시각적 노이즈에 끊임없이 노출됨.</li>
+<li>하향식 피드백 시스템은 이러한 악조건 속에서도 뇌가 정보를 빠르고 정확하게 복원해낼 수 있는 노이즈 강건성(robustness)을 제공함.</li>
+<li>의미 있는 단어는 정보이론(information theory) 관점에서 막대한 ’잉여성(redundancy)’을 가짐. <span class="math inline">\(\Rightarrow\)</span> 몇 개의 철자가 지워지더라도 전체 단어를 유추할 수 있는 충분한 맥락적 힌트를 단어 자체가 품고 있음!</li>
+</ul></li>
+<li><strong>심화 해설(어휘망을 통한 지각적 자동 완성 시뮬레이션)</strong>
+<ul>
+<li>만약 타겟 글자 위로 커피 얼룩이 떨어져 상향식 순 입력 에너지가 0.3이라는 형편없는 수준으로 하락했다고 가정해보자.</li>
+<li>고립된 글자 조건에서는 이 0.3의 입력만으로 자연 감쇠율을 뚫고 한계치 1.0에 도달하기 위해 수십, 수백 스텝의 기나긴 처리 시간이 필요하며, 도중에 억제성 공격이라도 받으면 영원히 인지에 실패하게 됨.</li>
+<li>하지만 단어 층위에서 쏟아지는 하향식 피드백 에너지는 0.6에 달함. 이 거대한 지식의 에너지가 상향식 에너지에 더해지면(0.3 + 0.6 = 0.9), 타겟 글자는 단 4~5 스텝 만에 1.0 천장에 도달하여 인지적 결정을 종결지음.</li>
+<li>즉 뇌는 물리적인 눈으로 잉크 자국을 일일이 확인해서 글자를 읽는 것이 아니라, 상위 층의 지식이 만들어낸 환상(피드백)을 통해 손상된 정보를 스스로 복원하고 덧칠하여 읽어내는 ‘능동적 환각’ 머신에 가까움.</li>
+</ul></li>
+<li><strong>비유(스마트폰의 문장 자동 완성 기능)</strong>
+<ul>
+<li>이 놀라운 노이즈 강건성은 스마트폰 키보드의 ‘자동완성’ 기능과 완벽하게 똑같음.</li>
+<li>내가 문자로 ’컴퓨’까지만 대충 쳐서 오타가 날 뻔해도(불완전한 상향식 자극), 스마트폰 내부에 내장된 사전 지식(단어 층)이 문맥을 재빨리 파악하여 다음에 올 글자인 ’터’의 활성화를 미리 하향식으로 끌어올려 화면에 띄워줌.</li>
+<li>단어 우월 효과 시뮬레이션은 바로 우리 뇌에 내장된 이 신경망 ’자동 완성 알고리즘’을 미분 방정식 코드로 증명해냄.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 10] 고립 글자와 단어 속 글자의 활성화 궤적 비교 및 단어 우월 효과 시각화</strong> <img src="images/week12/Slide_010.png" class="img-fluid"></p>
+<section id="실습-2-3-고립-글자-vs.-단어-속-글자의-활성화-궤적-비교-및-단어-우월-효과-시각화-증명" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-3-고립-글자-vs.-단어-속-글자의-활성화-궤적-비교-및-단어-우월-효과-시각화-증명">[실습 2-3] 고립 글자 vs.&nbsp;단어 속 글자의 활성화 궤적 비교 및 단어 우월 효과 시각화 증명</h4>
+<div id="9969b640" class="cell" data-execution_count="6">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 2-3] 고립 글자 vs. 단어 속 글자의 활성화 궤적 비교 및 단어 우월 효과 시각화 증명</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 두 조건 간의 인지적 각성 속도 격차를 명확한 선 곡선으로 대비 도식하기 위해 가로 8인치, 세로 5인치 비율의 그래프 도화지를 마련함</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 두 조건 간의 활성화 시계열 곡선 시각화 증명</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------------------------------------------------------</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># [조건 1 라인 플롯] X축은 1부터 20까지의 정수 처리 시간, Y축은 고립 글자 'X'의 데이터 배열을 지정하여 로열블루 색상의 동그라미(o) 점선(--) 그래프를 생성함</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, num_steps_wse <span class="op">+</span> <span class="dv">1</span>), act_X_isolated, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, color<span class="op">=</span><span class="st">'royalblue'</span>, label<span class="op">=</span><span class="st">"Condition 1: Isolated Letter ('X' alone)"</span>, linewidth<span class="op">=</span><span class="fl">2.5</span>, markersize<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># [조건 2 라인 플롯] 똑같은 X축 상에 Y축 조건만 단어 속 글자 'X' 배열로 변환하고, 진홍색 사각형(s) 실선(-) 그래프를 누적 생성함</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, num_steps_wse <span class="op">+</span> <span class="dv">1</span>), act_X_in_word, marker<span class="op">=</span><span class="st">'s'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'crimson'</span>, label<span class="op">=</span><span class="st">"Condition 2: Letter in Word ('X' in 'TAX')"</span>, linewidth<span class="op">=</span><span class="fl">2.5</span>, markersize<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 이 시뮬레이션의 최종 과학적 결론을 대변하는 타이틀 명칭을 볼드 처리하여 상단 중앙에 고정함</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Simulation of Word Superiority Effect (IAM)"</span>, fontsize<span class="op">=</span><span class="dv">15</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># X축 아래 글자 힌트가 들어오는 하드웨어적 연산의 흐름을 인지시키기 위해 '정보 처리 시간(스텝 단위)'이라는 라벨을 씌워줌</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Information Processing Time (Steps)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Y축 왼쪽에 세로로 '타겟 글자 노드의 활성화 수준'(단어 우월 효과 판단의 기준이 되는 타겟 철자 뉴런의 흥분 정도) 라벨을 명시함</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Activation Level of Target Letter Node"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Y축의 범위를 기저 상태(0.0)부터 폭발 한계치(1.1)까지 설정함</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>, <span class="fl">1.1</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 뉴런이 아무리 흥분해도 뛰어넘을 수 없는 물리적 최대 한계 장벽인 1.0 위치에 회색조의 도트 가로 지지선(:)을 그어 천장 한계를 시각적으로 나타냄</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>plt.axhline(MAX_ACT, color<span class="op">=</span><span class="st">'gray'</span>, linestyle<span class="op">=</span><span class="st">':'</span>, label<span class="op">=</span><span class="st">'Max Activation Limit (1.0)'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 파란 점선과 빨간 실선이 각각 어떤 실험적 억압/보상 조건인지를 명확히 분별해주도록 범례 상자를 테두리(frameon)와 그림자(shadow)를 주어 우측 하단에 배치함</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">'lower right'</span>, fontsize<span class="op">=</span><span class="dv">11</span>, frameon<span class="op">=</span><span class="va">True</span>, shadow<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 가로선과 세로선의 척도 교차점을 단번에 정밀 파악하도록 투명도 60%를 준 대쉬 형태의 모눈망을 그리드로 배경에 깔아줌</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 지금까지 겹겹이 누적 선언해둔 모든 시뮬레이션 그래픽 원소들을 최종 병합하여 화면에 렌더링 출력함</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week12_2026_files/figure-html/cell-7-output-1.png" width="666" height="455" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="주차-요약-및-다음-주-예고" class="level2">
+<h2 class="anchored" data-anchor-id="주차-요약-및-다음-주-예고">12주차 요약 및 다음 주 예고</h2>
+<ul>
+<li><strong>요약</strong>
+<ul>
+<li><strong>상호작용 활성화 모델 아키텍처:</strong> 시각적 단어 인지는 단순히 선분이 글자가 되고 글자가 단어가 되는 수동적인 일방통행이 아님. 선분, 글자, 단어 층위가 거대한 가중치 행렬망 안에서 <strong>상향식 흥분</strong>과 층내 <strong>측면 억제</strong>를 맹렬하게 주고받으며 단 하나의 인식 상태로 수렴해가는 고도의 동적 네트워크 시스템임을 파이썬 코드로 검증했음.</li>
+<li><strong>단어 우월 효과와 하향식 피드백:</strong> 지각은 철저히 지식에 의해 지배됨. 단어 층위에서 내려보내는 강력한 <strong>하향식 피드백</strong> 에너지가 하위 글자 노드의 활성화를 폭발적으로 증폭시키는 기전을 양방향 미분방정식으로 구현함. 이를 통해 인간이 왜 악조건 속에서도 단어 속의 글자를 빠르고 완벽하게 복원해 알아보는지를 컴퓨터 시뮬레이션으로 입증했음.</li>
+</ul></li>
+<li><strong>다음 주 예고</strong>
+<ul>
+<li><strong>13주차: 문장 처리의 확률적 모형:</strong> 지금까지 배운 개별 단어의 인지 과정을 넘어, 단어들이 모여 이루는 문장 수준의 거시적 흐름으로 모델링을 확장함.</li>
+<li><strong>예측 가능성과 놀라움(surprisal theory):</strong> 인간이 글을 읽을 때 뇌는 항상 멈춰 있지 않고 다음 단어를 확률적으로 예측하고 있음. 이 다음 단어가 뇌의 예측을 빗나갔을 때 발생하는 정보이론적 놀라움(surprisal) 수치와 실제 인간의 안구 운동(읽기 시간 지연) 간의 상관관계를 통계적으로 다룰 것임.</li>
+<li><strong>순환 신경망(RNN/LSTM) 기초 맛보기:</strong> 과거의 맥락(단어들의 배열 순서)을 메모리에 내장한 채 문장을 시간 순서대로 처리해나가는 순환 신경망 아키텍처의 기초를 학습하고, 이것이 언어심리학적으로 지니는 함의를 살펴봄.</li>
+</ul></li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
