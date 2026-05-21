@@ -20,3 +20,5 @@
 * **[week10_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week10_2026.html):** 10주차 수업자료: 주의와 간섭: Stroop 과제와 활성화 확산 모델. 해당 자료를 열람하려면 링크를 클릭할 것.
 
 * **[week11_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week11_2026.html):** 11주차 수업자료: 기억인출과 망각: 계열 위치 효과와 맥락 모델. 해당 자료를 열람하려면 링크를 클릭할 것.
+
+* **[week12_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week12_2026.html):** 12주차 수업자료: 단어인지와 어휘접속: 상호작용 활성화 모델 구현 및 단어 우월 효과. 해당 자료를 열람하려면 링크를 클릭할 것.
