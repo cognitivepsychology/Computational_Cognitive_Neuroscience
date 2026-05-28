@@ -22,3 +22,5 @@
 * **[week11_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week11_2026.html):** 11주차 수업자료: 기억인출과 망각: 계열 위치 효과와 맥락 모델. 해당 자료를 열람하려면 링크를 클릭할 것.
 
 * **[week12_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week12_2026.html):** 12주차 수업자료: 단어인지와 어휘접속: 상호작용 활성화 모델 구현 및 단어 우월 효과. 해당 자료를 열람하려면 링크를 클릭할 것.
+
+* **[week13_2026.html](https://cognitivepsychology.github.io/Computational_Cognitive_Neuroscience/week13_2026.html):** 13주차 수업자료: 문장 처리의 확률적 모형: 놀라움 이론 및 RNN/LSTM 기초. 해당 자료를 열람하려면 링크를 클릭할 것.
