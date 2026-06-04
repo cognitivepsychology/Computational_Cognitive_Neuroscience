@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>계산주의 인지신경과학 14주차_강화학습과 인지 제어: 도파민 시스템과 갈등 모니터링</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="week14_2026_files/libs/clipboard/clipboard.min.js"></script>
+<script src="week14_2026_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="week14_2026_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="week14_2026_files/libs/quarto-html/popper.min.js"></script>
+<script src="week14_2026_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="week14_2026_files/libs/quarto-html/anchor.min.js"></script>
+<link href="week14_2026_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="week14_2026_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="week14_2026_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="week14_2026_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="week14_2026_files/libs/bootstrap/bootstrap-e0048d6574ccc2aa33e6fadbbc53b6fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#주차-수업-목표" id="toc-주차-수업-목표" class="nav-link active" data-scroll-target="#주차-수업-목표">14주차 수업 목표</a></li>
+  <li><a href="#부-강화학습과-가치-기반-의사결정" id="toc-부-강화학습과-가치-기반-의사결정" class="nav-link" data-scroll-target="#부-강화학습과-가치-기반-의사결정">1부: 강화학습과 가치 기반 의사결정</a>
+  <ul>
+  <li><a href="#보상-예측-오차와-뇌의-학습-메커니즘" id="toc-보상-예측-오차와-뇌의-학습-메커니즘" class="nav-link" data-scroll-target="#보상-예측-오차와-뇌의-학습-메커니즘">1.1 보상 예측 오차와 뇌의 학습 메커니즘</a></li>
+  <li><a href="#탐색과-활용의-딜레마" id="toc-탐색과-활용의-딜레마" class="nav-link" data-scroll-target="#탐색과-활용의-딜레마">1.2 탐색과 활용의 딜레마</a>
+  <ul>
+  <li><a href="#실습-1-1-멀티-암드-밴딧-탐색-전략-비교-시뮬레이션" id="toc-실습-1-1-멀티-암드-밴딧-탐색-전략-비교-시뮬레이션" class="nav-link" data-scroll-target="#실습-1-1-멀티-암드-밴딧-탐색-전략-비교-시뮬레이션">[실습 1-1] 멀티 암드 밴딧 탐색 전략 비교 시뮬레이션</a></li>
+  </ul></li>
+  <li><a href="#시간차-학습과-q-러닝의-순차적-의사결정" id="toc-시간차-학습과-q-러닝의-순차적-의사결정" class="nav-link" data-scroll-target="#시간차-학습과-q-러닝의-순차적-의사결정">1.3 시간차 학습과 Q-러닝의 순차적 의사결정</a>
+  <ul>
+  <li><a href="#실습-1-2-시간차-학습-도파민-신호-역전파-시뮬레이션" id="toc-실습-1-2-시간차-학습-도파민-신호-역전파-시뮬레이션" class="nav-link" data-scroll-target="#실습-1-2-시간차-학습-도파민-신호-역전파-시뮬레이션">[실습 1-2] 시간차 학습 도파민 신호 역전파 시뮬레이션</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#부-인지-제어와-갈등-모니터링" id="toc-부-인지-제어와-갈등-모니터링" class="nav-link" data-scroll-target="#부-인지-제어와-갈등-모니터링">2부: 인지 제어와 갈등 모니터링</a>
+  <ul>
+  <li><a href="#인지-제어와-전대상피질의-갈등-모니터링" id="toc-인지-제어와-전대상피질의-갈등-모니터링" class="nav-link" data-scroll-target="#인지-제어와-전대상피질의-갈등-모니터링">2.1 인지 제어와 전대상피질의 갈등 모니터링</a>
+  <ul>
+  <li><a href="#실습-2-1-스트룹-네트워크-갈등-에너지-계산-시뮬레이션" id="toc-실습-2-1-스트룹-네트워크-갈등-에너지-계산-시뮬레이션" class="nav-link" data-scroll-target="#실습-2-1-스트룹-네트워크-갈등-에너지-계산-시뮬레이션">[실습 2-1] 스트룹 네트워크 갈등 에너지 계산 시뮬레이션</a></li>
+  </ul></li>
+  <li><a href="#통제력-할당과-예측-오차의-융합" id="toc-통제력-할당과-예측-오차의-융합" class="nav-link" data-scroll-target="#통제력-할당과-예측-오차의-융합">2.2 통제력 할당과 예측 오차의 융합</a>
+  <ul>
+  <li><a href="#실습-2-2-evc-이론-기반-갈등-순응gratton-effect-시뮬레이션" id="toc-실습-2-2-evc-이론-기반-갈등-순응gratton-effect-시뮬레이션" class="nav-link" data-scroll-target="#실습-2-2-evc-이론-기반-갈등-순응gratton-effect-시뮬레이션">[실습 2-2] EVC 이론 기반 갈등 순응(Gratton effect) 시뮬레이션</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#주차-요약-및-다음-주-예고" id="toc-주차-요약-및-다음-주-예고" class="nav-link" data-scroll-target="#주차-요약-및-다음-주-예고">14주차 요약 및 다음 주 예고</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">계산주의 인지신경과학 14주차_강화학습과 인지 제어: 도파민 시스템과 갈등 모니터링</h1>
+<p class="subtitle lead">고려대학교 일반대학원 심리학과</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026년 6월 5일 금요일 4-5교시</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>[그림 1] 강화학습과 인지 제어의 통합 아키텍처 개관</strong> <img src="images/week14/Slide_001.png" class="img-fluid"></p>
+<section id="주차-수업-목표" class="level2">
+<h2 class="anchored" data-anchor-id="주차-수업-목표">14주차 수업 목표</h2>
+<ul>
+<li><strong>보상 예측 오차(reward prediction error, RPE)의 생물학적 메커니즘 이해:</strong> 중뇌 도파민 시스템이 어떻게 외부의 보상 자체를 학습하는 것이 아니라 예측과 실제의 차이를 수치화하여 학습을 주도하는지 이해함.</li>
+<li><strong>순차적 의사결정과 Q-러닝 구현:</strong> 한정된 정보 속에서 유기체가 탐색(exploration)과 활용(exploitation)의 딜레마를 어떻게 해결하는지 Q(quaility)-러닝 알고리즘을 통해 파이썬으로 직접 구현함.</li>
+<li><strong>갈등 모니터링과 인지 제어의 수치화:</strong> 본능적 습관과 현재 목표가 충돌할 때, 전대상피질(anterior cingulate cortex, ACC)이 갈등을 감지하고 배외측 전전두피질(dorsolateral prefrontal cortex, dlPFC)이 통제력을 할당하는 과정을 에너지 함수로 정량화함.</li>
+<li><strong>통제력의 기대 가치(expected value of control, EVC) 이론 체화:</strong> 뇌가 인지적 노력을 비용으로 인식하고, 보상 대비 최적의 통제 강도를 할당하여 그래튼 효과(Gratton effect)를 만들어내는 과정을 시뮬레이션함.</li>
+</ul>
+</section>
+<section id="부-강화학습과-가치-기반-의사결정" class="level2">
+<h2 class="anchored" data-anchor-id="부-강화학습과-가치-기반-의사결정">1부: 강화학습과 가치 기반 의사결정</h2>
+<section id="보상-예측-오차와-뇌의-학습-메커니즘" class="level3">
+<h3 class="anchored" data-anchor-id="보상-예측-오차와-뇌의-학습-메커니즘">1.1 보상 예측 오차와 뇌의 학습 메커니즘</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>유기체의 학습은 단순히 외부에서 보상이 주어졌을 때 수동적으로 일어나는 것이 아님. 계산주의 인지과학에 따르면 학습은 오직 ’기대했던 예측과 실제 결과 사이의 차이(surprise)’가 발생했을 때만 촉발됨.</li>
+<li><strong>볼프람 슐츠(Wolfram Schultz)의 원숭이 실험</strong>
+<ul>
+<li>실험 개요: 1997년 슐츠 연구팀이 원숭이에게 특정 단서(빛이나 소리)를 준 뒤 주스(보상)를 제공하며, 뇌 속 도파민 뉴런의 활성화 패턴을 측정한 신경과학 실험.</li>
+<li>실험의 3단계 핵심 결과
+<ul>
+<li>학습 전(예상치 못한 보상): 아무 단서 없이 갑자기 주스가 주어지면, 주스를 맛보는 ’보상 시점’에 도파민 뉴런이 강하게 발화함.</li>
+<li>학습 후(보상 예측의 형성): ‘단서 <span class="math inline">\(\rightarrow\)</span> 보상’ 패턴을 학습하고 나면, 정작 주스를 마실 때가 아니라 <strong>’최초 단서(conditional stimulus, CS)가 주어지는 시점’에 미리 도파민이 발화</strong>함. <span class="math inline">\(\Rightarrow\)</span> 가치의 역전파.</li>
+<li>보상 생략(부정적 예측 오차): 단서를 제시하여 도파민이 미리 분비되었는데 정작 기대했던 주스를 주지 않으면, 원래 보상이 주어졌어야 할 시점에 도파민 활성도가 기본치 이하로 급격히 뚝 떨어짐. <span class="math inline">\(\Rightarrow\)</span> 실망감의 수치화.</li>
+</ul></li>
+<li>인지과학적 의의
+<ul>
+<li>도파민이 단순히 ’기쁨’을 느끼게 하는 쾌락 물질이 아니라, 뇌가 환경을 학습할 때 “내 예측이 얼마나 빗나갔는가”를 계산하는 <strong>보상 예측 오차(reward prediction error, RPE)</strong> 신호 그 자체임을 생물학적으로 증명함.</li>
+<li>뇌의 중뇌 복측피개영역(ventral tegmental area, VTA)과 흑질(substantia nigra)에 밀집된 도파민 뉴런이 정확히 이 보상 예측 오차를 실시간으로 계산하여 대뇌피질 전체로 쏘아보내는 핵심 학습 신호 전달자임을 증명함.</li>
+</ul></li>
+</ul></li>
+<li>아무런 기대가 없는 상태에서 예상치 못한 긍정적 보상이 주어지면 도파민 발화가 급증(positive RPE)하여 해당 행동의 시냅스를 강화함. 반면, 빛이나 소리 같은 단서를 통해 보상을 이미 완벽히 예측했다면, 실제 보상이 주어지는 시점에는 도파민이 베이스라인을 유지하며 침묵함(이미 다 아는 정보이므로 추가 학습 불필요).</li>
+</ul></li>
+</ul>
+<p><strong>[그림 2] 중뇌 도파민 뉴런의 보상 예측 오차 발화 패턴을 보여주는 슐츠의 고전적 실험 데이터</strong> <img src="images/week14/Slide_002.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(RPE의 수학적 공식과 델타 규칙)</strong>
+<ul>
+<li>생물학적인 뇌의 도파민 RPE 신호는 인지심리학의 고전적 연합 학습 방정식인 ’레스콜라-와그너(Rescorla-Wagner) 모델’의 구조와 완벽하게 일치함.</li>
+<li><strong>레스콜라-와그너 모델</strong>
+<ul>
+<li>정의: 1972년 로버트 레스콜라(Robert Rescorla)와 앨런 와그너(Allan Wagner)가 제안한 동물 연합 학습(고전적 조건화)의 수학적 모델. 동물의 학습은 두 자극의 단순한 시간적 인접성에 의해 기계적으로 일어나는 것이 아니라, 결과에 대한 ’놀라움(surprise, 예측 오차)’이 발생했을 때만 촉발된다고 설명함.</li>
+<li>핵심 방정식: <span class="math inline">\(\Delta V = \alpha \beta (\lambda - \Sigma V)\)</span>
+<ul>
+<li><span class="math inline">\(\Delta V\)</span>: 특정 자극에 대한 연합 강도(예측 가치)의 변화량. <span class="math inline">\(\Rightarrow\)</span> 오늘 한 번의 경험(학습)을 통해 그 믿음이 어제보다 얼마나 더 커지거나 작아졌는가(변화량)?
+<ul>
+<li><span class="math inline">\(V\)</span>: Value(가치)의 이니셜. 뇌가 특정 단서(예: 종소리)에 부여한 ’주관적인 기대 가치’를 뜻함. <span class="math inline">\(\Rightarrow\)</span> 종소리(단서)를 들으면 고기(보상)가 나올 것이라는 뇌 속의 강력한 믿음.</li>
+<li>연합 강도: ‘단서(예: 종소리)’와 ’실제 보상(예: 고기)’ 사이의 끈끈한 연결 고리를 뜻함. <span class="math inline">\(\Rightarrow\)</span> 종소리를 들었을 때 뇌가 고기를 얼마나 강력하게 짝지어 떠올리는지, 그 두 기억 사이의 연결된 정도(연합[association]).</li>
+<li>예측 가치: 단서를 보고 ’곧 다가올 미래의 보상(예: 고기)이 얼마나 클지 혹은 주어질 확률이 얼마나 될지’를 미리 점치는 것. <span class="math inline">\(\Rightarrow\)</span> “이 종소리가 울렸으니, 3초 뒤에 맛있는 고기가 떨어질 것이다!”라고 뇌가 미리 계산해둔 기대치(예측치).</li>
+</ul></li>
+<li><span class="math inline">\(\alpha\)</span>
+<ul>
+<li>정의: 조건 자극(단서)의 두드러짐을 나타내는 학습률 파라미터.</li>
+<li>예: 시계의 째깍거리는 작은 소리(낮은 <span class="math inline">\(\alpha\)</span>) vs 눈앞에서 번쩍이는 천둥번개(높은 <span class="math inline">\(\alpha\)</span>).</li>
+</ul></li>
+<li><span class="math inline">\(\beta\)</span>
+<ul>
+<li>정의: 무조건 자극(보상)의 두드러짐을 나타내는 학습률 파라미터.</li>
+<li>예: 밍밍한 물 한 모금(낮은 <span class="math inline">\(\beta\)</span>) vs 입안이 얼얼할 정도로 달콤한 초콜릿(높은 <span class="math inline">\(\beta\)</span>).</li>
+</ul></li>
+<li>자극의 두드러짐과 학습률 간의 관계
+<ul>
+<li>뇌는 강렬하고 존재감이 큰 자극일수록 더 집중해서 빠르게 배움.</li>
+<li>느린 학습률: 자극들이 희미하면(<span class="math inline">\(\alpha, \beta\)</span>가 낮으면), 뇌는 “이게 중요한 건가?” 하고 시큰둥하게 반응하며 수십 번을 겪어봐야 겨우 조금 배움.</li>
+<li>빠른 학습률: 자극들이 강렬하면(<span class="math inline">\(\alpha, \beta\)</span>가 높으면), 뇌는 엄청난 임팩트를 받아 단 한 번의 경험만으로도 머릿속의 기대치(<span class="math inline">\(V\)</span>)를 대폭 업데이트함.</li>
+</ul></li>
+<li><span class="math inline">\(\lambda\)</span>: 환경으로부터 실제 주어진 보상의 최대 크기.</li>
+<li><span class="math inline">\(\Sigma V\)</span>: 현재 유기체가 머릿속으로 예측하고 있는 총 보상 기대치.</li>
+<li><span class="math inline">\((\lambda - \Sigma V)\)</span>: 실제 보상과 예측의 격차. <span class="math inline">\(\Rightarrow\)</span> <strong>예측 오차</strong>.</li>
+</ul></li>
+<li>주요 인지 현상(차단 효과): 이미 ’종소리’만으로 먹이를 100% 예측하게 된 개(<span class="math inline">\(\Sigma V = \lambda\)</span>, 오차가 0인 상태)에게 ’종소리+불빛’을 동시에 제시하며 먹이를 주어도, 개는 새로운 단서인 ’불빛’에 대해서는 학습(<span class="math inline">\(\Delta V\)</span>)을 하지 않음. 예측과 실제가 이미 일치하여 오차가 없으므로 뇌가 추가적인 연합을 맺을 이유가 없기 때문임.</li>
+<li>계산주의 인지신경과학적 의의: 1970년대 행동주의 심리학에서 순수하게 수학적으로 추론된 이 학습 방정식은, 훗날 슐츠가 발견한 중뇌 도파민 뉴런의 발화 메커니즘(RPE)과 생물학적으로 완벽하게 일치함이 증명됨.</li>
+</ul></li>
+<li><span class="math inline">\(RPE = R_t - V_t\)</span>: RPE는 현재 시점(<span class="math inline">\(t\)</span>)에서 실제 얻은 보상(<span class="math inline">\(R_t\)</span>)에서 현재 뇌가 머릿속으로 기대했던 가치(<span class="math inline">\(V_t\)</span>)를 뺀 수학적 차이로 정의됨.</li>
+<li><span class="math inline">\(V_{t+1} = V_t + \alpha \times RPE\)</span>
+<ul>
+<li>뇌가 다음번의 기대치(<span class="math inline">\(V_{t+1}\)</span>)를 정할 때, 오늘 예측이 빗나간 충격(RPE)을 바탕으로 기존에 갖고 있던 믿음(<span class="math inline">\(V_t\)</span>)을 수정하는 과정임.</li>
+<li>이때 오차를 무작정 100% 다 반영하여 곧바로 생각을 확 바꾸는 것이 아니라, 새로운 정보를 얼마나 유연하게 수용할지 결정하는 뇌의 고집 꺾기(학습률, <span class="math inline">\(\alpha\)</span>) 비율만큼만 반영하여 점진적으로 현실 감각을 업데이트함.</li>
+</ul></li>
+<li>이 델타 규칙 수식에 따르면, 오차가 양수(+)이면 다음번 행동의 가치가 증가하고, 오차가 음수(-)이면 가치가 하락함. 궁극적으로 예측과 실제가 완벽히 일치하여 오차가 0이 될 때(<span class="math inline">\(R_t = V_t\)</span>), 가중치 갱신(학습)이 종료되고 완벽한 습관이 형성됨.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 3] 긍정적/부정적 예측 오차 크기에 따른 시냅스 가중치(연결 강도) 변화율의 비선형 곡선</strong> <img src="images/week14/Slide_003.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유(명절 용돈과 도파민의 기대치 계산법)</strong>
+<ul>
+<li>명절에 친척 어른이 내게 용돈을 1만 원 주실 것으로 굳게 기대(<span class="math inline">\(V=10000\)</span>)하고 정성껏 세배를 했다고 가정함.</li>
+<li>만약 봉투에 5만 원이 들어있었다면(<span class="math inline">\(R=50000\)</span>), 뇌 속의 RPE는 +40000이 되어 도파민이 폭발적으로 분비됨(긍정적 놀라움). 이 강력한 신경화학적 쾌감은 “다음 명절에도 반드시 가장 먼저 달려가 이 어른께 세배를 해야겠다”는 강력한 ’행동 강화’를 유발함.</li>
+<li>반대로 봉투가 텅 비어 있었다면(<span class="math inline">\(R=0\)</span>), RPE는 -10000이 됨. 도파민 수치가 바닥을 치며 극심한 실망감과 불쾌감을 느끼고, “다음 명절에는 절대 세배를 하지 않겠다”는 ’행동 소거’가 발생함. 우리의 뇌는 이렇듯 철저히 주관적 기대치와의 격차(오차)를 수학적으로 계산하여 세상의 법칙을 업데이트하는 고도의 회계사와 같음.</li>
+</ul></li>
+</ul>
+</section>
+<section id="탐색과-활용의-딜레마" class="level3">
+<h3 class="anchored" data-anchor-id="탐색과-활용의-딜레마">1.2 탐색과 활용의 딜레마</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li>유기체가 불확실한 환경에서 최적의 의사결정을 내리기 위해서는 <strong>탐색(exploration)</strong>과 <strong>활용(exploitation)</strong> 사이의 본질적인 딜레마를 반드시 해결해야 함.</li>
+<li><strong>활용</strong>
+<ul>
+<li>Q 값(Q-value): 특정 상태(state)에서 특정 행동(action)을 선택했을 때 미래에 얻게 될 누적 보상의 총 기대치를 수치화한 값.</li>
+<li>현재까지의 학습 경험을 바탕으로 기대 가치(Q 값)가 가장 높다고 판단되는 행동을 선택하여 <strong>즉각적인 보상을 극대화</strong>하는 보수적 전략임.</li>
+</ul></li>
+<li><strong>탐색:</strong> 현재 최고라고 생각되지는 않지만, 정보가 부족한 대안을 의도적으로 시도하여 환경에 대한 새로운 지식을 습득하는 진취적 전략임.</li>
+<li>환경이 정적이지 않고 변화하거나 정보가 불완전할 때, 지나친 활용은 유기체를 ’지역 최적해(local optimum)’에 갇히게 만들고, 지나친 탐색은 이미 확보한 보상 획득의 기회를 무의미하게 낭비하게 만듦.</li>
+</ul></li>
+<li><strong>심화 해설(행동 선택 알고리즘의 수식화)</strong>
+<ul>
+<li>계산주의 인지 모델에서는 유기체가 이 딜레마를 어떻게 수학적으로 해결하는지 설명하기 위해 주로 두 가지 알고리즘을 사용함.</li>
+<li><strong><span class="math inline">\(\epsilon\)</span>-greedy(입실론-그리디) 전략</strong>
+<ul>
+<li>입실론(<span class="math inline">\(\epsilon\)</span>)
+<ul>
+<li>개념적 정의: <span class="math inline">\(\epsilon\)</span>은 유기체가 의사결정을 내릴 때, 과거의 경험(Q-value)을 전적으로 신뢰하지 않고 의도적으로 무작위 대안을 시도해보는 ’탐색 확률’을 의미함.</li>
+<li>수치적 의미: 0과 1 사이의 확률값을 가짐.
+<ul>
+<li><span class="math inline">\(\epsilon = 0\)</span>: 탐색 확률 0%. 오직 자신이 아는 최고 가치의 행동만 반복하는 극단적 ‘활용’ 상태. <span class="math inline">\(\Rightarrow\)</span> 인지적 경직성, 보수성.</li>
+<li><span class="math inline">\(\epsilon = 1\)</span>: 탐색 확률 100%. 과거의 학습을 전혀 참고하지 않고 매번 아무 대안이나 충동적으로 선택하는 상태. <span class="math inline">\(\Rightarrow\)</span> 극단적 산만함, 충동성.</li>
+<li><span class="math inline">\(\epsilon = 0.1\)</span>: 90%의 상황에서는 경험에 의존하여 최적의 선택을 하고, 10%의 여유를 두어 새로운 가능성을 찔러보는 상태. <span class="math inline">\(\Rightarrow\)</span> 일반적으로 환경 변화에 대처하는 가장 ‘적응적인’ 수치로 간주됨.</li>
+</ul></li>
+<li>인지과학적 비유(호기심의 정량화): 우리가 매일 점심을 먹을 때, 10번 중 9번은 실패 확률이 없는 검증된 단골 식당에 가지만(활용), 1번 정도는 맛이 없을 위험을 감수하더라도 새로 개업한 식당에 도전해보는(탐색) 인간의 ’적응적 호기심’을 컴퓨터 수식으로 치환한 것임.</li>
+</ul></li>
+<li>가장 직관적인 행동 선택 모델: 대부분의 상황(<span class="math inline">\(1-\epsilon\)</span>의 확률)에서는 과거의 경험을 전적으로 신뢰하여 Q 값이 가장 높은 행동을 선택(활용)하지만, 아주 작은 확률(<span class="math inline">\(\epsilon\)</span>)로 무작위 대안을 찔러봄(탐색).</li>
+</ul></li>
+<li><strong>softmax(소프트맥스) 전략</strong>
+<ul>
+<li>수식: <span class="math inline">\(P(a_i) = \frac{\exp(Q(a_i) / \tau)}{\sum_{j} \exp(Q(a_j) / \tau)}\)</span></li>
+<li><span class="math inline">\(\epsilon\)</span>-greedy의 무의미한 무작위 탐색이 가진 한계를 보완한 모델임.</li>
+<li>각 대안의 Q 값에 비례하여 선택 확률을 할당하므로, 차선책들 사이에서도 더 가치 있는 것을 우선적으로 탐색함. 여기서 매개변수 <span class="math inline">\(\tau\)</span>는 유기체의 탐색 성향을 통제함.</li>
+<li>타우(<span class="math inline">\(\tau\)</span>)
+<ul>
+<li><span class="math inline">\(\tau\)</span> = 무한대: 완전한 무작위 탐색(충동성)이 됨.</li>
+<li><span class="math inline">\(\tau\)</span> = 0: 철저한 활용(경직성) 상태가 됨.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><strong>비유(단골 식당과 신규 식당)</strong>
+<ul>
+<li>매일 점심시간마다 늘 가던 검증된 단골 식당(활용)에 갈 것인가, 아니면 맛이 없을지도 모르는 새로 개업한 식당(탐색)에 도전할 것인가의 문제와 완벽히 같음.</li>
+<li>만약 이 동네에 앞으로 10년을 더 살아야 한다면(충분한 시간적 여유 및 학습 기회), 초반에 맛없는 식사를 할 위험을 감수하더라도 다양한 식당을 탐색해두는 것이 장기적인 누적 만족도를 극대화하는 합리적 결정임.</li>
+</ul></li>
+</ul>
+<section id="실습-1-1-멀티-암드-밴딧-탐색-전략-비교-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-1-멀티-암드-밴딧-탐색-전략-비교-시뮬레이션">[실습 1-1] 멀티 암드 밴딧 탐색 전략 비교 시뮬레이션</h4>
+<ul>
+<li><strong>멀티 암드 밴딧과 Q-러닝의 결합</strong>
+<ul>
+<li><strong>멀티 암드 밴딧(multi-armed bandit, MAB) 문제</strong></li>
+<li><strong>정의:</strong> ’밴딧(bandit)’은 카지노의 슬롯머신을 뜻하며, ’멀티 암드(multi-armed)’는 손잡이가 여러 개 달려 있다는 의미.</li>
+<li><strong>인지적 함의:</strong> 유기체가 각기 다른(그리고 처음에는 전혀 모르는) 보상 확률을 가진 여러 대안 중에서, 어떤 것을 선택해야 장기적인 누적 보상을 극대화할 수 있는지 묻는 고전적인 ‘불확실성하의 의사결정’ 패러다임.</li>
+</ul></li>
+<li><strong>Q-러닝</strong>
+<ul>
+<li><strong>정의:</strong> 밴딧 문제의 해결책으로, 유기체가 각 손잡이(선택지)를 당겼을 때 얻을 수 있는 기대 가치(Q-value)를 학습해나가는 알고리즘.</li>
+<li><strong>과정:</strong> 머신을 당겨서 예상 외의 보상을 받으면 도파민이 분비되어(+RPE) 해당 선택지의 Q 값을 높이고, 예상과 달리 꽝이 나오면 도파민이 억제되어(-RPE) Q 값을 낮추는 델타 규칙의 직접적인 시뮬레이션.</li>
+</ul></li>
+<li><strong>탐색 전략</strong>
+<ul>
+<li><strong>정의</strong>
+<ul>
+<li>MAB 환경에서 활용과 탐색 사이에서 발생하는 갈등을 해결하는 규칙. <span class="math inline">\(\Rightarrow\)</span> 현재까지 학습된 Q 값이 가장 높은 기계만 계속 당길 것인가(<strong>활용</strong>), 아니면 더 좋은 기계가 있을지도 모르니 확률이 낮아 보이는 다른 기계를 당겨볼 것인가(<strong>탐색</strong>)?</li>
+<li>활용 vs 탐색
+<ul>
+<li>우물 안 개구리: ’활용’만 하면 당장의 수익은 확실하지만, 더 큰 대박(진짜 최적의 정답)을 영원히 놓칠 우려가 있음.</li>
+<li>극단적 충동성: ’탐색’만 하면 새로운 정보를 얻을 수는 있지만, 꽝을 뽑는 실패 비용이 누적되어 결국 생존(총 보상)에 실패함.</li>
+</ul></li>
+</ul></li>
+<li><strong>구현:</strong> 실습 코드에서는 <span class="math inline">\(\epsilon\)</span>이라는 탐색 확률 변수를 두어, 이 딜레마를 수학적으로 통제하고 유기체의 ’적응적 호기심’을 구현.</li>
+</ul></li>
+</ul>
+<div id="978508ec" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 1-1] 멀티 암드 밴딧 Q-러닝 및 탐색 전략 통합 시뮬레이션</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) 단일 피험자가 예측 오차(RPE)를 통해 가치를 학습하는 과정을 확인하고,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) 동시에 탐색률(epsilon)이 학습 성과에 미치는 영향을 시각적으로 비교함.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 배열 계산 및 행렬 연산을 지원하는 파이썬 표준 과학 라이브러리를 np라는 이름으로 불러옴.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 시뮬레이션 결과의 시각화(학습 곡선 그래프)를 위해 matplotlib.pyplot을 plt라는 이름으로 불러옴.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># [운영체제별 한글 폰트 자동 설정] </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 수강생들의 OS(윈도우 vs 맥)가 달라도 코드가 알아서 호환되도록 설정함.</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> platform</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> platform.system() <span class="op">==</span> <span class="st">'Windows'</span>:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    plt.rcParams[<span class="st">'font.family'</span>] <span class="op">=</span> <span class="st">'Malgun Gothic'</span>  <span class="co"># 윈도우 사용자</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> platform.system() <span class="op">==</span> <span class="st">'Darwin'</span>:</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    plt.rcParams[<span class="st">'font.family'</span>] <span class="op">=</span> <span class="st">'AppleGothic'</span>    <span class="co"># 맥 사용자</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    plt.rcParams[<span class="st">'font.family'</span>] <span class="op">=</span> <span class="st">'NanumGothic'</span>    <span class="co"># 리눅스 등 기타</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'axes.unicode_minus'</span>] <span class="op">=</span> <span class="va">False</span>         <span class="co"># 마이너스(-) 기호 깨짐 방지</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 시뮬레이션을 반복 실행하더라도 항상 동일한 난수 패턴이 나오도록 시드를 42로 고정함. </span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 이는 실험 결과의 완벽한 재현성을 확보하기 위함임.</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1. 인지 환경 및 하이퍼파라미터 설정 ---</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자가 두 슬롯머신 중 하나를 선택하는 시행(trial)의 총 횟수를 200회로 설정함.</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>n_trials <span class="op">=</span> <span class="dv">200</span>                 </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 학습률(alpha): 도파민 예측 오차(RPE)를 다음번 시냅스 가중치 갱신에 얼마나 반영할지 결정함(15%).</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="fl">0.15</span>                   </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 외부 환경의 객관적 법칙: 머신 0을 당기면 30%, 머신 1을 당기면 80% 확률로 보상(1)이 주어지도록 통제함.</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>true_probs <span class="op">=</span> [<span class="fl">0.3</span>, <span class="fl">0.8</span>]        </span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 세 명의 각기 다른 행동 탐색 성향을 가진 피험자의 탐색 확률(epsilon)을 딕셔너리로 정의함.</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>epsilons <span class="op">=</span> {</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Low (0.01)'</span>: <span class="fl">0.01</span>,   <span class="co"># 보수적 성향: 단 1%의 확률로만 낯선 대안을 탐색하고 기존 경험에 집착함.</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Optimal (0.1)'</span>: <span class="fl">0.1</span>, <span class="co"># 적응적 성향: 10%의 확률로 탐색하며 환경 불확실성에 유연하게 대처함.</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'High (0.5)'</span>: <span class="fl">0.5</span>     <span class="co"># 충동적 성향: 50%의 확률로 무작위 탐색을 남발하여 보상 획득 기회를 낭비함.</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># 각 피험자가 시간에 따라 최적 대안(머신 1)을 선택한 누적 비율을 저장할 빈 딕셔너리를 초기화함.</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>optimal_choice_rates <span class="op">=</span> {}</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 모든 200회 시행이 끝난 후 각 피험자가 머릿속에 형성한 최종 기대치(Q-value)를 보관할 딕셔너리임.</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>final_q_values <span class="op">=</span> {} </span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2. 피험자 성향별 Q-러닝 강화학습 루프 가동 ---</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co"># 앞서 정의한 3명의 피험자 조건에 대해 각각 독립적인 뇌 시뮬레이션을 반복 수행함.</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, epsilon <span class="kw">in</span> epsilons.items():</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 피험자의 뇌 속 초기 기대치: 머신 0과 머신 1에 대한 사전 경험이 없으므로 가치를 모두 0.5로 평등하게 초기화함.</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    Q_values <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>]) </span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 매 시행마다 피험자가 객관적 최적 대안(1)을 선택했는지, 오답(0)을 선택했는지 시간 순으로 기록할 빈 리스트임.</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    choices <span class="op">=</span> []</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 정해진 총 시행 횟수(200회)만큼 순차적인 의사결정-보상-학습의 루프를 반복함.</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [행동 선택 단계: 탐색 vs 활용]</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 0.0과 1.0 사이의 난수를 뽑아 피험자 고유의 탐색 확률(epsilon)과 비교하거나, </span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 혹은 뇌 속의 두 머신에 대한 기대치가 완전히 똑같을 경우 의도적인 탐색을 실행함.</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.random.rand() <span class="op">&lt;</span> epsilon <span class="kw">or</span> Q_values[<span class="dv">0</span>] <span class="op">==</span> Q_values[<span class="dv">1</span>]:</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 탐색: 과거의 Q 값을 완전히 무시하고 머신 0과 1 중 동전 던지기로 무작위 대안을 찔러봄.</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>            action <span class="op">=</span> np.random.choice([<span class="dv">0</span>, <span class="dv">1</span>]) </span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>            <span class="co"># 활용: 현재 뇌(Q_values)가 기억하는 가장 기대치가 높은(argmax) 머신을 확실하게 선택함.</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>            action <span class="op">=</span> np.argmax(Q_values)      </span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 에이전트가 이번 시행에서 선택한 행동(action)이 80%짜리 정답 머신인지 판별하여 1 또는 0으로 치환함.</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>        is_optimal <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> action <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 판별된 정답 여부를 choices 리스트의 맨 끝에 추가하여 행동 궤적을 누적함.</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>        choices.append(is_optimal)</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [환경의 피드백 및 도파민 RPE 계산 단계]</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 선택한 머신(action)의 실제 보상 확률(true_probs)을 바탕으로 가상의 당첨(1) 또는 꽝(0) 결과를 생성함.</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>        reward <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> np.random.rand() <span class="op">&lt;</span> true_probs[action] <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 보상 예측 오차(RPE): 외부에서 얻은 '실제 보상'에서 내가 머릿속으로 '기대했던 가치(Q)'를 뺀 순수 오차값임.</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>        rpe <span class="op">=</span> reward <span class="op">-</span> Q_values[action]</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [머릿속 기대치 수정: 델타 규칙 적용]</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 방금 한 행동으로 얻은 충격(오차)과 나의 유연성(학습률)을 바탕으로 해당 행동에 대한 기존의 믿음(Q-value)을 현실에 맞게 갱신함.</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>        Q_values[action] <span class="op">=</span> Q_values[action] <span class="op">+</span> (alpha <span class="op">*</span> rpe)</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 해당 피험자가 1회부터 200회까지 선택한 정답 누적 횟수(cumsum)를 현재 시행 횟수 배열로 나누어 이동 평균을 구함.</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>    cumulative_optimal_rate <span class="op">=</span> np.cumsum(choices) <span class="op">/</span> np.arange(<span class="dv">1</span>, n_trials <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 계산된 누적 정답률 배열을 피험자 이름(label)에 매핑하여 최종 딕셔너리에 저장함.</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>    optimal_choice_rates[label] <span class="op">=</span> cumulative_optimal_rate</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 200회의 훈련이 끝난 후, 뇌 속 신경망에 맺힌 최종 Q 값 배열을 복사(.copy())하여 저장함.</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>    final_q_values[label] <span class="op">=</span> Q_values.copy()</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 3. 결과 출력 및 시각화 ---</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="co"># [1.1 섹션 목표] 도파민 오차 신호가 유기체의 주관적 가치를 객관적 환경 확률에 맞게 수렴시켰는지 확인.</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Q-value 학습 결과 (가치 업데이트) ==="</span>)</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Optimal(0.1) 에이전트 최종 기대치 - Machine 0: </span><span class="sc">{</span>final_q_values[<span class="st">'Optimal (0.1)'</span>][<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">, Machine 1: </span><span class="sc">{</span>final_q_values[<span class="st">'Optimal (0.1)'</span>][<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 해석: 델타 규칙을 통해 각 머신의 실제 당첨 확률(0.3, 0.8)에 근접하게 기대치를 성공적으로 업데이트함.</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="co"># [1.2 섹션 목표] 탐색과 활용 딜레마를 시각화하기 위해 가로 10, 세로 6 크기의 도화지를 생성함.</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="co"># 3명의 에이전트가 보여준 누적 정답률 궤적을 꺾은선 그래프로 차례대로 그려냄.</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, rate <span class="kw">in</span> optimal_choice_rates.items():</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>    plt.plot(rate, label<span class="op">=</span><span class="ss">f'Epsilon = </span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="co"># 시각적 지침을 위해 완벽한 학습 상태인 정답률 100%(y=1.0) 위치에 붉은 점선을 추가함.</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>plt.axhline(y<span class="op">=</span><span class="fl">1.0</span>, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="co"># 그래프의 제목, x축 라벨, y축 라벨을 인지과학적 맥락에 맞게 부여함.</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'탐색률(epsilon)이 불확실성 환경에서의 학습 성과에 미치는 영향'</span>)</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'시행 횟수(Trials)'</span>)</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'최적 대안(Machine 1) 누적 선택 비율'</span>)</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a><span class="co"># y축의 상하단 범위를 0에서 1.05로 고정하여 여백을 확보함.</span></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>, <span class="fl">1.05</span>)</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="co"># 각 선이 어떤 탐색률 조건인지 구별할 수 있도록 범례를 활성화함.</span></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="co"># 데이터의 추세를 쉽게 파악할 수 있도록 배경에 연한 격자무늬를 추가하고 화면에 출력함.</span></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="co"># 그래프의 패턴이 가지는 인지과학적 의의를 텍스트로 요약 출력함.</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== 탐색 전략 비교 해석 ==="</span>)</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"- 탐색 부족(0.01): 초반에 운 좋게 당첨된 오답(머신 0)에 갇혀 지역 최적해에 빠질 위험이 큼."</span>)</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"- 탐색 과도(0.5): 최적 대안을 이미 찾았음에도 자꾸 불필요한 모험을 하느라 누적 보상이 지속적으로 누수됨."</span>)</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"- 적절한 탐색(0.1): 10%의 여유를 통해 가장 빠르고 안정적으로 환경을 파악하고 최적의 대안으로 수렴함."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== Q-value 학습 결과 (가치 업데이트) ===
+Optimal(0.1) 에이전트 최종 기대치 - Machine 0: 0.39, Machine 1: 0.69
+-&gt; 해석: 델타 규칙을 통해 각 머신의 실제 당첨 확률(0.3, 0.8)에 근접하게 기대치를 성공적으로 업데이트함.
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week14_2026_files/figure-html/cell-2-output-2.png" width="809" height="526" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== 탐색 전략 비교 해석 ===
+- 탐색 부족(0.01): 초반에 운 좋게 당첨된 오답(머신 0)에 갇혀 지역 최적해에 빠질 위험이 큼.
+- 탐색 과도(0.5): 최적 대안을 이미 찾았음에도 자꾸 불필요한 모험을 하느라 누적 보상이 지속적으로 누수됨.
+- 적절한 탐색(0.1): 10%의 여유를 통해 가장 빠르고 안정적으로 환경을 파악하고 최적의 대안으로 수렴함.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="시간차-학습과-q-러닝의-순차적-의사결정" class="level3">
+<h3 class="anchored" data-anchor-id="시간차-학습과-q-러닝의-순차적-의사결정">1.3 시간차 학습과 Q-러닝의 순차적 의사결정</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li><strong>순차적 의사결정(sequential decision making)의 딜레마:</strong> 파블로프의 개처럼 단일 자극에 즉각적인 보상이 주어지는 단순 환경과 달리, 현실의 유기체는 미로 탐색이나 장기적 인생 설계처럼 수많은 갈림길을 거쳐야만 지연된 최종 보상을 얻음. 이때 ’최종 보상에 기여한 과거의 연쇄적인 행동들을 어떻게 평가할 것인가’를 해결하기 위해 뇌가 진화시킨 계산 메커니즘이 시간차 학습(temporal difference learning)과 Q-러닝임.</li>
+<li><strong>시간차 학습과 순차적 가치 예측:</strong>
+<ul>
+<li>정의: 순차적 경로에서 ‘직전에 예상했던 가치’(예: 부산까지 4시간 소요된다는 네비게이션의 예측)와 ‘직접 한 스텝 전진한 뒤 업데이트한 남은 여정의 기대치’(예: 한 시간 이동한 뒤 부산에 도착하는 데 2시간 30분 걸린다는 네비게이터 예측 = 1 + 2.5 = 3시간 반 소요) 사이의 격차인 시간차 오차(TD error)(예: 4 - 3.5 = 30분 당겨짐)를 실시간으로 계산하는 알고리즘임.</li>
+<li>역할
+<ul>
+<li>순차적 시간 흐름에 따라 매 스텝마다 뇌에 도파민 신호를 발생시켜, 먼 미래의 보상 가치를 현재의 상태로 연쇄적으로 끌어오고(<strong>역전파</strong>) 다가올 미래를 지속적으로 예측하게 만듦.</li>
+<li>비유
+<ul>
+<li>먼 미래 보상의 역전파: 배달 앱에 익숙해지면 ’음식을 먹는 순간(최종 보상)’이 아닌 ’결제 버튼을 누르는 순간(현재 상태)’에 도파민이 분비됨. 40분 뒤의 보상 가치가 시간을 거슬러 현재로 당겨진 것임.</li>
+<li>매 스텝의 연쇄적 신호 발생: 결제 후 대기하는 동안 ‘조리 시작’, ‘배달 픽업’ 등 중간 알람(순차적 단서)이 울릴 때마다 뇌는 긍정적 예측 오차를 계산하여 작은 도파민을 연속적으로 분비함.</li>
+<li>지속적 미래 예측: 예정된 시간에 알람이 울리지 않으면 뇌는 즉시 부정적 예측 오차를 발생시키며 실망함. <span class="math inline">\(\Rightarrow\)</span> 뇌는 최종 보상을 수동적으로 기다리지 않고, 중간 단서들을 통해 보상 획득 여부를 끊임없이 예측하고 갱신함.</li>
+</ul></li>
+</ul></li>
+<li>의의
+<ul>
+<li>슐츠(Schultz)의 원숭이 실험에서 도파민 발화가 최종 보상 시점에서 초기 단서 시점(conditional stimulus, CS)으로 역전파되는 현상을 완벽히 설명하며, 뇌가 지연된 보상 문제를 해결하는 생물학적 기제를 수치화함.</li>
+<li>CS(조건자극)
+<ul>
+<li>개념적 의미: 원래는 생존이나 보상과 아무런 관련이 없던 중립적인 자극이었지만, 지속적인 학습(조건화)을 통해 <strong>’이제 곧 보상이 주어질 것’이라고 예측하게 만드는 사전 단서</strong>가 된 자극.</li>
+<li>예시
+<ul>
+<li>파블로프의 개: 개에게 고기(무조건 자극, US)를 주기 전에 울리는 <strong>종소리(CS)</strong>.</li>
+<li>슐츠의 원숭이 실험: 원숭이 입에 주스(보상)가 들어가기 전에 켜지는 <strong>불빛이나 모니터 화면(CS)</strong>.</li>
+<li>배달 앱: 음식이 도착하기 전, 우리가 누르는 <strong>결제 완료 버튼이나 알람 소리(CS)</strong>.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><strong>시간차 오차(TD Error)</strong>
+<ul>
+<li>개념적 정의: 실제 한 스텝을 경험한 후 얻은 ‘새로운 정보(즉각적 보상 + 남은 여정의 기대치)’와 ’행동하기 전에 뇌가 미리 계산했던 기존 예측치’ 간의 격차임.</li>
+<li>수학적 표현: <span class="math inline">\((R_{t+1} + \gamma V(S_{t+1})) - V(S_t)\)</span></li>
+<li>신경과학적 의미: 중뇌 복측피개영역(VTA)의 도파민 뉴런이 뿜어내는 <strong>보상 예측 오차</strong> 신호와 수학적으로 완전히 동일함.</li>
+<li>인지적 해석(놀라움의 수치화): 뇌가 세상을 학습하게 만드는 원동력임.</li>
+<li>TD Error = 0: 예측과 현실이 완벽히 일치함 <span class="math inline">\(\Rightarrow\)</span> 더 이상 새롭게 학습할 것이 없는 평온한 상태.</li>
+<li>TD Error &gt; 0 (양수): 현실이 기대보다 더 좋음 <span class="math inline">\(\Rightarrow\)</span> 긍정적 놀라움, 도파민 분비 증가 <span class="math inline">\(\rightarrow\)</span> 방금 한 행동의 가치를 상향 업데이트.</li>
+<li>TD Error &lt; 0 (음수): 현실이 기대에 미치지 못함 <span class="math inline">\(\Rightarrow\)</span> 실망감, 도파민 분비 기본치 이하로 감소 <span class="math inline">\(\rightarrow\)</span> 방금 한 행동의 가치를 하향 업데이트.</li>
+</ul></li>
+<li><strong>Q-러닝과 순차적 행동 선택:</strong>
+<ul>
+<li>정의: 시간차 학습 원리를 기반으로 하되, 현재의 상태(<span class="math inline">\(s\)</span>)에서 특정 행동(<span class="math inline">\(a\)</span>)을 선택했을 때 최종 목적지에 도달할 때까지 앞으로 얻게 될 모든 보상의 총합(최종 보상뿐만 아니라 이동 과정의 비용과 중간 이득까지 모두 정산한 누적 기대 가치, <span class="math inline">\(Q\)</span>)을 미리 계산하고 학습하는 의사결정 모델임.</li>
+<li>예시: 현재 교차로(<span class="math inline">\(s\)</span>)에서 ’좌회전’이라는 단 하나의 행동(<span class="math inline">\(a\)</span>)을 함. <span class="math inline">\(\rightarrow\)</span> 이 행동 직후에 당장 뚝 떨어지는 즉각적 보상은 없음. 오히려 기름값(-1)만 들었음. <span class="math inline">\(\rightarrow\)</span> 하지만 좌회전을 했기 때문에 ’고속도로 진입로’라는 새로운 상태에 놓이게 됨. <span class="math inline">\(\rightarrow\)</span> 거기서 ’직진’이라는 다음 행동을 할 수 있게 됨. <span class="math inline">\(\rightarrow\)</span> 결국 최종 목적지인 ’부산 도착(+100)’이라는 최종 보상에 도달함.</li>
+<li>역할: 수많은 선택지가 꼬리를 무는 순차적 환경에서, 유기체가 매 갈림길마다 다음 단계의 연쇄적 결과까지 모두 고려하여 목표 도달을 위한 전체 경로를 최적으로 완성할 수 있는 행동 기준을 제공함.</li>
+<li>의의: 불확실한 세상에서 유기체가 눈앞의 이익에 매몰되는 근시안적인 선택을 피하고, 장기적인 순차적 계획을 이성적 행동으로 옮길 수 있는 뇌의 계산 원리를 규명함.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 4] 의사결정자와 불확실한 인지 환경 간의 상태-행동(state-action) 상호작용 루프</strong> <img src="images/week14/Slide_004.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(가치 갱신 수식과 순차적 연결 고리)</strong>
+<ul>
+<li><strong>순차적 가치 갱신의 통합 수식</strong>
+<ul>
+<li>순차적 의사결정 상황에서 시간차 학습과 Q-러닝 알고리즘이 결합하여 기대 가치를 업데이트하는 과정은 마르코프 결정 과정의 벨만 방정식(Bellman equation)을 기초로 함.</li>
+<li>벨만 방정식: <span class="math inline">\(Q(s, a) \leftarrow Q(s, a) + \alpha [R_{t+1} + \gamma \max Q(s_{t+1}, a') - Q(s, a)]\)</span></li>
+</ul></li>
+<li><strong>TD 메커니즘(시간차 오차와 순차적 할인)</strong>
+<ul>
+<li>수식의 대괄호 <span class="math inline">\([ \dots ]\)</span> 안의 연산: 중뇌 도파민 뉴런이 쏘아 보내는 도파민 신호(TD error)임.</li>
+<li>할인율(감마, <span class="math inline">\(\gamma\)</span>): 순차적 단계가 길어질수록 미래의 지연된 보상을 현재 가치로 환산할 때의 감소율을 의미함. 이 값이 1에 가까울수록 긴 순차적 단계를 인내하는 장기적 안목을 대변함.</li>
+</ul></li>
+<li><strong>Q-러닝 메커니즘(순차적 궤적의 독립적 평가)</strong>
+<ul>
+<li><span class="math inline">\(\max Q(s_{t+1}, a')\)</span>
+<ul>
+<li>기호별 의미 풀이
+<ul>
+<li><span class="math inline">\(s_{t+1}\)</span>: 현재 행동을 취한 결과로 내가 도달하게 될 ‘다음 상태(예: 다음 교차로)’.</li>
+<li><span class="math inline">\(a'\)</span>: 그 다음 상태에서 내가 선택할 수 있는 ‘모든 후보 행동들(예: 직진, 좌회전, 우회전 등)’.</li>
+<li><span class="math inline">\(Q\)</span>(Q-value): 해당 행동을 했을 때 예상되는 ‘누적 보상 가치(예: 최종 목적지까지의 이익 <span class="math inline">\(\Rightarrow\)</span> )’.</li>
+<li><span class="math inline">\(\max\)</span>(maximum): 후보들 중에서 가장 값이 큰 것, 즉 ‘최선의 선택’.</li>
+</ul></li>
+<li>수식의 해석
+<ul>
+<li>다음 상태(<span class="math inline">\(s_{t+1}\)</span>)에 도달했을 때, 내가 취할 수 있는 여러 행동(<span class="math inline">\(a'\)</span>)들 중 가장 최고의 누적 보상(<span class="math inline">\(Q\)</span>)을 가져다줄 최선의 선택(<span class="math inline">\(\max\)</span>).</li>
+<li>순차적 의사결정의 핵심 고리. 이는 현재 나의 행동이 ’다음 상태에서 취할 최선의 순차적 행동’과 수학적으로 연결되어 있음을 의미함.</li>
+</ul></li>
+</ul></li>
+<li>유기체가 도중에 충동적 실수를 하거나 호기심에 엉뚱한 경로로 이탈(탐색)했더라도, 뇌 신경망은 오직 다음 상태의 ’최선의 행동(<span class="math inline">\(\max\)</span>)’만을 잣대로 삼음. 이를 통해 중간에 실수하더라도 최종 목적지로 향하는 전체 순차적 궤적의 최적성을 유지함.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 5] 벨만 방정식 기반의 시간차 가치 백업 다이아그램</strong> <img src="images/week14/Slide_005.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유 (장거리 자동차 여행과 순차적 의사결정)</strong>
+<ul>
+<li><strong>순차적 의사결정의 맥락:</strong> 서울에서 출발하여 여러 교차로(상태)에서 연속적으로 진로를 선택(행동)하며 최종 목적지인 부산(최종 보상)까지 가야 하는 장거리 자동차 여행과 같음.</li>
+<li><strong>TD 학습의 비유(순차적 소요 시간의 실시간 예측):</strong> 부산에 도착해서야 전체 운전을 평가하는 것이 아님. 대전 교차로를 통과할 때, ’출발 전 예상했던 남은 시간’과 ’대전에서 새로 갱신된 남은 시간’의 차이(시간차 오차)를 계산하여, 다음 순차적 단계로 넘어가기 전에 예상 소요 시간을 즉각 수정하는 원리임.</li>
+<li><strong>Q-러닝의 비유(순차적 경로의 이성적 재탐색):</strong> 대구 근처에서 호기심에 엉뚱한 국도로 빠져 정체를 겪었더라도 “이번 전체 여행은 망했다”고 자포자기하지 않음. 머릿속 판단 장치는 “현재 놓인 이 국도에서 취할 수 있는 수많은 순차적 행동 중, 다음 교차로에서 다시 고속도로로 복귀하는 것(<span class="math inline">\(\max Q\)</span>)이 남은 여정을 위한 최선이다”라고 계산함. <span class="math inline">\(\Rightarrow\)</span> 매 순간의 선택이 최종 목적지까지의 전체 경로와 어떻게 연결되는지 이성적으로 평가하는 <strong>내비게이션의 경로 재탐색 시스템</strong>과 같음.</li>
+</ul></li>
+</ul>
+<section id="실습-1-2-시간차-학습-도파민-신호-역전파-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-1-2-시간차-학습-도파민-신호-역전파-시뮬레이션">[실습 1-2] 시간차 학습 도파민 신호 역전파 시뮬레이션</h4>
+<div id="a4148f5b" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 1-2] 시간차 오차를 통한 도파민 신호의 역전파 시뮬레이션</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 슐츠의 원숭이 실험을 모사하여, 학습이 진행될수록 도파민 발화(오차)가 </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 보상 시점에서 최초 단서 시점으로 앞당겨지는 역전파 현상을 구현함.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 배열 연산을 위해 numpy 라이브러리를 불러옴.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 실행할 때마다 결과가 달라지지 않도록 난수 시드를 42로 고정함.</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1. 시간 축 및 시간차 학습 파라미터 셋업 ---</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 단일 시행 내에 존재하는 시간의 흐름을 10단계(t=0부터 t=9까지)로 쪼개어 정의함.</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>n_time_steps <span class="op">=</span> <span class="dv">10</span>         </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자가 단서-보상 환경 규칙을 반복해서 경험할 총 에피소드 횟수를 50회로 설정함.</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>n_episodes <span class="op">=</span> <span class="dv">50</span>           </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># TD 학습률: 계산된 시간차 오차(TD error)를 미래 가치 예측을 갱신하는 데 20% 속도로 반영함.</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>alpha_td <span class="op">=</span> <span class="fl">0.2</span>            </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 할인율(gamma): 1스텝 뒤의 미래 가치를 현재 시점으로 끌어올 때, 가치를 90%만 남기고 10% 삭감함(시간 지연 비용).</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>gamma <span class="op">=</span> <span class="fl">0.9</span>               </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자가 특정 시간 스텝(t)에 도달했을 때 마음속으로 기대하는 미래 가치(V)를 담을 1차원 배열.</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 아직 환경을 전혀 경험하지 않았으므로 모든 스텝의 기대 가치를 0.0으로 초기화함.</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> np.zeros(n_time_steps) </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 실험 환경 셋업: 종소리와 같은 조건 자극(CS)은 2번 스텝에 등장함.</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>cs_time <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 무조건 자극인 실제 보상(먹이 등)은 조건 자극보다 5스텝 뒤인 7번 스텝에 비로소 주어짐.</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>reward_time <span class="op">=</span> <span class="dv">7</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 매 에피소드마다, 그리고 매 시간 스텝마다 발생한 TD 오차(도파민 분비량)의 변화 과정을 </span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 고스란히 기록하기 위해 행(episode) 50 x 열(time) 10 크기의 0으로 채워진 2차원 매트릭스를 생성함.</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>td_errors_history <span class="op">=</span> np.zeros((n_episodes, n_time_steps))</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2. 시간차(TD) 학습 에피소드 반복 루프 ---</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 50번의 에피소드를 순차적으로 반복하며 유기체의 학습 과정을 시뮬레이션함.</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> episode <span class="kw">in</span> <span class="bu">range</span>(n_episodes):</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 매 에피소드 내에서, t=0부터 t=8(끝에서 두 번째) 스텝까지 시간의 흐름을 한 칸씩 전진함.</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(n_time_steps <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 외부 환경으로부터 주어지는 실제 보상값(r)을 결정함.</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 오직 reward_time(t=7)에 도달했을 때만 1.0의 보상이 떨어지고, 그 외의 모든 잉여 시간엔 0.0임.</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> <span class="fl">1.0</span> <span class="cf">if</span> t <span class="op">==</span> reward_time <span class="cf">else</span> <span class="fl">0.0</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [핵심 로직: 시간차 오차 계산]</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>        <span class="co"># (현재 얻은 보상 + 0.9 * 1스텝 뒤 미래에 대한 기대치) - (현재 내가 품고 있던 기대치)</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 이 수식이 바로 뇌가 '미래의 예측치'를 담보로 '현재의 예측치'를 교정하는 벨만 방정식의 오차항임.</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>        td_error <span class="op">=</span> r <span class="op">+</span> gamma <span class="op">*</span> V[t<span class="op">+</span><span class="dv">1</span>] <span class="op">-</span> V[t]</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 단서가 등장(t=2)하기 전인 t=0, t=1 구간은 정보가 없으므로 가중치 업데이트를 생략하고,</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 단서가 등장한 시점(cs_time) 이후부터만 델타 규칙을 사용하여 해당 스텝의 기대 가치(V[t])를 상향시킴.</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> t <span class="op">&gt;=</span> cs_time:</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>            V[t] <span class="op">=</span> V[t] <span class="op">+</span> alpha_td <span class="op">*</span> td_error</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 뇌 신경망이 업데이트되는 과정에서 발생한 도파민의 흥분량(td_error)을 역사 기록장 배열에 저장함.</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>        td_errors_history[episode, t] <span class="op">=</span> td_error</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 3. 결과 역전파 해석 출력 ---</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="co"># 아무것도 모르던 학습 첫 번째 날(episode 0), 먹이가 주어지는 순간(t=7)에 터져나온 도파민 폭발량 추출.</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>error_early <span class="op">=</span> td_errors_history[<span class="dv">0</span>, reward_time]</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="co"># 50번의 학습으로 빠삭해진 마지막 날(episode 49), 먹이 없이 종소리 단서만 울린 순간(t=2)의 도파민 폭발량 추출.</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>error_late <span class="op">=</span> td_errors_history[<span class="dv">49</span>, cs_time]</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="co"># 추출한 도파민 오차 신호의 변화를 소수점 둘째 자리까지 콘솔에 출력함.</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"학습 초기(Trial 1) 보상 시점(t=7)의 시간차 오차: </span><span class="sc">{</span>error_early<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"학습 후기(Trial 50) 단서 시점(t=2)의 시간차 오차: </span><span class="sc">{</span>error_late<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-&gt; 해석: 학습이 고도화됨에 따라 도파민 신호(오차)가 보상 시점에서 단서 시점으로 완벽히 시간을 거슬러올라가 역전파됨을 증명함."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>학습 초기(Trial 1) 보상 시점(t=7)의 시간차 오차: 1.00
+학습 후기(Trial 50) 단서 시점(t=2)의 시간차 오차: 0.02
+-&gt; 해석: 학습이 고도화됨에 따라 도파민 신호(오차)가 보상 시점에서 단서 시점으로 완벽히 시간을 거슬러올라가 역전파됨을 증명함.</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="부-인지-제어와-갈등-모니터링" class="level2">
+<h2 class="anchored" data-anchor-id="부-인지-제어와-갈등-모니터링">2부: 인지 제어와 갈등 모니터링</h2>
+<section id="인지-제어와-전대상피질의-갈등-모니터링" class="level3">
+<h3 class="anchored" data-anchor-id="인지-제어와-전대상피질의-갈등-모니터링">2.1 인지 제어와 전대상피질의 갈등 모니터링</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li><strong>인지 제어(cognitive control):</strong> 일상생활에서 우리는 종종 강화학습을 통해 단단하게 굳어진 ’자동화된 습관’이 현재의 목표와 강력하게 충돌하는 상황을 마주함. 이때 본능적인 반응을 억제하고 목표 지향적인 주의를 재할당하는 능력을 인지 제어라고 함.</li>
+<li><strong>갈등 모니터링 이론:</strong> 매튜 보트비닉(Matthew Botvinick)과 조너선 코헨(Jonathan Cohen)이 제안한 ’갈등 모니터링 이론(conflict monitoring theory)’에 따르면, 이 복잡한 억제와 통제 과정은 뇌의 두 부위가 철저히 분업하여 수행함.
+<ul>
+<li>전대상피질(ACC, anterior cingulate cortex): 뇌 내부의 반응 회로에서 서로 모순되는 정보나 행동 계획이 충돌하는 상황을 실시간으로 감지하는 ‘감시자(알람)’ 역할을 수행함.</li>
+<li>배외측 전전두피질(dlPFC, dorsolateral prefrontal cortex): ACC의 강력한 갈등 알람 신호를 전달받아, 목표와 무관한 방해 자극을 억제하고 목표 관련 자극의 활성화를 증폭시키는 하향식 통제(top-down control)를 전격 집행함.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>[그림 6] 뇌의 갈등 모니터링 시스템: 전대상피질(ACC)과 전전두피질(PFC)의 해부학적 상호작용 회로도</strong> <img src="images/week14/Slide_006.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(갈등 에너지의 수학적 정량화와 인공신경망)</strong>
+<ul>
+<li>계산주의 인지 모델(connectionist model)에서 ’갈등’은 단순히 철학적이고 추상적인 심리 상태가 아님. 이는 네트워크 내의 수치적 ’에너지 상태’로 명확하게 정량화됨.</li>
+<li><strong>보트비닉(Botvinick)의 인지 갈등 모델</strong>
+<ul>
+<li>수식: <span class="math inline">\(C = \sum_{i \neq j} a_i \times a_j\)</span>. 두 개의 반응 노드일 경우 단순하게 <span class="math inline">\(C = a_1 \times a_2\)</span> 로 표현됨.</li>
+<li>설명: 반응층(response layer)에 있는 두 개의 양립할 수 없는 노드(예: 스트룹 검사에서의 ‘빨강’ 반응 노드 vs ‘초록’ 반응 노드)의 활성화 값을 각각 <span class="math inline">\(a_1\)</span>, <span class="math inline">\(a_2\)</span>라고 할 때, 홉필드 네트워크(Hopfield network)의 에너지 함수 개념을 차용하여 갈등 에너지 <span class="math inline">\(C\)</span>를 두 노드의 활성화 값의 곱연산으로 정의함.</li>
+<li>핵심 용어의 이해
+<ul>
+<li>반응층: 뇌가 시각 정보를 처리한 후 최종적으로 ‘어떤 행동을 할지’ 결정하는 <strong>출력 담당 부서</strong>임(예: 스트룹 검사에서 ‘빨강이라고 말하기’ 버튼과 ‘초록이라고 말하기’ 버튼이 놓여 있는 뇌의 영역).</li>
+<li>홉필드 네트워크와 에너지 함수: 물리학에서 공이 험준한 산꼭대기(높은 에너지, 불안정)에서 평온한 골짜기(낮은 에너지, 안정)로 굴러가려는 성질을 뇌 신경망에 빗댄 개념임. 뇌는 기본적으로 갈등이 없는 ‘낮은 에너지(평온)’ 상태를 원함.</li>
+</ul></li>
+<li>상세 설명 및 비유(왜 하필 곱셈인가?)
+<ul>
+<li>보트비닉은 뇌 안에서 두 개의 양립할 수 없는 행동 지시(예: “빨강을 외쳐라!” vs “초록을 외쳐라!”)가 동시에 팽팽하게 맞설 때 뇌가 받는 스트레스(갈등 에너지, <span class="math inline">\(C\)</span>)를 두 활성화 값(<span class="math inline">\(a_1, a_2\)</span>)의 <strong>곱연산</strong>으로 정의함.</li>
+<li>갈등이 없는 상태: 정답이 명확해서 한쪽 노드만 강하게 활성화(0.9)되고 다른 쪽은 잠잠(0.1)하다면, 두 값의 곱은 0.09로 낮음. <span class="math inline">\(\Rightarrow\)</span> 에너지 안정.</li>
+<li>극심한 갈등 상태: 글자 색상과 의미가 달라서 두 노드가 모두 “내가 정답이다!”라며 팽팽하게 활성화(0.9, 0.9)된다면, 두 값의 곱은 0.81로 치솟음. <span class="math inline">\(\Rightarrow\)</span> 갈등 에너지 폭발.</li>
+<li>이 단순한 곱셈 수식이 인간이 딜레마 상황에서 겪는 인지적 부하를 컴퓨터 수식으로 치환해낸 것임.</li>
+</ul></li>
+</ul></li>
+<li>스트룹 일치 조건에서 정답 노드 하나만 강하게 활성화(1.0과 0.0)되면 갈등 수치는 완벽한 0(<span class="math inline">\(1 \times 0 = 0\)</span>)임. 하지만 스트룹 불일치 조건에서 자동화된 경로와 목표 경로가 서로 정답이라고 강력하게 우기며 동시에 활성화(예: 0.8과 0.8)되면 갈등 에너지가 치솟게 됨(<span class="math inline">\(0.8 \times 0.8 = 0.64\)</span>). ACC는 정확히 이 수치의 크기에 비례하여 강하게 흥분 발화함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 7] 스트룹 과제에서의 반응 노드 활성화 궤적 및 갈등 에너지 비교</strong> <img src="images/week14/Slide_007.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유(연기 감지 센서와 소방 스프링클러 시스템)</strong>
+<ul>
+<li>뇌의 ACC는 건물 천장 곳곳에 달려 있는 무의식적인 ’연기 감지기’와 완벽히 동일함. 이 감지기 스스로는 불을 끌 물리적 능력이 전혀 없지만, 뇌 회로에 짙은 매연(갈등 에너지)이 감지되면 중앙 통제 본부에 맹렬하게 사이렌을 울려댐.</li>
+<li>뇌의 PFC는 이 긴급한 사이렌 소리를 듣고 즉각 출동을 지시하는 ‘소방 지휘 본부 및 스프링클러’ 시스템임. 사이렌 소리가 클수록(간섭이 심할수록) PFC는 더 많은 수압(인지적 자원 및 주의 통제력)을 현장에 할당하여 엉뚱하게 타오르는 불길(방해 자극)을 억눌러 진압하고, 올바른 대피로(정확한 과제 수행 반응)를 열어주는 역할을 함.</li>
+</ul></li>
+</ul>
+<section id="실습-2-1-스트룹-네트워크-갈등-에너지-계산-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-1-스트룹-네트워크-갈등-에너지-계산-시뮬레이션">[실습 2-1] 스트룹 네트워크 갈등 에너지 계산 시뮬레이션</h4>
+<div id="888d57f0" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [실습 2-1] 스트룹 과제 조건별 갈등 에너지 정량화</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 보트비닉의 에너지 함수(C = a1 * a2)를 사용하여, 일치/불일치 </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 조건에서 반응 노드 간의 신경학적 갈등 에너지가 어떻게 치솟는지 증명함.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 수치 계산을 위해 numpy 라이브러리를 임포트함.</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자의 머릿속 두 반응 노드('빨강'이라 말하기 vs '파랑'이라 말하기) 활성화 상태를 인공적으로 가정함.</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 사람의 뇌는 선천적으로 '단어 읽기' 경로가 '색상 명명' 경로보다 자동화되어 훨씬 강하게 활성화됨을 전제함.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># --- [조건 1: 일치 조건(Congruent)] 빨간색 잉크로 쓰인 '빨강' 단어를 볼 때 ---</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 읽기 습관과 과제 규칙(색상)이 모두 '빨강'을 가리키므로 정답 노드(빨강)가 95% 수준으로 강력하게 활성화됨.</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>a_red_congruent <span class="op">=</span> <span class="fl">0.95</span>   </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 정답과 무관한 오답 노드(파랑)는 처리 경로상 연관성이 없어 5% 수준의 베이스라인 활성화에 머묾.</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>a_blue_congruent <span class="op">=</span> <span class="fl">0.05</span>  </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --- [조건 2: 불일치 조건(Incongruent)] 파란색 잉크로 쓰인 '빨강' 단어를 볼 때 ---</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 과제 규칙인 색상 명명(파랑)을 따르기 위해 전전두피질이 노력하여 정답(파랑) 노드를 60% 수준으로 억지 활성화함.</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>a_blue_incongruent <span class="op">=</span> <span class="fl">0.60</span> </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 하지만 뇌의 무의식적이고 강력한 읽기 자동화 습관이 방해하여, 오답 노드('빨강' 단어)가 무려 85%나 강하게 점화됨.</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>a_red_incongruent <span class="op">=</span> <span class="fl">0.85</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 전대상피질(ACC)이 뇌 네트워크 전체에서 감지하는 갈등 에너지를 계산하는 함수를 정의함.</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 연결주의 모델의 홉필드 에너지 함수에 기반하여, 양립 불가능한 두 노드 활성화 값의 단순 곱연산으로 정의됨.</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_conflict(node1, node2):</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> node1 <span class="op">*</span> node2</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 일치 조건에서 두 노드 간 발생하는 상호 마찰(갈등 에너지) 수치를 계산함.</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>conflict_c <span class="op">=</span> calculate_conflict(a_red_congruent, a_blue_congruent)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 불일치 조건에서 팽팽하게 맞서는 두 노드 간의 상호 마찰(갈등 에너지) 수치를 계산함.</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>conflict_i <span class="op">=</span> calculate_conflict(a_red_incongruent, a_blue_incongruent)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 계산된 인지적 매연(갈등) 수치를 비교 출력함.</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== 반응 노드 갈등 에너지 분석 ==="</span>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"일치 조건(Congruent)의 갈등 에너지: </span><span class="sc">{</span>conflict_c<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"불일치 조건(Incongruent)의 갈등 에너지: </span><span class="sc">{</span>conflict_i<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">40</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 해석: 불일치 조건에서 두 노드가 동시에 높은 값(0.60과 0.85)으로 팽팽하게 맞서면서, 갈등 에너지가 약 </span><span class="sc">{</span>conflict_i<span class="op">/</span>conflict_c<span class="sc">:.1f}</span><span class="ss">배 폭증함을 수치로 확인함."</span>)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; ACC는 이 </span><span class="sc">{</span>conflict_i<span class="sc">:.4f}</span><span class="ss">이라는 강렬한 수학적 매연(갈등)을 감지하여 전전두피질(PFC)에 통제력 상승 사이렌을 송출하게 됨."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== 반응 노드 갈등 에너지 분석 ===
+일치 조건(Congruent)의 갈등 에너지: 0.0475
+불일치 조건(Incongruent)의 갈등 에너지: 0.5100
+----------------------------------------
+-&gt; 해석: 불일치 조건에서 두 노드가 동시에 높은 값(0.60과 0.85)으로 팽팽하게 맞서면서, 갈등 에너지가 약 10.7배 폭증함을 수치로 확인함.
+-&gt; ACC는 이 0.5100이라는 강렬한 수학적 매연(갈등)을 감지하여 전전두피질(PFC)에 통제력 상승 사이렌을 송출하게 됨.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="통제력-할당과-예측-오차의-융합" class="level3">
+<h3 class="anchored" data-anchor-id="통제력-할당과-예측-오차의-융합">2.2 통제력 할당과 예측 오차의 융합</h3>
+<ul>
+<li><strong>이론적 설명</strong>
+<ul>
+<li><strong>그래튼 효과(Gratton effect):</strong> 인간의 인지 제어는 아침에 한 번 설정되면 하루 종일 고정된 상태로 유지되는 시스템이 아님. <strong>직전 시행의 환경적 경험</strong>에 따라 역동적이고 유연하게 그 강도가 실시간으로 자동 조절됨. 행동심리학에서는 이를 <strong>갈등 순응 효과(conflict adaptation effect)</strong> 또는 발견자의 이름을 따 그래튼 효과라고 부름.</li>
+<li>실험에서 직전 시행(trial <span class="math inline">\(t-1\)</span>)에 불일치 자극을 만나 강한 갈등을 경험하며 쩔쩔맸다면, 우리의 뇌(PFC)는 “현재 내가 처한 환경이 꽤나 까다롭고 방해가 많다”고 판단하여 전반적인 주의 통제력을 일시적으로 확 끌어올림.</li>
+<li>그 결과, 바로 다음 시행(trial <span class="math inline">\(t\)</span>)에서는 억제 기제가 이미 예열되어 팽팽하게 활성화되어 있기 때문에, 동일한 불일치 자극이 또 연달아 나오더라도 간섭 효과가 현저히 줄어들고 반응 속도의 지연이 훌륭하게 방어되는 현상이 발생함.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 8] 인지 제어의 작동 원리를 묘사한 화재 감지기(ACC)와 소방 지휘 본부(PFC) 시스템 비유도</strong> <img src="images/week14/Slide_008.png" class="img-fluid"></p>
+<ul>
+<li><strong>심화 해설(인지 제어의 기대 가치)</strong>
+<ul>
+<li>아미타이 셰나브(Amitai Shenhav)와 보트비닉 등은 1부에서 배운 미래 가치 기반 강화학습과 2부의 인지 제어를 하나로 융합한 <strong>인지 제어의 기대 가치(expected value of control, EVC)</strong> 이론을 제안함.</li>
+<li>뇌가 주의 통제력을 100% 풀가동하면 일상에서 실수할 일이 없을 텐데, 왜 평소에는 통제력을 풀고 멍때리다가 실수를 할까? 이는 인지 제어(주의 집중)를 발휘하는 작업이 뇌의 포도당 대사를 엄청나게 갉아먹는 값비싼 ’비용(cognitive cost)’을 치르기 때문임.</li>
+<li>따라서 뇌는 무작정 통제력을 높이지 않음. “지금 통제력을 10% 올렸을 때 얻을 수 있는 추가적인 보상의 기대값”과 “그 통제력 발휘에 드는 생물학적 비용”을 수학적으로 저울질함. ACC는 이 두 값의 차이인 순이익(EVC) 곡선이 극대화되는 최적의 지점(피크)을 미적분학적으로 계산하여, PFC에게 “정확히 이만큼의 강도로만 통제해라”라고 세밀하게 지시하는 최적화 엔진임.</li>
+</ul></li>
+</ul>
+<p><strong>[그림 9] 갈등 순응 효과를 보여주는 전형적인 행동 데이터(RT) 그래프</strong> <img src="images/week14/Slide_009.png" class="img-fluid"></p>
+<ul>
+<li><strong>비유(악천후 속 운전대 꽉 쥐기 메커니즘)</strong>
+<ul>
+<li>맑은 날씨에 직진만 하는 뻥 뚫린 고속도로(일치 조건 연속)에서는 운전자가 핸들을 한 손으로 가볍게 잡음. 불필요한 인지적 피로(비용)를 아끼기 위함임.</li>
+<li>그러다 갑자기 비바람이 몰아치고 푹 파인 웅덩이(불일치 조건, 갈등 발생)을 덜컹 하고 밟아 차가 크게 흔들리면, ACC가 생존의 위협을 감지함.</li>
+<li>운전자는 즉각적으로 두 손으로 핸들을 꽉 쥐고 허리를 꼿꼿이 세움(PFC 통제력 대폭 상승). 흥미로운 것은 그 웅덩이를 무사히 지나친 후에도, 다음 1~2분 동안은 핸들을 꽉 쥔 긴장 상태를 스스로 유지하며 언제 튀어나올지 모를 다음 장애물에 훨씬 더 기민하게 반응(갈등 순응 효과)하게 됨. EVC 이론은 뇌가 비용 대비 효용을 계산하여 ’언제 다시 핸들을 느슨하게 풀지’를 정확히 결정하는 경제학적 원리임.</li>
+</ul></li>
+</ul>
+<section id="실습-2-2-evc-이론-기반-갈등-순응gratton-effect-시뮬레이션" class="level4">
+<h4 class="anchored" data-anchor-id="실습-2-2-evc-이론-기반-갈등-순응gratton-effect-시뮬레이션">[실습 2-2] EVC 이론 기반 갈등 순응(Gratton effect) 시뮬레이션</h4>
+<div id="2c5162b8" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np <span class="co"># 수학적 연산을 위해 넘파이 라이브러리를 불러옴. (현재 코드에선 필수적이진 않으나 확장성을 위해 포함함)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1. 시뮬레이션 파라미터 및 인지 과제 환경 셋업 ---</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 피험자가 연속으로 수행할 스트룹 과제(글자색 맞추기 등)의 총 시행 횟수를 5회로 짧게 통제함.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>n_trials <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 5번의 시행 동안 피험자에게 제시될 과제 조건의 배열 패턴을 설정함.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 0: 일치 조건(Congruent - 예: '빨강' 글자가 빨간색으로 적힘, 갈등 낮음)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 1: 불일치 조건(Incongruent - 예: '빨강' 글자가 초록색으로 적힘, 갈등 높음)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 흐름: 평온(0) -&gt; 첫 위기(1) -&gt; 예열된 상태에서 위기 방어(1) -&gt; 다시 평온(0) -&gt; 기습 위기(1)</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>trial_types <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>] </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 전전두피질(PFC)이 하향식으로 가하는 초기 통제력 가중치.</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 뇌는 에너지를 아끼려는 속성이 있으므로, 처음에는 과제가 쉬울 것이라 가정하고 0.3으로 느슨하게 시작함.</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>control_weight <span class="op">=</span> <span class="fl">0.3</span>  </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 학습률: 전대상피질(ACC)이 "갈등이 발생했다!"고 알람을 울렸을 때, </span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># PFC가 다음번 턴에 자신의 통제력을 얼마나 예민하게 끌어올릴지 결정하는 '고집 꺾기(유연성)' 파라미터.</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">0.5</span>   </span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 매 시행마다 변하는 뇌의 상태를 기록해둘 빈 리스트를 준비함.</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>history_conflict <span class="op">=</span> [] <span class="co"># 매 시행에서 발생한 갈등(스트레스) 수치를 모아둠.</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>history_control <span class="op">=</span> []  <span class="co"># 매 시행에서 뇌가 사용한 통제력(에너지) 수치를 모아둠.</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>history_rt <span class="op">=</span> []       <span class="co"># 매 시행에서 걸린 최종 반응 시간을 모아둠.</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 터미널에 시뮬레이션 결과를 깔끔한 표 형태로 출력하기 위해 헤더(머리글) 줄을 구성함.</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Trial | Task Condition | Conflict | Control W | RT (ms)"</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">55</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2. ACC 갈등 감지 및 PFC 통제력 동적 업데이트 루프 가동 ---</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 총 5번의 시행을 시간 순서대로 밟아가며, 뇌 내부의 인지 역동 과정(스트레스와 방어 사이의 핑퐁)을 추적함.</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(n_trials):</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 이번 시행(t)에서 피험자가 마주한 자극 조건(0 또는 1)을 추출함.</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    condition <span class="op">=</span> trial_types[t]</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 방금 추출한 이번 턴의 통제력(현재 뇌의 통제력)을 보관함에 가장 먼저 기록해둠.</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    history_control.append(control_weight)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [Step 1: 자극 조건에 따른 뇌 내부의 갈등 수준 계산 및 행동(RT) 도출]</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> condition <span class="op">==</span> <span class="dv">0</span>: </span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 일치 조건(0): 글자와 색상이 일치하여 자동화된 습관대로 읽으면 됨. 뇌 안의 마찰(갈등)이 거의 없음.</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        conflict <span class="op">=</span> <span class="fl">0.1</span> </span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>        cond_str <span class="op">=</span> <span class="st">"Congruent  "</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 반응 시간(RT) 연산: 기본적으로 400ms로 빠르며, 통제력이 가해질수록(주의를 집중할수록) 처리 속도가 약간 더 단축됨.</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>        rt <span class="op">=</span> <span class="dv">400</span> <span class="op">-</span> (control_weight <span class="op">*</span> <span class="dv">30</span>) </span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: </span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 불일치 조건(1): 글자(빨강)를 읽으려는 습관과 색상(초록)을 말하려는 목표가 치열하게 충돌함.</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 핵심 로직: 기본적으로 극심한 갈등(1.0)이 발생하지만, PFC의 통제력(control_weight)이 개입하여 방해 자극을 억누르고 갈등을 깎아냄.</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>        conflict <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> (control_weight <span class="op">*</span> <span class="fl">0.7</span>) </span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>        cond_str <span class="op">=</span> <span class="st">"Incongruent"</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 반응 시간 연산: 극심한 간섭으로 처리 속도가 600ms로 지연되지만, 통제력을 발휘한 만큼 지연 시간을 방어(단축)해냄.</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>        rt <span class="op">=</span> <span class="dv">600</span> <span class="op">-</span> (control_weight <span class="op">*</span> <span class="dv">180</span>)</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 이번 턴에서 뇌가 느낀 최종 갈등량과 도출된 최종 반응시간(RT)도 각각의 보관함에 기록함.</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>    history_conflict.append(conflict)</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>    history_rt.append(rt)</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 현재 시행(t)에서 발생한 모든 수치들을 표 형식에 맞춰 깔끔하게 한 줄로 출력함.</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>t<span class="op">+</span><span class="dv">1</span><span class="sc">:2d}</span><span class="ss">  |  </span><span class="sc">{</span>cond_str<span class="sc">}</span><span class="ss"> |   </span><span class="sc">{</span>conflict<span class="sc">:.2f}</span><span class="ss">   |   </span><span class="sc">{</span>control_weight<span class="sc">:.2f}</span><span class="ss">    | </span><span class="sc">{</span>rt<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># [Step 2: ACC의 갈등 모니터링 알람에 따른 t+1 시점의 PFC 통제력 업데이트]</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 방금 겪은 갈등(conflict)이 내가 쏟았던 방어력(control_weight)보다 컸다면, 다음 시행을 위해 통제력을 끌어올림(EVC 이론).</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 업데이트 델타 공식: 다음 턴 통제력 = 기존 통제력 + 학습률 * (이번에 감지된 갈등 - 기존에 쏟은 통제력)</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>    updated_control <span class="op">=</span> control_weight <span class="op">+</span> learning_rate <span class="op">*</span> (conflict <span class="op">-</span> control_weight)</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 계산된 새 통제력으로 기존 변수를 덮어씌움. 이 값은 루프가 돌아가며 '다음 시행'의 방어 기제로 사용됨.</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>    control_weight <span class="op">=</span> updated_control</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 3. 갈등 순응 효과 시뮬레이션 결과 해석 ---</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="co"># 파이썬 리스트는 인덱스가 0부터 시작함. 따라서 Trial 2의 데이터는 [1], Trial 3의 데이터는 [2]로 꺼내옴.</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">55</span>)</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 해석: Trial 2에서 처음 기습적인 불일치 조건에 당황하여 느슨한 통제력(</span><span class="sc">{</span>history_control[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">) 하에 높은 갈등(</span><span class="sc">{</span>history_conflict[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">)을 겪음."</span>)</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 그러나 그 충격(알람)의 여파로 Trial 3 진입 시 통제력이 크게 펌핑(</span><span class="sc">{</span>history_control[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss">)되었음."</span>)</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"-&gt; 결과적으로 똑같이 어려운 불일치 조건(Trial 3)임에도 불구하고 뇌의 방어력이 높아져 반응 시간이 </span><span class="sc">{</span>history_rt[<span class="dv">2</span>]<span class="sc">:.1f}</span><span class="ss">ms로 극적으로 단축되는 '그래튼 효과'를 수학적으로 재현함."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Trial | Task Condition | Conflict | Control W | RT (ms)
+-------------------------------------------------------
+   1  |  Congruent   |   0.10   |   0.30    | 391.0
+   2  |  Incongruent |   0.86   |   0.20    | 564.0
+   3  |  Incongruent |   0.63   |   0.53    | 504.6
+   4  |  Congruent   |   0.10   |   0.58    | 382.6
+   5  |  Incongruent |   0.76   |   0.34    | 538.8
+-------------------------------------------------------
+-&gt; 해석: Trial 2에서 처음 기습적인 불일치 조건에 당황하여 느슨한 통제력(0.20) 하에 높은 갈등(0.86)을 겪음.
+-&gt; 그러나 그 충격(알람)의 여파로 Trial 3 진입 시 통제력이 크게 펌핑(0.53)되었음.
+-&gt; 결과적으로 똑같이 어려운 불일치 조건(Trial 3)임에도 불구하고 뇌의 방어력이 높아져 반응 시간이 504.6ms로 극적으로 단축되는 '그래튼 효과'를 수학적으로 재현함.</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="주차-요약-및-다음-주-예고" class="level2">
+<h2 class="anchored" data-anchor-id="주차-요약-및-다음-주-예고">14주차 요약 및 다음 주 예고</h2>
+<p><strong>[그림 10] 강화학습과 인지 제어의 상호작용적 조율 과정 요약</strong> <img src="images/week14/Slide_010.png" class="img-fluid"></p>
+<ul>
+<li><strong>요약</strong>
+<ul>
+<li><strong>강화학습과 예측 오차:</strong> 중뇌 도파민 뉴런은 주관적 기대와 실제 보상의 격차를 계산하여(RPE) 대뇌에 전달하며, 이는 레스콜라-와그너 방정식 및 Q-러닝의 시간차 학습 알고리즘과 수학적으로 완벽히 매핑됨을 파이썬 시뮬레이션으로 증명함.</li>
+<li><strong>인지 제어와 갈등 역동:</strong> 자동화된 본능과 목표가 충돌하는 딜레마 상황에서, 뇌의 전대상피질(ACC)은 에너지 곱연산으로 갈등을 정량화하여 경고하고, 배외측 전전두피질(dlPFC)은 기대 가치(EVC)를 평가하여 최적의 주의 통제력을 할당함으로써 그래튼 효과와 같은 역동적 환경 적응을 이끌어냄.</li>
+</ul></li>
+<li><strong>다음 주 예고</strong>
+<ul>
+<li><strong>15주차: 시뮬레이션 데이터 분석 및 기말 프로젝트 클리닉.</strong></li>
+<li>그동안 파이썬으로 도출했던 다양한 신경망 시뮬레이션 가상 데이터(RT 분포, 학습 곡선, 갈등 에너지 궤적 등)를 실제 통계 기법으로 분석하고 시각화함.</li>
+<li>다가오는 16주차 기말 과제 발표(선택한 연구 주제의 계산 모델 시뮬레이션 결과 발표)를 위한 최종 점검을 진행할 예정이니, 각자 개발 중인 파이썬 스크립트(.py)를 반드시 지참하여 참석할 것.</li>
+<li>학습진도상 15주차에 14주차 수업을 이어가야 할 경우, 16주차 기말 과제 발표를 위한 최종 점검은 서면으로 대체. 미리 서면으로 과제 발표문을 제출할 경우, 마지막 주에 강의 담당자가 상세한 피드백을 제공할 예정.</li>
+</ul></li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
