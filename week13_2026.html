@@ -254,7 +254,7 @@ window.Quarto = {
 </ul></li>
 </ul></li>
 </ul>
-<div id="6062a244" class="cell" data-execution_count="1">
+<div id="d6e9d5d0" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
@@ -363,7 +363,7 @@ P(cat  | the) = 0.57</code></pre>
 <p><strong>[그림 5] 시뮬레이션 기반 놀라움 수치(surprisal) 산출 곡선 및 예측 읽기 시간 매핑</strong> <img src="images/week13/Slide_005.png" class="img-fluid"></p>
 <section id="실습-1-2-놀라움-값-계산-및-읽기-시간-지연-시뮬레이션" class="level4">
 <h4 class="anchored" data-anchor-id="실습-1-2-놀라움-값-계산-및-읽기-시간-지연-시뮬레이션">[실습 1-2] 놀라움 값 계산 및 읽기 시간 지연 시뮬레이션</h4>
-<div id="15467147" class="cell" data-execution_count="2">
+<div id="25dd3d95" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
@@ -534,7 +534,7 @@ P(cat  | the) = 0.57</code></pre>
 <li><strong>최종 결론:</strong> 이 한 줄의 코드는 “4차원짜리 단어 벡터(4개의 숫자)를 5번 연속으로 찍어내어, 총 5개의 단어로 구성된 1개의 가상 테스트 문장 리스트를 완성하라”는 뜻임. <span class="math inline">\(\Rightarrow\)</span> RNN의 시간 축(t=0~4)을 따라 순차적으로 입력될 5개의 징검다리를 만들어낸 것임.</li>
 </ul></li>
 </ul>
-<div id="9c45557f" class="cell" data-execution_count="3">
+<div id="f966dad1" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
@@ -634,7 +634,7 @@ Time Step 5 | 과거와 현재가 융합된 맥락 벡터:
 <li>입력 게이트(input gate, <span class="math inline">\(i_t\)</span>) <span class="math inline">\(\Rightarrow\)</span> “새로운 핵심 정보의 선별 수용”: 현재 읽은 단어 중 문장 해석에 결정적 역할을 하는 핵심 정보(예: 새로운 주어나 반전의 접속사)만 골라내어 셀 상태 고속도로에 새롭게 탑승시킴.</li>
 </ol></li>
 <li><ol start="3" type="1">
-<li>출력 게이트(iutput gate, <span class="math inline">\(o_t\)</span>) <span class="math inline">\(\Rightarrow\)</span> “현재 단어 처리를 위한 의식화”: 갱신된 장기 기억 고속도로(<span class="math inline">\(C_t\)</span>)에서 ’지금 당장 이 단어를 해석하고 다음 단어를 예측하는 데 필요한 정보’만 필터링하여 의식의 표면(은닉 상태 <span class="math inline">\(h_t\)</span>)으로 꺼내놓음.</li>
+<li>출력 게이트(output gate, <span class="math inline">\(o_t\)</span>) <span class="math inline">\(\Rightarrow\)</span> “현재 단어 처리를 위한 의식화”: 갱신된 장기 기억 고속도로(<span class="math inline">\(C_t\)</span>)에서 ’지금 당장 이 단어를 해석하고 다음 단어를 예측하는 데 필요한 정보’만 필터링하여 의식의 표면(은닉 상태 <span class="math inline">\(h_t\)</span>)으로 꺼내놓음.</li>
 </ol></li>
 </ul></li>
 <li><strong>예문:</strong> “앨리스는 [아주 길고 지루한 회의가 끝난 후], 마침내 그녀의 고양이에게 먹이를 주었다.”
@@ -721,7 +721,7 @@ Time Step 5 | 과거와 현재가 융합된 맥락 벡터:
 </ul></li>
 </ul></li>
 </ul>
-<div id="c70c9d7b" class="cell" data-execution_count="4">
+<div id="3420a7f7" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
