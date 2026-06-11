@@ -254,7 +254,7 @@ window.Quarto = {
 </ul></li>
 </ul></li>
 </ul>
-<div id="d6e9d5d0" class="cell" data-execution_count="1">
+<div id="2736f8a6" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
@@ -363,7 +363,7 @@ P(cat  | the) = 0.57</code></pre>
 <p><strong>[그림 5] 시뮬레이션 기반 놀라움 수치(surprisal) 산출 곡선 및 예측 읽기 시간 매핑</strong> <img src="images/week13/Slide_005.png" class="img-fluid"></p>
 <section id="실습-1-2-놀라움-값-계산-및-읽기-시간-지연-시뮬레이션" class="level4">
 <h4 class="anchored" data-anchor-id="실습-1-2-놀라움-값-계산-및-읽기-시간-지연-시뮬레이션">[실습 1-2] 놀라움 값 계산 및 읽기 시간 지연 시뮬레이션</h4>
-<div id="25dd3d95" class="cell" data-execution_count="2">
+<div id="2e890cf4" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
@@ -534,7 +534,7 @@ P(cat  | the) = 0.57</code></pre>
 <li><strong>최종 결론:</strong> 이 한 줄의 코드는 “4차원짜리 단어 벡터(4개의 숫자)를 5번 연속으로 찍어내어, 총 5개의 단어로 구성된 1개의 가상 테스트 문장 리스트를 완성하라”는 뜻임. <span class="math inline">\(\Rightarrow\)</span> RNN의 시간 축(t=0~4)을 따라 순차적으로 입력될 5개의 징검다리를 만들어낸 것임.</li>
 </ul></li>
 </ul>
-<div id="f966dad1" class="cell" data-execution_count="3">
+<div id="fd2688a9" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
@@ -684,44 +684,43 @@ Time Step 5 | 과거와 현재가 융합된 맥락 벡터:
 <ul>
 <li><strong>보충 해설: LSTM의 4가지 독립 연산에 대한 필요성과 가중치 행렬이 4배인 이유</strong>
 <ul>
-<li>기본 RNN은 들어오는 정보를 수동적으로 더하기만 하지만, LSTM은 정보를 능동적으로 제어하기 위해 내부적으로 <strong>4가지 독립적인 프로세스(3개의 게이트 + 1개의 정보 추출)</strong>를 가동함.</li>
+<li>기본 RNN은 들어오는 정보를 수동적으로 더하기만 하지만, LSTM은 정보를 능동적으로 제어하기 위해 내부적으로 4가지 독립적인 프로세스(3개의 게이트 + 1개의 정보 추출)를 가동함.</li>
 <li>이 4가지 연산은 완전히 독립된 연산이라서 각각 고유의 시냅스 연결 가중치(<span class="math inline">\(W\)</span>) 행렬을 따로 가져야 함. 따라서 물리적 가중치 공간의 크기가 일반 RNN의 <strong>4배</strong>가 필요함.</li>
 <li>계산 효율성을 극대화하기 위해 코드에서는 4개의 가중치 행렬을 따로 만들지 않고, 세로로 4배 길게 확장하여 하나의 거대한 행렬(<code>hidden_size * 4</code>)로 묶어 한 번에 내적(dot) 연산을 처리함.</li>
 </ul></li>
 <li><strong>왜 4개의 독립된 연산이 필요한가?</strong>
 <ul>
-<li>인간이 긴 문장을 읽을 때 머릿속 작업기억 안에서는 단순히 정보를 더하기만 하지 않음. <strong>필요 없는 과거 정보는 지우고(<span class="math inline">\(f_t\)</span>)</strong>, <strong>새로운 중요한 정보는 기억에 추가하며(<span class="math inline">\(i_t\)</span>, <span class="math inline">\(\tilde{C}_t\)</span>)</strong>, <strong>지금 당장 필요한 맥락만 의식 표면으로 꺼내는(<span class="math inline">\(o_t\)</span>)</strong> 복잡한 정보 제어가 일어남.</li>
-<li>LSTM은 이 고도의 심리적 통제 과정을 구현하기 위해 3개의 통제 밸브(게이트)와 <strong>1개의 새로운 정보 추출기</strong>를 두어 총 4개의 독립된 연산 메커니즘을 가동함.</li>
+<li>인간이 긴 문장(예: “이 영화는 영상미는 참 좋았지만, 스토리가 너무 [지루했다].”)을 읽을 때 머릿속 작업기억 안에서는 단순히 정보를 더하기만 하지 않음. <strong>필요 없는 과거 정보는 지우고(<span class="math inline">\(f_t\)</span>)</strong>, <strong>새로운 중요한 정보는 기억에 추가하며(<span class="math inline">\(i_t\)</span>, <span class="math inline">\(\tilde{C}_t\)</span>)</strong>, <strong>지금 당장 필요한 맥락만 의식 표면으로 꺼내는(<span class="math inline">\(o_t\)</span>)</strong> 복잡한 정보 제어가 일어남.</li>
+<li>LSTM은 이 고도의 심리적 독해 과정을 구현하기 위해 3개의 통제 밸브(게이트)와 <strong>1개의 새로운 정보 추출기</strong>를 두어 총 4개의 독립된 연산 메커니즘을 가동함.</li>
 </ul></li>
 <li><strong>독립된 4가지 연산의 정체와 역할</strong>
 <ul>
-<li><strong>망각 게이트(<span class="math inline">\(f_t\)</span>):</strong> 기억 유통기한 관리자
-<ul>
-<li>수학적 특징: 연산 후 시그모이드 함수를 통과하여 <code>0.0~1.0</code> 사이의 값을 가짐.</li>
+<li><strong>망각 게이트(<span class="math inline">\(f_t\)</span>):</strong> 기억 유통기한 관리자</li>
+<li>수학적 특징: 연산 후 시그모이드 함수를 통과하여 <code>0.0~1.0</code> 사이의 비율 값을 가짐.</li>
 <li>역할: 과거의 장기 기억 컨베이어 벨트(셀 상태)에 남아 있는 정보 중 “더 이상 쓸모없어져서 버릴 정보”가 무엇인지 결정함.</li>
-<li>예시: 문장에서 주어가 바뀌었거나, 수식해주는 부사구가 끝나서 더 이상 기억할 필요가 없을 때 밸브를 0.0에 가깝게 닫아 기억을 청소하고 새로운 인지 공간을 확보함.</li>
+<li><strong>문장 처리(NLP) 관점 예시:</strong> “영상미는 참 좋았지만,”까지 읽고 나서 “스토리가”로 화제가 전환되는 순간, 뇌는 앞서 유지하던 ’긍정적인 뉘앙스’의 유통기한이 끝났다고 판단함. 이에 따라 망각 밸브를 0.0에 가깝게 닫아 과거의 맥락 비중을 확 줄이고, 새로운 평가(스토리)를 받아들일 빈 공간을 확보함.</li>
 </ul></li>
-<li><strong>입력 게이트(<span class="math inline">\(i_t\)</span>):</strong> 정보 진입로 차단기
+<li><strong>후보 셀 상태(candidate cell state, <span class="math inline">\(\tilde{C}_t\)</span> 실습 2-2 코드의 <code>C_bar</code>):</strong> 새로운 정보(의미 덩어리) 추출기
 <ul>
-<li>수학적 특징: 연산 후 시그모이드 함수를 통과하여 <code>0.0~1.0</code> 사이의 값을 가짐.</li>
-<li>역할: 방금 읽은 현재 단어의 정보 중 <strong>얼마나 많은 양을 장기 기억 컨베이어 벨트에 새로 태울지</strong> 그 진입 비율을 결정함.</li>
-<li>역할의 중요성: 이 게이트가 없다면 문맥에 상관없는 무의미한 조사나 노이즈 정보까지 장기 기억을 오염시키게 됨. 이를 차단하는 방어벽임.</li>
+<li>수학적 특징: 연산 후 하이퍼볼릭 탄젠트(<span class="math inline">\(\tanh\)</span>) 함수를 통과하여 <code>-1.0~1.0</code> 사이의 압축된 값과 방향을 가짐.</li>
+<li>역할: 과거 맥락과 현재 읽은 단어를 조합하여 <strong>이번 턴에 새롭게 깨달은 순수한 핵심 사실/정보</strong> 그 자체를 의미함. 게이트가 ’밸브’라면, 후보 셀 상태는 밸브를 통과하기 위해 대기 중인 ’내용물(기획안 초안)’임.</li>
+<li><strong>문장 처리(NLP) 관점 예시:</strong> 과거의 앞선 맥락(“스토리가 너무…”)과 방금 눈으로 읽은 문장의 마지막 단어(“지루했다”)를 융합함. 그 결과, <strong>아! 결국 이 영화는 노잼이라는 뜻이구나!</strong> 하는 새로운 의미 덩어리가 추출됨(영화에 대한 강력한 부정적 평가이므로 -0.9와 같은 뚜렷한 방향과 크기를 가짐).</li>
 </ul></li>
-<li><strong>후보 셀 상태(candidate cell state, <span class="math inline">\(\tilde{C}_t\)</span> 실습 2-2 코드의 <code>C_bar</code>):</strong> 새로운 정보 추출기
+<li><strong>입력 게이트(<span class="math inline">\(i_t\)</span>):</strong> 정보 진입로 차단기(중요도 필터)
 <ul>
-<li>수학적 특징: 연산 후 하이퍼볼릭 탄젠트(<span class="math inline">\(\tanh\)</span>) 함수를 통과하여 <code>-1.0~1.0</code> 사이의 압축된 값을 가짐.</li>
-<li>역할: 과거 맥락과 현재 읽은 단어를 조합하여 <strong>이번 턴에 새롭게 깨달은 순수한 핵심 사실/정보</strong> 그 자체를 의미함.</li>
-<li>연결 원리: 이 새 정보(<span class="math inline">\(\tilde{C}_t\)</span>)에 입력 게이트의 합격 비율(<span class="math inline">\(i_t\)</span>)이 곱해져서, 최종적으로 장기 기억 벨트에 누적(<span class="math inline">\(+\)</span>) 업데이트됨.</li>
+<li>수학적 특징: 연산 후 시그모이드 함수를 통과하여 <code>0.0~1.0</code> 사이의 비율 값을 가짐.</li>
+<li>역할: 방금 파악한 이 새로운 정보(<span class="math inline">\(\tilde{C}_t\)</span>) 중 <strong>얼마나 많은 양을 장기 기억 컨베이어 벨트에 새로 태울지</strong> 그 진입 비율(합격률)을 결정함.</li>
+<li><strong>문장 처리(NLP) 관점 예시:</strong> 방금 읽은 단어가 전체 문맥에서 얼마나 중요한지를 판별함. “지루했다”처럼 리뷰의 결론을 뒤집는 핵심 서술어를 읽었을 때는 비율을 0.95(95%)로 활짝 열어주지만, “은/는” 같은 단순 조사나 “너무” 같은 부사를 읽었을 때는 중요도가 낮다고 판단하여 0.05(5%)로 문을 닫아버림.</li>
+<li><strong>최종 결합 원리(<span class="math inline">\(\tilde{C}_t \times i_t\)</span>):</strong> 새롭게 파악한 뚜렷한 부정적 뉘앙스(-0.9)에 핵심 단어로서의 높은 합격률(95%)이 곱해져서, 최종적으로 뇌의 장기 기억 장부(셀 상태)에 “이 리뷰는 악평이다!”라는 굵직한 결론이 업데이트됨. 자잘한 조사들은 이 필터를 통과하지 못해 장기 기억 공간을 오염시키지 않음.</li>
 </ul></li>
 <li><strong>출력 게이트(<span class="math inline">\(o_t\)</span>):</strong> 의식 표면 필터
 <ul>
-<li>수학적 특징: 연산 후 시그모이드 함수를 통과하여 <code>0.0~1.0</code> 사이의 값을 가짐.</li>
+<li>수학적 특징: 연산 후 시그모이드 함수를 통과하여 <code>0.0~1.0</code> 사이의 비율 값을 가짐.</li>
 <li>역할: 업데이트가 모두 완료된 든든한 장기 기억(셀 상태) 중, <strong>지금 당장 이 순간 의식의 표면(은닉 상태)으로 꺼내어 다음 단어를 예측하는 데 쓸 정보</strong>가 무엇인지 필터링함.</li>
-<li>의미: 깊은 무의식(장기 기억)에 저장된 방대한 맥락 중, 바로 다음 단어의 통사/의미적 기대를 실시간으로 계산하는 데 필요한 핵심 액기스만 의식 위로 노출시킴.</li>
-</ul></li>
+<li><strong>문장 처리(NLP) 관점 예시:</strong> 예를 들어, 방금 “너무”라는 단어를 읽은 시점이라고 가정해보자. 깊은 무의식(장기 기억)에 저장된 방대한 전체 맥락 중에서, ‘지금은 정도(degree)를 강하게 수식해주는 상태다’라는 통사적 기대만을 의식 표면 위로 끌어올림. 이를 통해 우리의 뇌는 다음에 ’지루했다’, ‘재미없다’ 등의 형용사가 등장할 것을 실시간으로 예측해냄.</li>
 </ul></li>
 </ul>
-<div id="3420a7f7" class="cell" data-execution_count="4">
+<div id="c1cb74f5" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =========================================================================</span></span>
